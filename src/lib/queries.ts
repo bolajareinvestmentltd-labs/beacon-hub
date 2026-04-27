@@ -2,24 +2,25 @@
 import { articles, horoscopes, listings } from "../db/schema";
 import { desc, eq } from "drizzle-orm";
 
-// 1. Fetch the absolute newest article (For your Hero Section / ARABA Ads)
+// 1. PINNED HERO: Fetch the ARABA Campaign explicitly
 export async function getFeaturedArticle() {
   const data = await db.select()
     .from(articles)
-    .orderBy(desc(articles.createdAt))
+    .where(eq(articles.slug, "araba-2027-vision"))
     .limit(1);
-  return data[0]; // Returns the single newest post
+  return data[0]; 
 }
 
 // 2. Fetch the latest general briefings (For the Main Column)
 export async function getLatestBriefings() {
   return await db.select()
     .from(articles)
+    .where(eq(articles.category, "Dev Log")) // Just an example to separate them
     .orderBy(desc(articles.createdAt))
-    .limit(5); // Grabs the last 5 articles
+    .limit(5); 
 }
 
-// 3. Fetch articles by specific category (e.g., "Politics" or "Tech")
+// 3. Fetch articles by specific category
 export async function getArticlesByCategory(categoryName: string) {
   return await db.select()
     .from(articles)
@@ -27,7 +28,7 @@ export async function getArticlesByCategory(categoryName: string) {
     .orderBy(desc(articles.createdAt));
 }
 
-// 4. Fetch the latest active Deals (Cars/Houses)
+// 4. Fetch the latest active Deals
 export async function getActiveListings() {
   return await db.select()
     .from(listings)
