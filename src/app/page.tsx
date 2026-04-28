@@ -1,4 +1,5 @@
-﻿import Link from "next/link";
+﻿import NewsletterForm from "@/components/NewsletterForm";
+import Link from "next/link";
 import { getFeaturedArticle, getLatestBriefings } from "../lib/queries";
 
 export default async function Home() {
@@ -80,10 +81,7 @@ export default async function Home() {
             <h3 className="text-lg font-bold text-white mb-2">The Daily Architect</h3>
             <p className="text-sm text-slate-400 mb-6">Get daily developer logs, market trends, and horoscopes sent directly to your inbox.</p>
             
-            <form className="flex flex-col gap-3">
-              <input type="email" placeholder="Enter your email address..." className="bg-slate-950 border border-slate-700 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all placeholder:text-slate-600" required />
-              <button type="button" className="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 rounded-lg text-sm transition-colors shadow-lg shadow-indigo-500/20">Subscribe via Magic Link</button>
-            </form>
+            <NewsletterForm />
           </div>
 
         </aside>
