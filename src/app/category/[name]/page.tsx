@@ -35,7 +35,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ name:
                     {article.category}
                   </span>
                   <span className="text-xs text-slate-400 font-medium">
-                    {new Date(article.createdAt).toLocaleDateString()}
+                   {new Date(article.createdAt ?? new Date()).toLocaleDateString()}
                   </span>
                 </div>
                 <h2 className="font-playfair text-3xl font-bold text-[#0A1128] group-hover:text-[#D4AF37] transition-colors leading-snug">

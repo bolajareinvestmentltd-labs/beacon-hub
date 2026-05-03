@@ -5,6 +5,7 @@ import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import FloatingNav from "@/components/FloatingNav";
 import MobileDock from "@/components/MobileDock";
+import { ThemeProvider } from "@/components/ThemeProvider"
 
 // Load Inter for standard reading text
 const inter = Inter({ subsets: ["latin"] });

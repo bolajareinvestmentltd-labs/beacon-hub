@@ -8,7 +8,7 @@ export const articles = pgTable('articles', {
   coverImage: text('cover_image'),
   content: text('content').notNull(),
   author: text('author').default("Senior Architect"),
-  createdAt: timestamp('created_at').defaultNow(),
+ createdAt: timestamp('created_at').defaultNow().notNull(), // Add .notNull() here
 });
 
 // 2. The Astrology Engine
