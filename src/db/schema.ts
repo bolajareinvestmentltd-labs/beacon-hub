@@ -1,5 +1,4 @@
-﻿import { pgTable, serial, text, timestamp, boolean, integer } from 'drizzle-orm/pg-core';
-
+﻿import { pgTable, serial, text, varchar, timestamp, boolean, integer } from "drizzle-orm/pg-core";
 // 1. The Content Hub (News & Dev Logs)
 export const articles = pgTable('articles', {
   id: serial('id').primaryKey(),
@@ -33,9 +32,8 @@ export const listings = pgTable('listings', {
 });
 
 // 4. The Audience (Resend Magic Links)
-export const subscribers = pgTable('subscribers', {
-  id: serial('id').primaryKey(),
-  email: text('email').notNull().unique(),
-  isActive: boolean('is_active').default(true),
-  joinedAt: timestamp('joined_at').defaultNow(),
+export const subscribers = pgTable("subscribers", {
+  id: serial("id").primaryKey(),
+  email: varchar("email", { length: 255 }).notNull().unique(),
+  subscribedAt: timestamp("subscribed_at").defaultNow(),
 });

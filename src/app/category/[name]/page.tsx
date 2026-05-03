@@ -1,49 +1,60 @@
 ﻿import { getArticlesByCategory } from "../../../lib/queries";
 import Link from "next/link";
+import SubNavigation from "@/components/SubNavigation";
 
-// ⚡ NEXT.JS 15 UPDATE: params must be a Promise
 export default async function CategoryPage({ params }: { params: Promise<{ name: string }> }) {
   const resolvedParams = await params;
-  
-  // The URL gives us "%20" for spaces, so we decode it (e.g., "Dev Log")
   const categoryName = decodeURIComponent(resolvedParams.name);
   const articles = await getArticlesByCategory(categoryName);
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
-      <div className="flex items-center gap-4 mb-10 border-b border-slate-800 pb-6">
-        <h1 className="text-3xl md:text-5xl font-extrabold text-white capitalize">
-          {categoryName} Desk
-        </h1>
-        <span className="bg-indigo-600/20 text-indigo-400 text-sm font-bold px-3 py-1 rounded-full border border-indigo-500/30">
-          {articles.length} Briefings
-        </span>
-      </div>
+    <>
+      <SubNavigation />
+      
+      <div className="max-w-4xl mx-auto py-12 px-4 pb-32">
+        <header className="mb-12 border-b-2 border-[#0A1128] pb-6">
+          <h1 className="font-playfair text-4xl md:text-5xl font-black text-[#0A1128] mb-4">
+            {categoryName} Desk
+          </h1>
+          <p className="text-slate-500 font-medium">
+            The latest updates and briefings from the {categoryName} sector.
+          </p>
+        </header>
 
-      {articles.length === 0 ? (
-        <div className="text-center py-20 bg-slate-900/50 rounded-2xl border border-slate-800">
-          <p className="text-slate-400 text-lg">No reports filed under {categoryName} yet.</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {articles.map((post) => (
-            <Link href={`/read/${post.slug}`} key={post.id} className="block">
-              <article className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 hover:border-indigo-500/50 transition-colors h-full flex flex-col group cursor-pointer shadow-lg">
-                <h3 className="text-xl font-bold text-slate-100 mb-3 group-hover:text-indigo-400 transition-colors">
-                  {post.title}
-                </h3>
-                <p className="text-slate-400 mb-4 line-clamp-3 flex-grow">
-                  {post.content}
-                </p>
-                <div className="text-sm text-slate-500 font-medium group-hover:text-indigo-400 transition-colors flex items-center justify-between mt-4">
-                  <span>Read Article</span>
-                  <span className="text-xs uppercase bg-slate-800 px-2 py-1 rounded text-slate-300">By {post.author}</span>
+        {articles.length === 0 ? (
+          <div className="text-center py-20 bg-slate-50 rounded-2xl border border-slate-200">
+            <h2 className="text-xl font-bold text-[#0A1128] mb-2">No Reports Filed</h2>
+            <p className="text-slate-500">Check back shortly for breaking updates.</p>
+          </div>
+        ) : (
+          <div className="flex flex-col divide-y divide-slate-200">
+            {articles.map((article) => (
+              <Link href={`/read/${article.slug}`} key={article.id} className="py-8 group flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-bold uppercase tracking-widest text-[#D4AF37]">
+                    {article.category}
+                  </span>
+                  <span className="text-xs text-slate-400 font-medium">
+                    {new Date(article.createdAt).toLocaleDateString()}
+                  </span>
                 </div>
-              </article>
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
+                <h2 className="font-playfair text-3xl font-bold text-[#0A1128] group-hover:text-[#D4AF37] transition-colors leading-snug">
+                  {article.title}
+                </h2>
+                <p className="text-slate-600 line-clamp-3 text-base mt-2 leading-relaxed">
+                  {article.content}
+                </p>
+                <div className="text-sm font-semibold text-[#0A1128] mt-4 flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-[#0A1128] text-[#FAFAFA] flex items-center justify-center text-[10px]">
+                    {article.author?.charAt(0) || "P"}
+                  </span>
+                  {article.author}
+                </div>
+              </Link>
+            ))}
+          </div>
+        )}
+      </div>
+    </>
   );
 }

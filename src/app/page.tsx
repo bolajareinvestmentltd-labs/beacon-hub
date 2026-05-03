@@ -1,91 +1,135 @@
-﻿import NewsletterForm from "@/components/NewsletterForm";
+﻿import { db } from "@/db";
+import { articles } from "@/db/schema";
+import { desc } from "drizzle-orm";
 import Link from "next/link";
-import { getFeaturedArticle, getLatestBriefings } from "../lib/queries";
+import NewsletterModal from "@/components/NewsletterModal";
+
+export const revalidate = 60; 
 
 export default async function Home() {
-  const featuredPost = await getFeaturedArticle();
-  const latestPosts = await getLatestBriefings();
+  // Fetch the latest 30 articles across the whole network
+  const allArticles = await db.query.articles.findMany({
+    orderBy: [desc(articles.createdAt)],
+    limit: 30,
+  });
+
+  // The absolute newest article gets the Hero Spotlight
+  const heroArticle = allArticles[0];
+  
+  // The rest get sorted into their specific desks
+  const restArticles = allArticles.slice(1);
+  
+  // Helper function to pull exactly 3 articles for any given category
+  const getDesk = (categoryName: string) => {
+    return restArticles.filter(a => a.category === categoryName).slice(0, 3);
+  };
+
+  // Define our new media empire desks
+  const desks = [
+    { name: "Naija Politics", data: getDesk("Naija Politics") },
+    { name: "Global Politics", data: getDesk("Global Politics") },
+    { name: "Tech & Startups", data: getDesk("Tech & Startups") },
+    { name: "Wealth & Real Estate", data: getDesk("Wealth & Real Estate") },
+    { name: "Sports", data: getDesk("Sports") },
+    { name: "Culture", data: getDesk("Culture") },
+    { name: "Astro Desk", data: getDesk("Astro Desk") },
+  ];
 
   return (
-    <div className="flex flex-col gap-12">
-      
-      {/* HERO SECTION: Sticky Political Post */}
-      {featuredPost && (
-        <Link href={`/read/${featuredPost.slug}`} className="relative w-full h-80 md:h-[400px] rounded-3xl overflow-hidden bg-slate-900 border border-slate-800 flex items-end p-6 md:p-10 group cursor-pointer block hover:ring-2 hover:ring-indigo-500 transition-all">
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-900/60 to-transparent z-10"></div>
-          
-          <div className="relative z-20 max-w-3xl w-full">
-            <div className="flex justify-between items-center mb-4">
-              <span className="bg-indigo-600 text-white text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider shadow-[0_0_10px_rgba(79,70,229,0.5)]">
-                LATEST UPDATE
+    <main className="min-h-screen bg-[#FAFAFA] text-slate-900 pb-20">
+      {/* THE 15-SECOND TRAP */}
+      <NewsletterModal />
+
+      {/* TOP TICKER & BRANDING */}
+      <div className="w-full bg-slate-900 text-white text-[10px] sm:text-xs py-2 px-4 uppercase tracking-widest flex flex-col sm:flex-row justify-between items-center gap-2">
+        <span>Beacon-Hub Global Intelligence</span>
+        <span className="opacity-70 text-center">Lagos • London • New York</span>
+      </div>
+
+      {/* THE GLOBAL NAV BAR (Scrollable on mobile) */}
+      <nav className="border-b border-slate-200 sticky top-0 bg-[#FAFAFA]/90 backdrop-blur-md z-40">
+        <div className="max-w-7xl mx-auto px-4 overflow-x-auto hide-scrollbar">
+          <ul className="flex items-center gap-6 sm:gap-8 py-4 whitespace-nowrap text-xs font-bold uppercase tracking-widest text-slate-500">
+            {desks.map((desk) => (
+              <li key={desk.name}>
+                <Link href={`/category/${desk.name.replace(/ & /g, '-').replace(/ /g, '-')}`} className="hover:text-slate-900 transition-colors">
+                  {desk.name}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </nav>
+
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        
+        {/* HERO SPOTLIGHT (The absolute latest breaking news) */}
+        {heroArticle && (
+          <div className="mb-16 border-b-2 border-slate-900 pb-12">
+            <div className="flex items-center gap-3 mb-4">
+              <span className="bg-red-600 text-white text-[10px] font-bold px-2 py-1 uppercase tracking-wider animate-pulse">
+                Breaking
               </span>
-              <span className="text-indigo-400 text-sm font-bold opacity-0 group-hover:opacity-100 transition-opacity flex items-center gap-1">
-                READ MORE.. <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+              <span className="text-slate-500 text-xs font-bold uppercase tracking-widest">
+                {heroArticle.category}
               </span>
             </div>
-            
-            <h1 className="text-3xl md:text-5xl font-extrabold text-white leading-tight mb-4 group-hover:text-indigo-300 transition-colors">
-              {featuredPost.title}
-            </h1>
-            <p className="text-slate-300 font-medium flex items-center gap-2">
-              <span className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-xs border border-slate-700 uppercase font-bold text-emerald-400">
-                P
-              </span>
-              By {featuredPost.author} • Kwara State
+            <Link href={`/read/${heroArticle.slug}`} className="group">
+              <h1 className="font-serif text-4xl sm:text-6xl md:text-7xl font-black text-slate-900 leading-tight mb-6 group-hover:text-slate-600 transition-colors">
+                {heroArticle.title}
+              </h1>
+            </Link>
+            <p className="font-sans text-base sm:text-lg text-slate-600 max-w-3xl leading-relaxed mb-6 line-clamp-3">
+              {heroArticle.content}
             </p>
+            <div className="flex items-center gap-2 text-xs text-slate-400 font-bold uppercase tracking-wider">
+              <span>By {heroArticle.author}</span>
+              <span>•</span>
+              <span>{new Date(heroArticle.createdAt).toLocaleDateString()}</span>
+            </div>
           </div>
-        </Link>
-      )}
+        )}
 
-      {/* SPLIT BODY LAYOUT */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
-        {/* MAIN COLUMN (Dynamic Articles Feed) */}
-        <div className="lg:col-span-2 flex flex-col gap-8">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-            <h2 className="text-2xl font-bold text-white">Latest Briefings</h2>
-            <Link href="/category/all" className="text-sm text-indigo-400 hover:text-indigo-300 font-medium">View All →</Link>
-          </div>
-          
-          {latestPosts.map((post) => (
-            <article key={post.id} className="bg-slate-900/50 border border-slate-800 rounded-2xl p-6 hover:border-indigo-500/50 transition-colors cursor-pointer group">
-              <span className="text-indigo-400 text-xs font-bold uppercase tracking-wider mb-3 inline-block">
-                {post.category}
-              </span>
-              <h3 className="text-xl font-bold text-slate-100 mb-3 group-hover:text-indigo-400 transition-colors">
-                {post.title}
-              </h3>
-              <p className="text-slate-400 mb-4 line-clamp-2">
-                {post.content}
-              </p>
-              <div className="text-sm text-slate-500 font-medium group-hover:text-indigo-400 transition-colors">READ MORE..</div>
-            </article>
-          ))}
+        {/* THE DESKS (Iterating through all our new categories) */}
+        <div className="flex flex-col gap-16">
+          {desks.map((desk) => {
+            // If the AI hasn't fetched articles for this desk yet, don't show the empty section
+            if (desk.data.length === 0) return null;
+
+            return (
+              <section key={desk.name} className="border-t border-slate-200 pt-8">
+                <div className="flex justify-between items-end mb-8">
+                  <h2 className="font-serif text-3xl font-black text-slate-900">
+                    {desk.name}
+                  </h2>
+                  <Link href={`/category/${desk.name.replace(/ & /g, '-').replace(/ /g, '-')}`} className="text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-slate-900 transition-colors">
+                    View All →
+                  </Link>
+                </div>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                  {desk.data.map((article) => (
+                    <article key={article.id} className="group flex flex-col">
+                      <Link href={`/read/${article.slug}`}>
+                        <h3 className="font-serif text-xl font-bold text-slate-900 leading-snug mb-3 group-hover:underline decoration-2 underline-offset-4">
+                          {article.title}
+                        </h3>
+                      </Link>
+                      <p className="font-sans text-sm text-slate-600 line-clamp-3 mb-4 flex-grow">
+                        {article.content}
+                      </p>
+                      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">
+                        {new Date(article.createdAt).toLocaleDateString()}
+                      </span>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            );
+          })}
         </div>
 
-        {/* STICKY SIDEBAR (Ads & Subscriptions) */}
-        <aside className="flex flex-col gap-8">
-          
-          <div className="bg-gradient-to-br from-slate-900 to-slate-950 border border-slate-800 rounded-2xl p-6 relative overflow-hidden group cursor-pointer shadow-lg">
-            {/* SPONSOR TAG: Commented out. Uncomment the div below to toggle back on later */}
-            {/* <div className="absolute top-0 right-0 bg-slate-800 text-slate-400 text-[10px] uppercase px-2 py-1 rounded-bl-lg font-bold z-10">Sponsored</div> */}
-            
-            <div className="w-12 h-12 bg-slate-800 rounded-full mb-4 flex items-center justify-center text-xl">🚗</div>
-            <h3 className="text-lg font-bold text-white mb-2 group-hover:text-indigo-400 transition-colors">Upgrade Your Ride Today</h3>
-            <p className="text-sm text-slate-400 mb-6">Beacon-Hub Auto: Trade your old model for a 2026 upgrade. Zero hidden fees. Instant valuation.</p>
-            <div className="inline-block bg-white text-slate-950 px-4 py-2 rounded-lg text-sm font-bold w-full text-center hover:bg-slate-200 transition-colors">View Inventory</div>
-          </div>
-
-          <div className="bg-slate-900 border border-indigo-600/30 rounded-2xl p-6 shadow-[0_0_30px_rgba(79,70,229,0.05)] relative overflow-hidden">
-            <div className="absolute -top-10 -right-10 w-32 h-32 bg-indigo-600/20 rounded-full blur-3xl pointer-events-none"></div>
-            <h3 className="text-lg font-bold text-white mb-2">The Daily Architect</h3>
-            <p className="text-sm text-slate-400 mb-6">Get daily developer logs, market trends, and horoscopes sent directly to your inbox.</p>
-            
-            <NewsletterForm />
-          </div>
-
-        </aside>
       </div>
-    </div>
+    </main>
   );
 }

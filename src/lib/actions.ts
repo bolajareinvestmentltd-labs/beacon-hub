@@ -1,9 +1,11 @@
 ﻿"use server";
 
 import { db } from "../db";
-import { articles } from "../db/schema";
+import { articles, subscribers } from "../db/schema";
+import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { Resend } from "resend";
 
 export async function publishArticle(formData: FormData) {
   // 1. Grab the data from the form
@@ -36,7 +38,6 @@ export async function publishArticle(formData: FormData) {
 }
 
 // --- EMAIL NEWSLETTER ENGINE ---
-import { Resend } from "resend";
 
 // Initialize Resend with the key from your .env.local
 const resend = new Resend(process.env.RESEND_API_KEY);
@@ -47,6 +48,10 @@ export async function subscribeUser(formData: FormData) {
   if (!email) return { error: "Email is required" };
 
   try {
+    // 1. Save to Neon Database
+    await db.insert(subscribers).values({ email });
+
+    // 2. Fire the Resend Welcome Email
     await resend.emails.send({
       from: "Beacon-Hub <onboarding@resend.dev>", 
       to: email, // ⚠️ NOTE: On Resend's free tier, you can only send to your OWN verified email address!
@@ -63,7 +68,29 @@ export async function subscribeUser(formData: FormData) {
     });
 
     return { success: true };
+  } catch (error: any) {
+    // Gracefully handle duplicate emails
+    if (error.code === '23505') {
+      return { error: "You are already on the intelligence list." };
+    }
+    console.error("Subscription Error:", error);
+    return { error: "Failed to connect to the network. Try again later." };
+  }
+}
+
+// --- ARTICLE DELETION ENGINE ---
+
+export async function deleteArticle(id: number) {
+  try {
+    await db.delete(articles).where(eq(articles.id, id));
+    
+    // Instantly refresh the admin page and the homepage so the deleted article vanishes everywhere
+    revalidatePath("/admin");
+    revalidatePath("/");
+    revalidatePath("/category/[name]", "page");
+    
+    return { success: true };
   } catch (error) {
-    return { error: "Failed to send email." };
+    return { error: "Failed to delete article" };
   }
 }
