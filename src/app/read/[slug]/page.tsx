@@ -1,4 +1,4 @@
-﻿import { getArticleBySlug } from "../../../lib/queries";
+﻿import { getArticleBySlug } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
@@ -7,60 +7,70 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const resolvedParams = await params;
   const article = await getArticleBySlug(resolvedParams.slug);
 
+  // If the URL is wrong or article doesn't exist, Next.js automatically shows a 404
   if (!article) {
     notFound();
   }
 
   return (
-    <article className="max-w-3xl mx-auto py-12 px-4 pb-32">
-      {/* Back Button */}
-      <Link 
-        href={`/category/${article.category}`} 
-        className="inline-flex items-center gap-2 text-sm font-bold text-slate-500 hover:text-[#0A1128] transition-colors mb-8 uppercase tracking-widest"
-      >
-        <ArrowLeft size={16} />
-        Back to {article.category}
-      </Link>
+    <article className="w-full max-w-3xl mx-auto py-6 md:py-10">
+      
+      {/* Utility Header */}
+      <div className="mb-8">
+        <Link 
+          href="/" 
+          className="inline-flex items-center text-xs font-bold uppercase tracking-widest text-slate-500 hover:text-[#E2725B] transition-colors"
+        >
+          <ArrowLeft size={16} className="mr-2" />
+          Back to Briefing
+        </Link>
+      </div>
 
-      {/* Header Info */}
-      <div className="mb-10">
-        <div className="flex items-center gap-3 mb-6">
-          <span className="text-xs font-bold uppercase tracking-widest text-[#D4AF37] bg-[#D4AF37]/10 px-3 py-1 rounded-full">
+      {/* Article Header */}
+      <header className="mb-10">
+        <div className="flex items-center gap-3 mb-4">
+          <span className="text-xs font-bold text-[#3A7B7A] uppercase tracking-widest">
             {article.category}
-          </span>
-          <span className="text-xs text-slate-500 font-medium tracking-wide">
-            {new Date(article.createdAt).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </span>
         </div>
 
-        <h1 className="font-playfair text-4xl md:text-5xl lg:text-6xl font-black text-[#0A1128] leading-[1.1] mb-8">
+        <h1 className="text-4xl md:text-5xl lg:text-6xl font-black font-playfair leading-[1.1] mb-6 text-black dark:text-[#F9F6F0]">
           {article.title}
         </h1>
 
-        <div className="flex items-center justify-between border-t border-b border-slate-200 py-4">
-          <div className="flex items-center gap-3 text-sm font-semibold text-[#0A1128]">
-            <span className="w-10 h-10 rounded-full bg-[#0A1128] text-[#FAFAFA] flex items-center justify-center text-sm">
-              {article.author?.charAt(0) || "P"}
-            </span>
-            <div>
-               <p className="m-0 leading-none mb-1">By {article.author}</p>
-               <p className="text-xs text-slate-500 font-normal m-0 leading-none">Beacon-Hub {article.category} Desk</p>
-            </div>
+        <p className="text-lg md:text-xl text-slate-600 dark:text-slate-400 leading-relaxed mb-6 font-medium">
+          {article.excerpt}
+        </p>
+
+        <div className="flex items-center gap-4 py-4 border-y border-black/10 dark:border-white/10">
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
+            By <span className="text-black dark:text-[#F9F6F0]">{article.author}</span>
+          </div>
+          <span className="text-slate-300 dark:text-slate-600">&bull;</span>
+          <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
+            {article.publishedAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </div>
         </div>
+      </header>
+
+      {/* Featured Image */}
+      {article.coverImage && (
+        <div className="w-full h-[250px] md:h-[400px] mb-10 bg-slate-200 dark:bg-white/5 rounded-xl overflow-hidden">
+          <img 
+            src={article.coverImage} 
+            alt={article.title} 
+            className="w-full h-full object-cover"
+          />
+        </div>
+      )}
+
+      {/* Article Body */}
+      {/* Note: We use prose class if you have @tailwindcss/typography installed, otherwise standard styling */}
+      <div className="text-lg text-slate-800 dark:text-slate-300 leading-loose space-y-6">
+        <p>{article.content}</p>
+        {/* If the content was HTML from a rich text editor, you'd use dangerouslySetInnerHTML here */}
       </div>
 
-      {/* Article Content */}
-      <div className="prose prose-lg prose-slate max-w-none text-[#0A1128] leading-loose">
-        <p className="text-xl md:text-2xl text-slate-600 leading-relaxed font-playfair mb-8">
-          {article.content}
-        </p>
-        
-        {/* Placeholder for future rich text rendering */}
-        <p className="text-slate-600">
-          (This is where the full rich-text content will render once we implement the advanced CMS editor. For now, we are displaying the raw content snippet.)
-        </p>
-      </div>
     </article>
   );
 }
