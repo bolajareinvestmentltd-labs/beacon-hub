@@ -1,78 +1,118 @@
-"use client";
+﻿"use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Home, TrendingUp, Sparkles, Bookmark, Menu, X, ChevronRight } from "lucide-react";
 
 export default function MobileDock() {
+  const pathname = usePathname();
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  const desks = [
-    "Naija Politics",
-    "Global Politics",
-    "Tech & Startups",
-    "Wealth & Real Estate",
-    "Sports",
-    "Culture",
+  useEffect(() => { setIsDrawerOpen(false); }, [pathname]);
+
+  useEffect(() => {
+    if (isDrawerOpen) document.body.style.overflow = 'hidden';
+    else document.body.style.overflow = 'unset';
+    return () => { document.body.style.overflow = 'unset'; }
+  }, [isDrawerOpen]);
+
+  // Bottom Dock Core Navigation
+  const navItems = [
+    { name: "Home", href: "/", icon: Home },
+    { name: "Trending", href: "/category/trending", icon: TrendingUp },
+    { name: "Astro", href: "/horoscopes", icon: Sparkles },
+    { name: "Saved", href: "/deals", icon: Bookmark }, 
+  ];
+
+  // The Hindustan Times Screenshot Blueprint Integration
+  const primaryCategories = [
+    "Global News", "Naija Politics", "Entertainment", "Trending", 
+    "Videos", "Photos", "Sports", "Real Estate",
+    "Astrology", "Lifestyle", "Education", "Cities"
+  ];
+
+  const editorialLinks = [
+    "Daily Digest", "Quickreads", "Opinion", "Analysis", "Science", "Tech & Startups"
   ];
 
   return (
     <>
-      {/* THE SLIDE-UP DRAWER */}
-      {/* Background Overlay */}
-      {isDrawerOpen && (
-        <div 
-          className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 md:hidden transition-opacity"
-          onClick={() => setIsDrawerOpen(false)}
-        />
-      )}
-      
-      {/* Drawer Sheet */}
-      <div 
-        className={`fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl z-50 md:hidden transform transition-transform duration-300 ease-out ${
-          isDrawerOpen ? "translate-y-0" : "translate-y-full"
-        }`}
-      >
-        <div className="p-6 pb-24">
-          <div className="w-12 h-1.5 bg-slate-200 rounded-full mx-auto mb-6" />
-          <h3 className="font-serif text-2xl font-black text-slate-900 mb-6">All Desks</h3>
-          <ul className="flex flex-col gap-4">
-            {desks.map((desk) => (
-              <li key={desk}>
-                <Link 
-                  href={`/category/${desk.replace(/ & /g, '-').replace(/ /g, '-')}`}
-                  onClick={() => setIsDrawerOpen(false)}
-                  className="block text-lg font-medium text-slate-600 hover:text-slate-900 border-b border-slate-100 pb-3"
-                >
-                  {desk}
-                </Link>
-              </li>
+      {/* FULL SCREEN DRAWER */}
+      <div className={`fixed inset-0 z-40 bg-[#1C1C1E] text-[#F9F6F0] transform transition-transform duration-500 ease-in-out flex flex-col md:hidden ${isDrawerOpen ? "translate-x-0" : "translate-x-full"}`}>
+        <div className="flex items-center justify-between p-6 border-b border-white/10 mt-4">
+          <span className="text-2xl font-black tracking-wide font-playfair">Menu</span>
+          <button onClick={() => setIsDrawerOpen(false)} className="p-2 rounded-full bg-white/5 text-[#F9F6F0] hover:text-[#E2725B] transition-colors"><X size={24} /></button>
+        </div>
+        
+        <div className="flex-1 overflow-y-auto p-6 space-y-8 pb-40">
+          
+          {/* Primary Two-Column Grid (Matches HT top links) */}
+          <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+            {primaryCategories.map((cat) => (
+              <Link key={cat} href={`/category/${cat.toLowerCase().replace(/ & | /g, '-')}`} className="flex items-center justify-between group">
+                <span className="font-bold text-sm tracking-wide group-hover:text-[#E2725B] transition-colors">{cat}</span>
+              </Link>
             ))}
-          </ul>
+          </div>
+
+          <hr className="border-white/10" />
+
+          {/* Deep Dive / Editorial Section */}
+          <div>
+            <h3 className="text-[10px] text-white/40 tracking-[0.2em] uppercase mb-4 font-bold">In-Depth</h3>
+            <div className="grid grid-cols-2 gap-x-6 gap-y-4">
+              {editorialLinks.map((link) => (
+                <Link key={link} href={`/category/${link.toLowerCase().replace(/ & | /g, '-')}`} className="text-sm font-medium hover:text-[#E2725B] transition-colors">
+                  {link}
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <hr className="border-white/10" />
+
+          {/* Beacon-Hub Exclusives */}
+          <div className="space-y-4 pt-2">
+            <h3 className="text-[10px] text-[#E2725B] tracking-[0.2em] uppercase mb-4 font-bold">Beacon-Hub Exclusives</h3>
+            <Link href="/deals" className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
+              <span className="font-medium text-sm">Special Deals</span>
+              <ChevronRight size={16} className="text-[#E2725B]" />
+            </Link>
+            <Link href="/dev-log" className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
+              <span className="font-medium text-sm">Developer Log</span>
+              <ChevronRight size={16} className="text-[#E2725B]" />
+            </Link>
+            <Link href="/admin" className="flex items-center justify-between p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
+              <span className="font-medium text-sm">Admin Portal</span>
+              <ChevronRight size={16} className="text-[#E2725B]" />
+            </Link>
+          </div>
+        </div>
+
+        {/* Branding Footer */}
+        <div className="absolute bottom-28 w-full text-center p-6 border-t border-white/10 bg-[#1C1C1E]/95 backdrop-blur-md">
+          <p className="text-[10px] text-[#F9F6F0]/50 tracking-[0.2em] uppercase">Engineered & Architected By</p>
+          <p className="text-sm font-bold text-[#E2725B] mt-1.5 tracking-wide uppercase">JCLS• (Jare's Choice Labs)</p>
         </div>
       </div>
 
-      {/* THE FLOATING PILL DOCK */}
-      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[90%] max-w-[320px] md:hidden">
-        <div className="bg-slate-900 text-white rounded-full px-6 py-4 shadow-2xl flex justify-between items-center border border-slate-700">
-          
-          <Link href="/" onClick={() => setIsDrawerOpen(false)} className="flex flex-col items-center gap-1 opacity-70 hover:opacity-100 transition-opacity">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-            <span className="text-[9px] uppercase tracking-wider font-bold">Home</span>
-          </Link>
-
-          <Link href="/category/Astro-Desk" onClick={() => setIsDrawerOpen(false)} className="flex flex-col items-center gap-1 opacity-70 hover:opacity-100 transition-opacity">
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-            <span className="text-[9px] uppercase tracking-wider font-bold">Astro</span>
-          </Link>
-
-          <button 
-            onClick={() => setIsDrawerOpen(!isDrawerOpen)}
-            className="flex flex-col items-center gap-1 opacity-100 transition-opacity"
-          >
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
-            <span className="text-[9px] uppercase tracking-wider font-bold">Desks</span>
+      {/* MOBILE DOCK */}
+      <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 md:hidden w-[95%] max-w-[400px]">
+        <div className="bg-[#1C1C1E]/90 backdrop-blur-xl border border-white/10 p-1.5 rounded-[2rem] flex items-center justify-between shadow-[0_20px_50px_rgba(0,0,0,0.5)]">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href && !isDrawerOpen;
+            const Icon = item.icon;
+            return (
+              <Link key={item.name} href={item.href} className={`flex flex-col items-center justify-center w-14 h-14 rounded-full transition-all duration-300 ${isActive ? "bg-[#E2725B] text-[#F9F6F0] shadow-md" : "text-[#F9F6F0]/60 hover:text-[#F9F6F0] hover:bg-white/5"}`}>
+                <Icon size={22} className={isActive ? "mb-0.5" : ""} strokeWidth={isActive ? 2.5 : 2} />
+                {isActive && <span className="text-[10px] font-bold tracking-wide">{item.name}</span>}
+              </Link>
+            );
+          })}
+          <button onClick={() => setIsDrawerOpen(!isDrawerOpen)} className={`flex flex-col items-center justify-center w-14 h-14 rounded-full transition-all duration-300 ${isDrawerOpen ? "bg-[#E2725B] text-[#F9F6F0] shadow-md" : "text-[#E2725B] hover:bg-[#E2725B]/10"}`}>
+            {isDrawerOpen ? <X size={28} strokeWidth={2.5} /> : <Menu size={28} strokeWidth={2.5} />}
           </button>
-
         </div>
       </div>
     </>
