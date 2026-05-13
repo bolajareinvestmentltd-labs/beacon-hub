@@ -32,7 +32,7 @@ export const subscribers = pgTable("subscribers", {
 });
 
 // ==========================================
-// 3. ADMIN PORTAL (JCLS / Editors)
+// 3. ADMIN PORTAL (JCLs / Editors)
 // ==========================================
 export const admins = pgTable("admins", {
   id: serial("id").primaryKey(),

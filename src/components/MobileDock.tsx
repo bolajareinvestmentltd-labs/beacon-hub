@@ -93,7 +93,7 @@ export default function MobileDock() {
         {/* Branding Footer */}
         <div className="absolute bottom-28 w-full text-center p-6 border-t border-white/10 bg-[#1C1C1E]/95 backdrop-blur-md">
           <p className="text-[10px] text-[#F9F6F0]/50 tracking-[0.2em] uppercase">Engineered & Architected By</p>
-          <p className="text-sm font-bold text-[#E2725B] mt-1.5 tracking-wide uppercase">JCLS• (Jare's Choice Labs)</p>
+          <p className="text-sm font-bold text-[#E2725B] mt-1.5 tracking-wide uppercase">JCLs (Jare's Choice Labs)</p>
         </div>
       </div>
 
