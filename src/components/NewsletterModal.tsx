@@ -8,11 +8,9 @@ export default function NewsletterModal() {
   const [isOpen, setIsOpen] = useState(false);
 
   useEffect(() => {
-    // Check if they've already seen it so we don't annoy them
     const hasSeenModal = localStorage.getItem("jcls_newsletter_seen");
     
     if (!hasSeenModal) {
-      // Trigger the pop-up after 15 seconds of reading
       const timer = setTimeout(() => {
         setIsOpen(true);
         localStorage.setItem("jcls_newsletter_seen", "true");
@@ -33,7 +31,6 @@ export default function NewsletterModal() {
         >
           <X size={16} />
         </button>
-        {/* We reuse the beautiful form we already built! */}
         <NewsletterForm />
       </div>
     </div>
