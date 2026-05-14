@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const session = request.cookies.get('admin_session');
 
   // If the user is trying to access the Command Center...
@@ -15,7 +15,7 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Only run this middleware on the admin routes to keep the rest of the site blazing fast
+// Only run this proxy on the admin routes to keep the rest of the site blazing fast
 export const config = {
   matcher: ['/admin/:path*'],
 };
