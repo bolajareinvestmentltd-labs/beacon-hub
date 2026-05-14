@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Search, Menu } from "lucide-react";
+import { Search, Menu, Terminal } from "lucide-react";
 import { TAXONOMY } from "@/config/taxonomy";
 
 export default function Navbar() {
@@ -14,7 +14,7 @@ export default function Navbar() {
       {/* TOP TIER: Hamburger, Logo, CTA */}
       <div className="flex items-center justify-between px-4 h-16 max-w-7xl mx-auto w-full">
         
-        {/* Left: Mobile Menu Trigger (Visual only for now, drawer is in MobileDock) & Search */}
+        {/* Left: Mobile Menu Trigger & Search */}
         <div className="flex items-center space-x-4 w-1/3">
           <button className="md:hidden text-black dark:text-[#F9F6F0] hover:text-[#E2725B] transition-colors">
             <Menu size={24} strokeWidth={2} />
@@ -33,12 +33,24 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Right: Subscribe / Get App CTA */}
-        <div className="flex items-center justify-end w-1/3 space-x-4">
-          <button className="md:hidden text-black dark:text-[#F9F6F0] hover:text-[#E2725B] transition-colors mr-2">
-            <Search size={20} strokeWidth={2} />
+        {/* Right: Meta & CTA */}
+        <div className="flex items-center justify-end w-1/3 space-x-3 md:space-x-4">
+          
+          {/* The Dev Log "Bandage" / Version Pill */}
+          <Link 
+            href="/dev-log" 
+            className="flex items-center gap-1.5 text-[10px] font-mono border border-black/10 dark:border-white/10 px-2 py-1.5 rounded-sm text-slate-500 hover:text-[#E2725B] hover:border-[#E2725B] hover:bg-[#E2725B]/5 transition-all bg-slate-50 dark:bg-black/50"
+            title="System Architecture Log"
+          >
+            <Terminal size={12} className="text-[#E2725B]" />
+            <span className="hidden md:inline font-bold tracking-widest uppercase">v1.2.0</span>
+          </Link>
+
+          <button className="md:hidden text-black dark:text-[#F9F6F0] hover:text-[#E2725B] transition-colors">
+            <Search size={18} strokeWidth={2} />
           </button>
-          <button className="text-[11px] md:text-xs font-bold uppercase tracking-wider border border-[#E2725B] text-[#E2725B] px-3 py-1.5 md:px-5 md:py-2 rounded-sm hover:bg-[#E2725B] hover:text-white transition-all duration-300">
+          
+          <button className="text-[10px] md:text-xs font-bold uppercase tracking-wider border border-[#E2725B] text-[#E2725B] px-3 py-1.5 md:px-5 md:py-2 rounded-sm hover:bg-[#E2725B] hover:text-white transition-all duration-300">
             <span className="md:hidden">Get App</span>
             <span className="hidden md:inline">Subscribe</span>
           </button>

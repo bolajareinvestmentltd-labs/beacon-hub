@@ -30,9 +30,7 @@ export default async function HomePage() {
       {/* 1. LIVE HERO SECTION */}
       <article className="mb-12 border-b-2 border-black dark:border-white/20 pb-10">
         <div className="flex items-center gap-3 mb-5">
-          <span className="bg-[#E2725B] text-white text-[10px] font-bold px-2 py-0.5 tracking-wider uppercase">
-            Latest Briefing
-          </span>
+          <span className="bg-[#E2725B] text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-sm mb-4 mt-8 inline-block">Latest Briefing</span>
           <span className="text-[10px] font-bold text-[#3A7B7A] uppercase tracking-wider">
             {heroArticle.category}
           </span>

@@ -9,6 +9,7 @@ export const TAXONOMY = {
     { name: "Real Estate", href: "/category/real-estate" },
     { name: "Sports", href: "/category/sports" },
     { name: "Entertainment", href: "/category/entertainment" },
+    
   ],
   // These go into the Drawer Grid
   secondary: [
