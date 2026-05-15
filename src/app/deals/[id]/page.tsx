@@ -1,27 +1,29 @@
 import { ShieldCheck, Lock, AlertCircle, ArrowRight } from "lucide-react";
 import Link from "next/link";
+import { db } from "@/db";
+import { deals } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { notFound } from "next/navigation";
 
 export default async function EscrowDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
+  const dealId = parseInt(resolvedParams.id, 10);
   
-  // Architect Note: This is placeholder data until we build the Deals Publisher in the Command Center.
-  // We will eventually fetch this dynamically using: await db.select().from(deals).where(eq(deals.id, resolvedParams.id))
-  const dummyAsset = {
-    id: resolvedParams.id,
-    title: "Lekki Phase 1 - 4 Bedroom Duplex (Off-Plan)",
-    vendor: "Ay'Smart Realtors",
-    description: "Premium architectural design featuring a massive penthouse, fitted kitchen, and automated smart-home integrations. Secure this off-plan unit before phase 2 pricing initiates.",
-    price: 150000000, // ₦150,000,000
-    category: "Real Estate",
-    imageUrl: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?q=80&w=1200&auto=format&fit=crop"
-  };
+  // Fetch the specific asset from Neon DB
+  const assetResults = await db.select().from(deals).where(eq(deals.id, dealId));
+  const asset = assetResults[0];
 
-  const JCLS_FEE = 50;
-  const TOTAL_PRICE = dummyAsset.price + JCLS_FEE;
+  // If someone types a random ID in the URL, trigger the Next.js 404 page
+  if (!asset) {
+    notFound();
+  }
+
+  // The locked JCLs platform processing logic
+  const JCLS_FEE = asset.platformFee || 50;
+  const TOTAL_PRICE = (asset.price || 0) + JCLS_FEE;
 
   return (
     <div className="w-full max-w-6xl mx-auto py-12 px-4">
-      {/* Back Navigation */}
       <Link href="/deals" className="text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-[#E2725B] transition-colors mb-8 inline-block">
         ← Back to Marketplace
       </Link>
@@ -31,8 +33,7 @@ export default async function EscrowDetailPage({ params }: { params: Promise<{ i
         {/* LEFT COLUMN: Asset Intelligence */}
         <div className="lg:col-span-2 flex flex-col gap-8">
           <div className="w-full h-[400px] bg-slate-200 dark:bg-[#1C1C1E] rounded-xl overflow-hidden border border-black/10 dark:border-white/10 relative">
-            {/* We use standard img tag here for simplicity, but next/image is better for prod */}
-            <img src={dummyAsset.imageUrl} alt={dummyAsset.title} className="w-full h-full object-cover" />
+            <img src={asset.imageUrl || ""} alt={asset.title} className="w-full h-full object-cover" />
             <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-md text-white px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
               <Lock size={12} className="text-[#E2725B]" /> Verified Asset
             </div>
@@ -40,15 +41,15 @@ export default async function EscrowDetailPage({ params }: { params: Promise<{ i
 
           <div>
             <div className="flex items-center gap-2 mb-2">
-              <span className="text-[10px] font-bold text-[#E2725B] uppercase tracking-wider">{dummyAsset.category}</span>
+              <span className="text-[10px] font-bold text-[#E2725B] uppercase tracking-wider">{asset.category}</span>
               <span className="text-slate-400 text-[10px]">•</span>
-              <span className="text-slate-500 text-[10px] uppercase tracking-wider font-bold">Listed by {dummyAsset.vendor}</span>
+              <span className="text-slate-500 text-[10px] uppercase tracking-wider font-bold">Listed by {asset.vendorName}</span>
             </div>
             <h1 className="text-4xl md:text-5xl font-black font-playfair text-black dark:text-[#F9F6F0] mb-6 leading-tight">
-              {dummyAsset.title}
+              {asset.title}
             </h1>
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm md:text-base">
-              {dummyAsset.description}
+              {asset.description}
             </p>
           </div>
         </div>
@@ -65,7 +66,7 @@ export default async function EscrowDetailPage({ params }: { params: Promise<{ i
             <div className="flex flex-col gap-4 mb-6 text-sm">
               <div className="flex justify-between items-center text-slate-600 dark:text-slate-400 font-medium">
                 <span>Asset Principal</span>
-                <span>₦{dummyAsset.price.toLocaleString()}</span>
+                <span>₦{(asset.price || 0).toLocaleString()}</span>
               </div>
               <div className="flex justify-between items-center text-slate-600 dark:text-slate-400 font-medium">
                 <span>JCLs Processing Fee</span>

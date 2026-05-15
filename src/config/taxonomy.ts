@@ -2,6 +2,7 @@ export const TAXONOMY = {
   // These appear in the swipeable top bar
   primary: [
     { name: "Top News", href: "/" },
+    { name: "Escrow Deals", href: "/deals" },
     { name: "Elections 2026", href: "/category/elections" },
     { name: "Global News", href: "/category/global-news" },
     { name: "Astrology", href: "/horoscopes" },
