@@ -10,19 +10,20 @@ const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfa
 
 export const metadata: Metadata = {
   title: "Beacon-Hub | Global Intelligence",
-  description: "A premium decentralized intelligence network and secure escrow marketplace. Get the latest macro-trends, global news, and exclusive asset listings.",
+  description: "Your premium source for global news, tech startups, astrology, and verified escrow deals.",
+  metadataBase: new URL("beacon-hub.vercel.app"), // IMPORTANT: Change to your actual Vercel domain
   openGraph: {
-    title: "Beacon-Hub | The Architect's Network",
-    description: "Premium decentralized intelligence and secure escrow marketplace.",
-    url: "https://beacon-hub.vercel.app",
+    title: "Beacon-Hub | Global Intelligence",
+    description: "Your premium source for global news and verified deals.",
+    url: "/",
     siteName: "Beacon-Hub",
     images: [
       {
-        url: "https://images.unsplash.com/photo-1614028674026-a65e31bfd27c?q=80&w=1200&auto=format&fit=crop", // A premium dark-mode architectural placeholder image
+        url: "/opengraph-image.jpg", 
         width: 1200,
         height: 630,
-        alt: "Beacon-Hub Intelligence Dashboard",
-      }
+        alt: "Beacon-Hub Cover Image",
+      },
     ],
     locale: "en_US",
     type: "website",
@@ -30,10 +31,10 @@ export const metadata: Metadata = {
   twitter: {
     card: "summary_large_image",
     title: "Beacon-Hub | Global Intelligence",
-    description: "Premium decentralized intelligence and secure escrow marketplace.",
+    description: "Your premium source for global news and verified deals.",
+    images: ["/opengraph-image.jpg"],
   },
 };
-
 export default function RootLayout({
   children,
 }: Readonly<{

@@ -69,3 +69,18 @@ export async function publishDeal(formData: FormData) {
   revalidatePath("/deals");
   revalidatePath("/admin");
 }
+
+export async function subscribeUser(formData: FormData) {
+  const email = formData.get("email");
+  
+  if (!email || typeof email !== "string") {
+    return { error: "Invalid email" };
+  }
+
+  try {
+    console.log("Subscribed:", email);
+    return { success: true };
+  } catch (error) {
+    return { error: "Failed to subscribe. Please try again." };
+  }
+}

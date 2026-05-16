@@ -17,6 +17,7 @@ export const articles = pgTable("articles", {
   coverImage: text("cover_image"), 
   
   isBreaking: boolean("is_breaking").default(false), 
+  isSponsored: boolean("is_sponsored").default(false),
   
   publishedAt: timestamp("published_at").defaultNow().notNull(),
   createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -68,6 +69,8 @@ export const deals = pgTable("deals", {
   
   category: varchar("category", { length: 100 }), // e.g., 'Real Estate', 'Cosmetics', 'VIP Events'
   imageUrl: text("image_url"),
+  videoUrl: text("video_url"), 
+  hasWatermark: boolean("has_watermark").default(false)
   isActive: boolean("is_active").default(true),
   
   createdAt: timestamp("created_at").defaultNow().notNull(),
