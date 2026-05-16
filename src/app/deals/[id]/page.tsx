@@ -88,17 +88,6 @@ export default async function EscrowDetailPage({ params }: { params: Promise<{ i
   </div>
 </div>
 
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-12 mt-12">
-        
-        {/* LEFT COLUMN: Asset Intelligence */}
-        <div className="lg:col-span-2 flex flex-col gap-8">
-          <div className="w-full h-[400px] bg-slate-200 dark:bg-[#1C1C1E] rounded-xl overflow-hidden border border-black/10 dark:border-white/10 relative">
-            <img src={asset.imageUrl || ""} alt={asset.title} className="w-full h-full object-cover" />
-            <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-md text-white px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
-              <Lock size={12} className="text-[#E2725B]" /> Verified Asset
-
             <div className="mt-6 flex gap-3 text-[10px] text-slate-500 uppercase tracking-wider leading-relaxed">
               <AlertCircle size={16} className="shrink-0 text-[#E2725B]" />
               <p>Funds are held in secure JCLs Escrow until asset delivery is confirmed by both parties. Zero hidden charges.</p>
