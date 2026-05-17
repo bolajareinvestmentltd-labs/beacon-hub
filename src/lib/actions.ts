@@ -85,6 +85,7 @@ export async function subscribeUser(formData: FormData) {
     return { error: "Failed to subscribe. Please try again." };
   }
 }
+
 // ========================================================
 // 3. NETWORK ENGINE (Newsletter Subscribers)
 // ========================================================
@@ -97,7 +98,6 @@ export async function subscribeUser(formData: FormData) {
     await db.insert(subscribers).values({ email });
     return { success: true };
   } catch (error: any) {
-    // 23505 is the standard Postgres error code for a unique constraint violation
     if (error.code === '23505' || error.message.includes('unique')) {
       return { error: "You are already connected to the Network." };
     }
