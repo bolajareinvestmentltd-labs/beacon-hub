@@ -47,7 +47,7 @@ export default async function HomePage() {
         </p>
         
         <div className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.1em]">
-          By {heroArticle.author} &bull; {heroArticle.publishedAt.toLocaleDateString()}
+          By {"JCLS Editorial"} &bull; {heroArticle.publishedAt!.toLocaleDateString()}
         </div>
       </article>
 
@@ -69,16 +69,16 @@ export default async function HomePage() {
               <div className="flex items-center gap-2 mt-4 text-[11px] font-bold tracking-wide">
                 <span className="text-[#3A7B7A] dark:text-[#4A9B9A] uppercase">{article.category}</span>
                 <span className="text-slate-300 dark:text-slate-600">&bull;</span>
-                <span className="text-slate-500">{timeAgo(article.publishedAt)}</span>
+                <span className="text-slate-500">{timeAgo(article.publishedAt!)}</span>
               </div>
             </div>
 
             {/* Right: Live Image */}
             <Link href={`/read/${article.slug}`} className="block flex-shrink-0">
               <div className="w-[100px] h-[75px] md:w-[160px] md:h-[100px] bg-slate-200 dark:bg-white/5 rounded-md overflow-hidden relative border border-black/5 dark:border-white/5">
-                {article.coverImage ? (
+                {article.imageUrl ? (
                   <img 
-                    src={article.coverImage} 
+                    src={article.imageUrl} 
                     alt={article.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />

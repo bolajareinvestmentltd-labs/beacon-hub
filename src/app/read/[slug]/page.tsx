@@ -44,20 +44,20 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
         <div className="flex items-center gap-4 py-4 border-y border-black/10 dark:border-white/10">
           <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
-            By <span className="text-black dark:text-[#F9F6F0]">{article.author}</span>
+            By <span className="text-black dark:text-[#F9F6F0]">{"JCLS Editorial"}</span>
           </div>
           <span className="text-slate-300 dark:text-slate-600">&bull;</span>
           <div className="text-xs font-bold uppercase tracking-wider text-slate-500">
-            {article.publishedAt.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+            {article.publishedAt!.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </div>
         </div>
       </header>
 
       {/* Featured Image */}
-      {article.coverImage && (
+      {article.imageUrl && (
         <div className="w-full h-[250px] md:h-[400px] mb-10 bg-slate-200 dark:bg-white/5 rounded-xl overflow-hidden">
           <img 
-            src={article.coverImage} 
+            src={article.imageUrl} 
             alt={article.title} 
             className="w-full h-full object-cover"
           />

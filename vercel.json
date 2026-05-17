@@ -1,12 +1,8 @@
 {
   "crons": [
     {
-      "path": "/api/cron/news",
-      "schedule": "0 * * * *"
-    },
-    {
       "path": "/api/cron/astro",
-      "schedule": "0 0 * * *"
+      "schedule": "0 8 * * *"
     }
   ]
 }

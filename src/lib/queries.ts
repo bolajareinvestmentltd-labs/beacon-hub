@@ -32,13 +32,13 @@ export async function getArticleBySlug(slug: string) {
 
 // 5. Single Horoscope
 export async function getHoroscopeBySign(sign: string) {
-  const result = await db.select().from(horoscopes).where(eq(horoscopes.sign, sign.charAt(0).toUpperCase() + sign.slice(1).toLowerCase())).orderBy(desc(horoscopes.publishDate)).limit(1);
+  const result = await db.select().from(horoscopes).where(eq(horoscopes.sign, sign.charAt(0).toUpperCase() + sign.slice(1).toLowerCase())).orderBy(desc(horoscopes.createdAt)).limit(1);
   return result[0] || null;
 }
 
 // 6. Daily Horoscopes Grid
 export async function getDailyHoroscopes() {
-  const result = await db.select().from(horoscopes).orderBy(desc(horoscopes.publishDate)).limit(12);
+  const result = await db.select().from(horoscopes).orderBy(desc(horoscopes.createdAt)).limit(12);
   return result;
 }
 

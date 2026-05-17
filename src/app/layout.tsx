@@ -11,7 +11,7 @@ const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfa
 export const metadata: Metadata = {
   title: "Beacon-Hub | Global Intelligence",
   description: "Your premium source for global news, tech startups, astrology, and verified escrow deals.",
-  metadataBase: new URL("beacon-hub.vercel.app"), // IMPORTANT: Change to your actual Vercel domain
+  metadataBase: new URL("https://beacon-hub.vercel.app"), // IMPORTANT: Change to your actual Vercel domain
   openGraph: {
     title: "Beacon-Hub | Global Intelligence",
     description: "Your premium source for global news and verified deals.",

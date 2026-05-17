@@ -9,8 +9,8 @@ const generateSlug = (title: string) => {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + `-${Date.now().toString().slice(-4)}`;
 };
 
-// 1. CONTENT ENGINE (Articles)
-export async function publishArticle(formData: FormData) {
+// 1. CONTENT ENGINE (Articles) - Stripped return to satisfy TS void constraint
+export async function publishArticle(formData: FormData): Promise<void> {
   try {
     const title = formData.get("title") as string;
     const excerpt = formData.get("excerpt") as string;
@@ -32,14 +32,13 @@ export async function publishArticle(formData: FormData) {
     });
 
     revalidatePath("/");
-    return { success: true };
   } catch (error: any) {
-    return { error: "Failed to publish article." };
+    console.error("Failed to publish article:", error);
   }
 }
 
-// 2. ESCROW ENGINE (Deals)
-export async function publishDeal(formData: FormData) {
+// 2. ESCROW ENGINE (Deals) - Stripped return to satisfy TS void constraint
+export async function publishDeal(formData: FormData): Promise<void> {
   try {
     const title = formData.get("title") as string;
     const description = formData.get("description") as string;
@@ -59,13 +58,12 @@ export async function publishDeal(formData: FormData) {
     });
 
     revalidatePath("/deals");
-    return { success: true };
   } catch (error: any) {
-    return { error: "Failed to list deal." };
+    console.error("Failed to list deal:", error);
   }
 }
 
-// 3. NETWORK ENGINE (Newsletter Subscribers)
+// 3. NETWORK ENGINE (Newsletter Subscribers) - Return kept for client-side modal
 export async function subscribeUser(formData: FormData) {
   const email = formData.get("email") as string;
   if (!email) return { error: "Email is required." };

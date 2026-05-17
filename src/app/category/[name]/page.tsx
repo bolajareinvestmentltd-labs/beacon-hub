@@ -46,13 +46,13 @@ export default async function CategoryPage({ params }: { params: Promise<{ name:
                 <div className="flex items-center gap-2 mt-4 text-[11px] font-bold tracking-wide">
                   <span className="text-[#3A7B7A] dark:text-[#4A9B9A] uppercase">{article.category}</span>
                   <span className="text-slate-300 dark:text-slate-600">&bull;</span>
-                  <span className="text-slate-500">{timeAgo(article.publishedAt)}</span>
+                  <span className="text-slate-500">{timeAgo(article.publishedAt!)}</span>
                 </div>
               </div>
               <Link href={`/read/${article.slug}`} className="block flex-shrink-0">
                 <div className="w-[100px] h-[75px] md:w-[160px] md:h-[100px] bg-slate-200 dark:bg-white/5 rounded-md overflow-hidden relative border border-black/5 dark:border-white/5">
-                  {article.coverImage ? (
-                    <img src={article.coverImage} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                  {article.imageUrl ? (
+                    <img src={article.imageUrl} alt={article.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
                   ) : (
                     <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px] dark:bg-[radial-gradient(#fff_1px,transparent_1px)]"></div>
                   )}
