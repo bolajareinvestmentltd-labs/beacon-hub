@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { articles, deals } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { put } from "@vercel/blob";
+import { articles, deals, subscribers } from "@/db/schema";
 
 const generateSlug = (title: string) => {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + `-${Date.now().toString().slice(-4)}`;
@@ -82,5 +83,24 @@ export async function subscribeUser(formData: FormData) {
     return { success: true };
   } catch (error) {
     return { error: "Failed to subscribe. Please try again." };
+  }
+}
+// ========================================================
+// 3. NETWORK ENGINE (Newsletter Subscribers)
+// ========================================================
+export async function subscribeUser(formData: FormData) {
+  const email = formData.get("email") as string;
+
+  if (!email) return { error: "Email is required." };
+
+  try {
+    await db.insert(subscribers).values({ email });
+    return { success: true };
+  } catch (error: any) {
+    // 23505 is the standard Postgres error code for a unique constraint violation
+    if (error.code === '23505' || error.message.includes('unique')) {
+      return { error: "You are already connected to the Network." };
+    }
+    return { error: "Failed to connect to the Network." };
   }
 }
