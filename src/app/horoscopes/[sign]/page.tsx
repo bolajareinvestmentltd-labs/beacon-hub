@@ -106,10 +106,10 @@ export default async function HoroscopePage({ params }: PageProps) {
           <div className="space-y-12 w-full">
             <div>
               <h2 className="text-xs font-bold tracking-[0.2em] text-slate-400 uppercase">
-                Performance Telemetry Vectors
+                Daily Energy Metrics
               </h2>
               <p className="text-[11px] text-slate-500 font-sans mt-1">
-                Real-time operational thresholds for high-capacity system throughput.
+                Your personal alignment and daily energy forecast.
               </p>
             </div>
 
@@ -118,7 +118,7 @@ export default async function HoroscopePage({ params }: PageProps) {
               {/* Metric 1: Focus */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-medium">
-                  <span className="text-slate-300">COGNITIVE BANDWIDTH [FOCUS]</span>
+                  <span className="text-slate-300">MENTAL CLARITY & FOCUS</span>
                   <span className="text-[#C85A32] font-bold">{reading.metricFocus}%</span>
                 </div>
                 <div className="w-full bg-white/5 h-1.5 rounded-none overflow-hidden">
@@ -132,7 +132,7 @@ export default async function HoroscopePage({ params }: PageProps) {
               {/* Metric 2: Risk Posture */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-medium">
-                  <span className="text-slate-300">MARKET EXPOSURE POSTURE [RISK]</span>
+                  <span className="text-slate-300">CAREER & LUCK</span>
                   <span className="text-[#C85A32] font-bold">{reading.metricRisk}%</span>
                 </div>
                 <div className="w-full bg-white/5 h-1.5 rounded-none overflow-hidden">
@@ -146,7 +146,7 @@ export default async function HoroscopePage({ params }: PageProps) {
               {/* Metric 3: Velocity */}
               <div className="space-y-2">
                 <div className="flex justify-between text-xs font-medium">
-                  <span className="text-slate-300">EXECUTION THROUGHPUT [VELOCITY]</span>
+                  <span className="text-slate-300">ENERGY & MOMENTUM</span>
                   <span className="text-[#C85A32] font-bold">{reading.metricVelocity}%</span>
                 </div>
                 <div className="w-full bg-white/5 h-1.5 rounded-none overflow-hidden">
