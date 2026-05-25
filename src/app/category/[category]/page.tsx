@@ -13,12 +13,11 @@ export default async function DynamicCategoryPage({ params }: CategoryPageProps)
     .replace(/-/g, ' ')
     .toUpperCase();
 
-  // Fetch real live articles for this category from GNews
   const articles = await getLiveNews(rawCategory);
 
   return (
-    <main className="min-h-screen bg-[#F4EFEA] text-[#1A1A1A] px-6 pt-32 pb-16">
-      {/* Sector Header Block */}
+    // Note the heavy pt-36 padding here to clear the fixed navbar height cleanly!
+    <main className="min-h-screen bg-[#F4EFEA] text-[#1A1A1A] px-6 pt-36 pb-16">
       <div className="max-w-6xl mx-auto border-b border-[#1A1A1A]/10 pb-6 mb-12">
         <span className="text-[10px] font-mono text-[#9C4A3A] uppercase tracking-widest font-bold">
           LIVE INTELLIGENCE SECTOR // {rawCategory.toUpperCase()}
@@ -28,7 +27,6 @@ export default async function DynamicCategoryPage({ params }: CategoryPageProps)
         </h1>
       </div>
 
-      {/* Dynamic News Grid */}
       <div className="max-w-6xl mx-auto">
         {articles.length === 0 ? (
           <div className="border-2 border-dashed border-[#1A1A1A]/20 rounded-sm p-12 text-center bg-[#1A1A1A]/5">
