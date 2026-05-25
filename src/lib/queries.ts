@@ -1,6 +1,6 @@
 import { db } from "@/db";
 import { articles, horoscopes, deals } from "@/db/schema";
-import { desc, ilike, eq } from "drizzle-orm";
+import { desc, ilike, eq, and } from "drizzle-orm";
 
 // 1. Hero Article
 export async function getHeroArticle() {
@@ -30,9 +30,40 @@ export async function getArticleBySlug(slug: string) {
   return result[0] || null;
 }
 
-// 5. Single Horoscope
-export async function getHoroscopeBySign(sign: string) {
-  const result = await db.select().from(horoscopes).where(eq(horoscopes.sign, sign.charAt(0).toUpperCase() + sign.slice(1).toLowerCase())).orderBy(desc(horoscopes.publishDate)).limit(1);
+// 5. Single Horoscope (with optional date filter)
+export async function getHoroscopeBySign(sign: string, date?: Date) {
+  const normalizedSign = sign.charAt(0).toUpperCase() + sign.slice(1).toLowerCase();
+  
+  if (date) {
+    // Fetch reading for a specific date
+    const startOfDay = new Date(date);
+    startOfDay.setHours(0, 0, 0, 0);
+    
+    const endOfDay = new Date(date);
+    endOfDay.setHours(23, 59, 59, 999);
+    
+    const result = await db.select()
+      .from(horoscopes)
+      .where(
+        and(
+          eq(horoscopes.sign, normalizedSign),
+          and(
+            // @ts-ignore - comparing dates with Drizzle ORM
+            horoscopes.publishDate.gte(startOfDay),
+            horoscopes.publishDate.lte(endOfDay)
+          )
+        )
+      )
+      .limit(1);
+    return result[0] || null;
+  }
+  
+  // Default: get latest reading for this sign
+  const result = await db.select()
+    .from(horoscopes)
+    .where(eq(horoscopes.sign, normalizedSign))
+    .orderBy(desc(horoscopes.publishDate))
+    .limit(1);
   return result[0] || null;
 }
 

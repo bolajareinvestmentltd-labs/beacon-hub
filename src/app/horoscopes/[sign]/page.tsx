@@ -2,10 +2,27 @@ import { getHoroscopeBySign } from "@/lib/queries";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { ArrowLeft, Sparkles } from "lucide-react";
+import { HoroscopeDatePicker } from "@/components/HoroscopeDatePicker";
 
-export default async function AstroReadingPage({ params }: { params: Promise<{ sign: string }> }) {
+interface AstroReadingPageProps {
+  params: Promise<{ sign: string }>;
+  searchParams: Promise<{ date?: string }>;
+}
+
+export default async function AstroReadingPage({ params, searchParams }: AstroReadingPageProps) {
   const resolvedParams = await params;
-  const reading = await getHoroscopeBySign(resolvedParams.sign);
+  const resolvedSearchParams = await searchParams;
+  
+  // Parse date from query params or use today
+  let selectedDate = new Date();
+  if (resolvedSearchParams.date) {
+    const parsedDate = new Date(resolvedSearchParams.date);
+    if (!isNaN(parsedDate.getTime())) {
+      selectedDate = parsedDate;
+    }
+  }
+  
+  const reading = await getHoroscopeBySign(resolvedParams.sign, selectedDate);
 
   if (!reading) {
     // If the cron hasn't run yet, we don't 404, we show a premium "calculating" state
@@ -14,7 +31,11 @@ export default async function AstroReadingPage({ params }: { params: Promise<{ s
         <h1 className="text-4xl font-black font-playfair mb-4 uppercase tracking-tighter italic">
           {resolvedParams.sign}
         </h1>
-        <p className="text-slate-500 italic">Planetary alignments are still being processed for this sign. Check back at the next moon phase.</p>
+        <p className="text-slate-500 italic">
+          {resolvedSearchParams.date 
+            ? `No planetary alignment recorded for this sign on ${selectedDate.toLocaleDateString()}. Try another date.`
+            : "Planetary alignments are still being processed for this sign. Check back at the next moon phase."}
+        </p>
         <Link href="/horoscopes" className="mt-8 inline-block text-xs font-bold uppercase tracking-widest text-[#E2725B]">Return to Desk</Link>
       </div>
     );
@@ -25,6 +46,9 @@ export default async function AstroReadingPage({ params }: { params: Promise<{ s
       <Link href="/horoscopes" className="inline-flex items-center text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400 hover:text-[#E2725B] transition-colors mb-12">
         <ArrowLeft size={14} className="mr-2" /> Back to Astro Desk
       </Link>
+
+      {/* Date Picker */}
+      <HoroscopeDatePicker currentDate={selectedDate} />
 
       <div className="relative border-l-2 border-[#E2725B] pl-8 md:pl-12">
         <div className="flex items-center gap-2 text-[#3A7B7A] mb-4">
