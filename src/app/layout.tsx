@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import Navbar from "@/components/Navbar";
 import MobileDock from "@/components/MobileDock";
+import Footer from "@/components/Footer";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
@@ -17,14 +18,7 @@ export const metadata: Metadata = {
     description: "Your premium source for global news and verified deals.",
     url: "/",
     siteName: "Beacon-Hub",
-    images: [
-      {
-        url: "/opengraph-image.jpg",
-        width: 1200,
-        height: 630,
-        alt: "Beacon-Hub Cover Image",
-      },
-    ],
+    images: [{ url: "/opengraph-image.jpg", width: 1200, height: 630, alt: "Beacon-Hub Cover Image" }],
     locale: "en_US",
     type: "website",
   },
@@ -43,12 +37,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} ${playfair.variable} antialiased font-sans selection:bg-[#C85A32] selection:text-white pb-20 md:pb-0`}>
+      <body className={`${inter.variable} ${playfair.variable} antialiased font-sans selection:bg-[#C85A32] selection:text-white flex flex-col min-h-screen`}>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Navbar />
-          <main className="min-h-screen pt-20">
+          <div className="flex-grow">
             {children}
-          </main>
+          </div>
+          <Footer />
           <MobileDock />
         </ThemeProvider>
       </body>

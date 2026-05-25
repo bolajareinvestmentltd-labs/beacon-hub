@@ -1,171 +1,103 @@
-import React from "react";
-import { db } from "@/db";
-import { astrology } from "@/db/schema";
-import { and, eq, desc } from "drizzle-orm";
+import { neon } from "@neondatabase/serverless";
+import { notFound } from "next/navigation";
 import Link from "next/link";
+import { ArrowLeft, Heart, Briefcase, Wallet, ShieldPlus, Orbit } from "lucide-react";
 
-interface PageProps {
-  params: Promise<{ sign: string }>;
-}
+const ZODIAC_SIGNS = [
+  "aries", "taurus", "gemini", "cancer", "leo", "virgo",
+  "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "pisces"
+];
 
-export default async function HoroscopePage({ params }: PageProps) {
-  const resolvedParams = await params;
-  const currentSign = resolvedParams.sign.toLowerCase();
-  const todayStr = new Date().toISOString().split("T")[0];
+export const revalidate = 600;
 
-  // Live indexed query lookup for today's specific performance matrix block
-  const records = await db
-    .select()
-    .from(astrology)
-    .where(
-      and(
-        eq(astrology.sign, currentSign),
-        eq(astrology.date, todayStr)
-      )
-    )
-    .orderBy(desc(astrology.createdAt))
-    .limit(1);
+export default async function HoroscopePage({ params }: { params: any }) {
+  // Unwrap parameters safely for strict Next.js routing
+  const { sign: rawSign } = await Promise.resolve(params);
+  const sign = rawSign.toLowerCase();
+  
+  if (!ZODIAC_SIGNS.includes(sign)) return notFound();
 
-  const reading = records[0];
+  // 1. Connect to Neon Vault
+  const sql = neon(process.env.DATABASE_URL || "");
+  let readingData = null;
+  let readingDate = new Date();
 
-  // Capitalize current sign name for high-end editorial display headings
-  const formattedSign = currentSign.charAt(0).toUpperCase() + currentSign.slice(1);
-
-  // Fallback UI State matching your exact placeholder experience if data is pending sync
-  if (!reading) {
-    return (
-      <main className="min-h-screen bg-[#0B0B0B] text-[#F5F5F5] font-sans flex flex-col justify-center items-center p-6 text-center">
-        <div className="max-w-md space-y-6">
-          <span className="text-[10px] font-bold tracking-[0.3em] text-[#C85A32] uppercase font-mono block">
-            System Synchronization Incomplete
-          </span>
-          <p className="text-lg md:text-xl font-serif italic text-slate-400 leading-relaxed">
-            "Planetary alignments are still being processed for this sign. Check back at the next moon phase."
-          </p>
-          <Link 
-            href="/deals" 
-            className="inline-block border border-white/10 hover:border-[#C85A32] text-xs font-mono font-bold tracking-widest uppercase px-6 py-3 text-slate-300 transition-colors duration-300"
-          >
-            Return to Desk
-          </Link>
-        </div>
-      </main>
-    );
+  // 2. Fetch the latest intelligence for this specific sign
+  try {
+    const result = await sql`
+      SELECT content, created_at 
+      FROM horoscopes 
+      WHERE sign = ${sign} 
+      ORDER BY created_at DESC 
+      LIMIT 1
+    `;
+    
+    if (result.length > 0) {
+      // Parse the JSON string stored by our future cron job
+      readingData = typeof result[0].content === 'string' ? JSON.parse(result[0].content) : result[0].content;
+      readingDate = new Date(result[0].created_at);
+    }
+  } catch (err) {
+    console.error("Database fetch failed", err);
   }
 
+  // 3. Fallback matrix if the database is empty or still synchronizing
+  const insights = readingData || [
+    { title: "Romantic Alignment & Love", iconName: "Heart", text: "Awaiting planetary transmission. Database synchronization pending." },
+    { title: "Executive Career Strategy", iconName: "Briefcase", text: "Awaiting planetary transmission. Database synchronization pending." },
+    { title: "Capital & Wealth Management", iconName: "Wallet", text: "Awaiting planetary transmission. Database synchronization pending." },
+    { title: "Vitality & Health Metrics", iconName: "ShieldPlus", text: "Awaiting planetary transmission. Database synchronization pending." },
+    { title: "Ruling Astral Intelligence", iconName: "Orbit", text: "Awaiting planetary transmission. Database synchronization pending." }
+  ];
+
+  // Map the string icon names from the database to actual Lucide React components
+  const getIcon = (iconName: string) => {
+    switch(iconName) {
+      case "Heart": return <Heart className="text-[#C85A32]" size={18} />;
+      case "Briefcase": return <Briefcase className="text-[#C85A32]" size={18} />;
+      case "Wallet": return <Wallet className="text-[#C85A32]" size={18} />;
+      case "ShieldPlus": return <ShieldPlus className="text-[#C85A32]" size={18} />;
+      case "Orbit": return <Orbit className="text-[#C85A32]" size={18} />;
+      default: return <Orbit className="text-[#C85A32]" size={18} />;
+    }
+  };
+
   return (
-    <main className="min-h-screen bg-[#0B0B0B] text-[#F5F5F5] font-sans selection:bg-[#C85A32] selection:text-white">
-      {/* Top Editorial Utility Bar */}
-      <div className="border-b border-white/5 px-6 py-4 flex justify-between items-center text-[10px] font-mono tracking-widest text-slate-500">
-        <div>ORBITAL INDEX: SYSTEM_ACTIVE</div>
-        <div className="uppercase">LOG_DATE: {reading.date}</div>
+    <main className="min-h-screen bg-white dark:bg-[#0B0B0B] pt-28 pb-32">
+      {/* Header Profile */}
+      <div className="max-w-4xl mx-auto px-4 text-center space-y-4 border-b border-black/5 dark:border-white/5 pb-12">
+        <Link href="/horoscopes" className="inline-flex items-center text-xs font-mono font-bold tracking-widest uppercase text-slate-500 hover:text-[#C85A32] mb-4 transition-colors">
+          <ArrowLeft size={14} className="mr-2" />
+          All Signs
+        </Link>
+        <h1 className="text-5xl md:text-7xl font-serif font-black tracking-tighter uppercase text-black dark:text-[#FDFDFB]">
+          {sign}
+        </h1>
+        <p className="text-xs font-mono text-[#C85A32] uppercase tracking-[0.3em] font-bold">
+          Executive Daily Briefing • {readingDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
+        </p>
       </div>
 
-      {/* Main Column Split Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 min-h-[calc(100vh-53px)]">
-        
-        {/* Left Aspect: Strategic Mindset Reading */}
-        <section className="lg:col-span-7 p-6 md:p-12 lg:p-20 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-white/5">
-          <div className="space-y-8 max-w-2xl">
-            <div>
-              <span className="text-[10px] font-bold tracking-[0.25em] text-[#C85A32] uppercase font-mono block mb-1">
-                Executive Profile Analysis
-              </span>
-              <h1 className="text-4xl md:text-6xl font-serif tracking-tight text-white font-medium">
-                {formattedSign}
-              </h1>
+      {/* Dynamic Multi-Column Matrix mapped from Database */}
+      <div className="max-w-4xl mx-auto px-4 mt-16 grid grid-cols-1 md:grid-cols-2 gap-8">
+        {insights.map((item: any, index: number) => (
+          <section 
+            key={index} 
+            className={`p-6 rounded-sm bg-slate-50 dark:bg-[#121214] border border-black/5 dark:border-white/5 space-y-3 transition-all hover:border-black/20 dark:hover:border-white/10 ${
+              index === 4 ? "md:col-span-2 bg-gradient-to-r from-slate-50 to-orange-50/30 dark:from-[#121214] dark:to-[#1a1412]" : ""
+            }`}
+          >
+            <div className="flex items-center gap-2.5 border-b border-black/5 dark:border-white/5 pb-2">
+              {getIcon(item.iconName)}
+              <h3 className="text-sm font-mono font-bold uppercase tracking-wider text-black dark:text-white">
+                {item.title}
+              </h3>
             </div>
-
-            <div className="inline-flex items-center gap-3 bg-white/5 border border-white/5 px-3 py-1.5 rounded-sm">
-              <span className="text-[9px] font-mono font-bold tracking-wider uppercase text-slate-400">
-                Current Anchor Core:
-              </span>
-              <span className="text-xs font-mono font-bold text-[#C85A32]">
-                {reading.focusToken}
-              </span>
-            </div>
-
-            {/* Structured Long-Form Content Box */}
-            <div className="font-serif text-base md:text-lg leading-relaxed text-slate-300 space-y-6 pt-4 border-t border-white/5 whitespace-pre-line">
-              {reading.reading}
-            </div>
-          </div>
-
-          <div className="pt-12">
-            <Link 
-              href="/deals" 
-              className="text-xs font-mono tracking-wider text-slate-500 hover:text-[#C85A32] transition-colors"
-            >
-              &larr; Exit Terminal Feed
-            </Link>
-          </div>
-        </section>
-
-        {/* Right Aspect: Vector Performance Dashboard */}
-        <section className="lg:col-span-5 bg-[#101010] p-6 md:p-12 lg:p-16 flex flex-col justify-between font-mono">
-          <div className="space-y-12 w-full">
-            <div>
-              <h2 className="text-xs font-bold tracking-[0.2em] text-slate-400 uppercase">
-                Daily Energy Metrics
-              </h2>
-              <p className="text-[11px] text-slate-500 font-sans mt-1">
-                Your personal alignment and daily energy forecast.
-              </p>
-            </div>
-
-            {/* Metrics Graph Stack */}
-            <div className="space-y-8">
-              {/* Metric 1: Focus */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs font-medium">
-                  <span className="text-slate-300">MENTAL CLARITY & FOCUS</span>
-                  <span className="text-[#C85A32] font-bold">{reading.metricFocus}%</span>
-                </div>
-                <div className="w-full bg-white/5 h-1.5 rounded-none overflow-hidden">
-                  <div 
-                    className="bg-[#C85A32] h-full transition-all duration-1000 ease-out"
-                    style={{ width: `${reading.metricFocus}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Metric 2: Risk Posture */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs font-medium">
-                  <span className="text-slate-300">CAREER & LUCK</span>
-                  <span className="text-[#C85A32] font-bold">{reading.metricRisk}%</span>
-                </div>
-                <div className="w-full bg-white/5 h-1.5 rounded-none overflow-hidden">
-                  <div 
-                    className="bg-[#C85A32] h-full transition-all duration-1000 ease-out"
-                    style={{ width: `${reading.metricRisk}%` }}
-                  />
-                </div>
-              </div>
-
-              {/* Metric 3: Velocity */}
-              <div className="space-y-2">
-                <div className="flex justify-between text-xs font-medium">
-                  <span className="text-slate-300">ENERGY & MOMENTUM</span>
-                  <span className="text-[#C85A32] font-bold">{reading.metricVelocity}%</span>
-                </div>
-                <div className="w-full bg-white/5 h-1.5 rounded-none overflow-hidden">
-                  <div 
-                    className="bg-[#C85A32] h-full transition-all duration-1000 ease-out"
-                    style={{ width: `${reading.metricVelocity}%` }}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* System Sign-off Footer */}
-          <div className="border-t border-white/5 pt-6 mt-12 text-[10px] text-slate-600 space-y-1">
-            <div>FIRMWARE: JCLS• CORE_V1.2</div>
-            <div>DECRYPTED METRIC FRAME WORK OPERATING SUCCESSFUL.</div>
-          </div>
-        </section>
-
+            <p className="font-serif text-base text-slate-700 dark:text-slate-300 leading-relaxed">
+              {item.text}
+            </p>
+          </section>
+        ))}
       </div>
     </main>
   );

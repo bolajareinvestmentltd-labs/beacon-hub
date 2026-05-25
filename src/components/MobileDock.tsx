@@ -1,54 +1,78 @@
-﻿"use client";
+"use client";
 
+import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Tags, Sparkles, Menu } from "lucide-react";
+import { Home, Tags, Sparkles, Menu, X } from "lucide-react";
+import { TAXONOMY } from "@/config/taxonomy";
 
 export default function MobileDock() {
   const pathname = usePathname();
-
-  // The Navigation Map (Upgraded with the Tags icon for Deals)
-  const navItems = [
-    { name: "Feed", path: "/", icon: Home },
-    { name: "Deals", path: "/deals", icon: Tags },
-    { name: "Astro", path: "/horoscopes/aries", icon: Sparkles },
-  ];
+  const [isTrayOpen, setIsTrayOpen] = useState(false);
 
   return (
-    <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 w-[95%] max-w-sm md:hidden">
-      <div className="bg-white/90 dark:bg-[#1C1C1E]/90 backdrop-blur-xl border border-black/10 dark:border-white/10 rounded-3xl px-6 py-3 flex items-center justify-between shadow-2xl">
-        
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = pathname === item.path || (item.path !== "/" && pathname.startsWith(item.path));
-          
-          return (
-            <Link 
-              key={item.name} 
-              href={item.path}
-              className={`relative flex flex-col items-center gap-1 transition-all duration-300 w-12 ${isActive ? "text-[#E2725B]" : "text-slate-400 hover:text-black dark:hover:text-white"}`}
-            >
-              <Icon size={20} strokeWidth={isActive ? 2.5 : 2} />
-              {/* Native App Label */}
-              <span className={`text-[9px] font-bold tracking-wider uppercase ${isActive ? "opacity-100" : "opacity-70"}`}>
-                {item.name}
-              </span>
-              
-              {/* Glowing Dot Indicator */}
-              {isActive && (
-                <span className="absolute -top-1 right-1 w-1.5 h-1.5 bg-[#E2725B] rounded-full shadow-[0_0_8px_#E2725B]"></span>
-              )}
-            </Link>
-          );
-        })}
-        
-        {/* The Hamburger Menu */}
-        <button className="flex flex-col items-center gap-1 w-12 text-slate-400 hover:text-black dark:hover:text-white transition-colors">
-          <Menu size={20} />
-          <span className="text-[9px] font-bold tracking-wider uppercase opacity-70">Menu</span>
-        </button>
+    <>
+      {/* THE TRAY OVERLAY */}
+      {isTrayOpen && (
+        <div className="md:hidden fixed inset-0 z-40 flex flex-col justify-end bg-black/60 backdrop-blur-sm transition-opacity">
+          <div className="bg-white dark:bg-[#1C1C1E] w-full rounded-t-2xl shadow-2xl overflow-hidden animate-in slide-in-from-bottom-full duration-300 pb-28">
+            <div className="flex justify-between items-center p-5 border-b border-black/10 dark:border-white/10">
+              <span className="font-serif font-bold text-lg text-black dark:text-white">Directory</span>
+              <button 
+                onClick={() => setIsTrayOpen(false)}
+                className="p-1 rounded-full bg-slate-100 dark:bg-[#2A2A2C] text-slate-500 hover:text-[#C85A32]"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="max-h-[60vh] overflow-y-auto px-2 py-2">
+              <ul className="grid grid-cols-2 gap-2">
+                {TAXONOMY.primary.map((cat) => (
+                  <li key={cat.name}>
+                    <Link
+                      href={cat.href}
+                      onClick={() => setIsTrayOpen(false)}
+                      className="block px-4 py-3 text-sm font-bold tracking-wide text-black dark:text-[#F9F6F0] rounded-lg active:bg-slate-100 dark:active:bg-[#2A2A2C]"
+                    >
+                      {cat.name}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+      )}
 
+      {/* THE FLOATING PILL DOCK */}
+      <div className="md:hidden fixed bottom-6 left-1/2 -translate-x-1/2 z-50 w-[92%] max-w-sm bg-[#1C1C1E]/95 backdrop-blur-md text-white border border-white/10 rounded-full shadow-[0_20px_40px_rgba(0,0,0,0.5)] px-6 py-3">
+        <div className="flex justify-between items-center h-full">
+          
+          <Link href="/" className="flex flex-col items-center justify-center space-y-1 text-slate-400 hover:text-white transition-colors" onClick={() => setIsTrayOpen(false)}>
+            <Home size={20} className={pathname === '/' ? 'text-[#C85A32]' : ''} />
+            <span className="text-[9px] font-mono font-bold tracking-widest uppercase">Feed</span>
+          </Link>
+          
+          <Link href="/deals" className="flex flex-col items-center justify-center space-y-1 text-slate-400 hover:text-white transition-colors" onClick={() => setIsTrayOpen(false)}>
+            <Tags size={20} className={pathname.includes('/deals') ? 'text-[#C85A32]' : ''} />
+            <span className="text-[9px] font-mono font-bold tracking-widest uppercase">Deals</span>
+          </Link>
+          
+          <Link href="/horoscopes" className="flex flex-col items-center justify-center space-y-1 text-slate-400 hover:text-white transition-colors" onClick={() => setIsTrayOpen(false)}>
+            <Sparkles size={20} className={pathname.includes('/horoscopes') ? 'text-[#C85A32]' : ''} />
+            <span className="text-[9px] font-mono font-bold tracking-widest uppercase">Astro</span>
+          </Link>
+          
+          <button 
+            onClick={() => setIsTrayOpen(!isTrayOpen)}
+            className={`flex flex-col items-center justify-center space-y-1 transition-colors ${isTrayOpen ? 'text-[#C85A32]' : 'text-slate-400 hover:text-white'}`}
+          >
+            <Menu size={20} />
+            <span className="text-[9px] font-mono font-bold tracking-widest uppercase">Menu</span>
+          </button>
+
+        </div>
       </div>
-    </div>
+    </>
   );
 }

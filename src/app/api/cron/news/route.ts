@@ -1,108 +1,57 @@
+import { neon } from "@neondatabase/serverless";
 import { NextResponse } from "next/server";
-import { db } from "@/db";
-import { articles } from "@/db/schema";
 
-const generateSlug = (title: string) => {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '') + `-${Date.now().toString().slice(-4)}`;
-};
+// Allow the Vercel function more time to execute since longer articles take longer to write
+export const maxDuration = 60;
 
-export async function GET(request: Request) {
-  const authHeader = request.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}` && process.env.NODE_ENV === "production") {
-    return new NextResponse("Unauthorized Execution Protocol", { status: 401 });
-  }
-
-  const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-
-  if (!GNEWS_API_KEY) {
-    return NextResponse.json({ error: "Critical GNews API Key Missing" }, { status: 500 });
+export async function GET(req: Request) {
+  // Security lock: Only allow authorized cron requests
+  const authHeader = req.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    console.log("⚡ Initiating Editorial Synthesis Engine...");
-
-    const categoryTargets = [
-      { name: "Top News", query: "general", country: "ng" },
-      { name: "Global News", query: "world", country: "us" },
-      { name: "Elections 2026", query: "nation", country: "ng" }
-    ];
+    const sql = neon(process.env.DATABASE_URL || "");
+    const apiKey = process.env.GEMINI_API_KEY;
     
-    const target = categoryTargets[Math.floor(Math.random() * categoryTargets.length)];
-    console.log(`🎯 Targeting Sector: ${target.name}`);
-
-    const gnewsUrl = `https://gnews.io/api/v4/top-headlines?category=${target.query}&lang=en&country=${target.country}&max=3&apikey=${GNEWS_API_KEY}`;
-    const newsResponse = await fetch(gnewsUrl);
-    const newsData = await newsResponse.json();
-
-    if (!newsData.articles || newsData.articles.length === 0) {
-      return NextResponse.json({ error: "No raw intelligence returned from upstream." }, { status: 500 });
-    }
-
-    const formattedArticles = [];
-
-    for (const article of newsData.articles) {
-      console.log(`📝 Processing Asset: ${article.title.substring(0, 30)}...`);
-      
-      let finalContent = article.content || article.description || "Content processing error.";
-      
-      // Attempt Gemini Expansion
-      if (GEMINI_API_KEY) {
-        const masterPrompt = `
-          You are a senior investigative journalist. Expand this snippet into a professional, 4-paragraph editorial. 
-          Return ONLY the raw article text.
-          Headline: ${article.title}
-          Snippet: ${article.description || article.content}
-        `;
-
-        try {
-          const aiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              contents: [{ parts: [{ text: masterPrompt }] }],
-              generationConfig: { temperature: 0.6 }
-            })
-          });
-
-          if (aiResponse.ok) {
-            const aiResult = await aiResponse.json();
-            finalContent = aiResult.candidates[0].content.parts[0].text.trim();
-            console.log("   [✓] AI Expansion Successful.");
-          } else {
-             throw new Error("AI Rate Limit");
-          }
-        } catch (aiError) {
-          console.log("   [!] AI Locked. Applying safety fallback to short snippet.");
+    // Call the Gemini 2.0 Flash Engine
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{
+          parts: [{
+            text: "You are the Senior Editor for a premium news portal named Beacon-Hub. Generate 3 breaking news articles focusing on Global News, Tech & Startups, and Elections 2026. Return strictly in JSON format as an array of objects with the following keys: 'title', 'category', 'slug' (a URL-friendly string), 'image_url' (leave empty if no verified image is available, our system has a fallback), and 'content'. CRITICAL INSTRUCTION: The 'content' key MUST contain a comprehensive, deep-dive editorial consisting of at least 4 to 5 detailed paragraphs. Do not write short summaries. Ensure the tone is objective, analytical, and highly professional."
+          }]
+        }],
+        generationConfig: { 
+          response_mime_type: "application/json" 
         }
-      }
-
-      // 🛡️ THE FIX: Always push the article, whether it's expanded or just the fallback snippet
-      formattedArticles.push({
-        title: article.title,
-        slug: generateSlug(article.title),
-        category: target.name,
-        content: finalContent,
-        excerpt: (article.description || "Tap to read full intelligence briefing...").substring(0, 150) + "...",
-        imageUrl: article.image || null,
-        isPublished: true,
-        isBreaking: false,
-      });
-      
-      await new Promise(resolve => setTimeout(resolve, 1000)); 
-    }
-
-    if (formattedArticles.length > 0) {
-      await db.insert(articles).values(formattedArticles);
-    }
-
-    return NextResponse.json({ 
-      success: true, 
-      message: `${formattedArticles.length} intelligence briefings deployed to ${target.name}.` 
+      })
     });
 
+    const data = await response.json();
+    
+    if (data.error) {
+       throw new Error(data.error.message);
+    }
+
+    const textResponse = data.candidates[0].content.parts[0].text;
+    const articles = JSON.parse(textResponse);
+
+    // Inject the new, long-form articles into the Neon database
+    for (const article of articles) {
+      await sql`
+        INSERT INTO articles (title, slug, category, content, image_url, created_at)
+        VALUES (${article.title}, ${article.slug}, ${article.category}, ${article.content}, ${article.image_url}, NOW())
+        ON CONFLICT (slug) DO NOTHING;
+      `;
+    }
+
+    return NextResponse.json({ success: true, message: 'Deep-dive intelligence deployed successfully.' });
   } catch (error: any) {
-    console.error("❌ Synthesis Engine Error:", error.message);
-    return NextResponse.json({ error: "Failed to deploy intelligence" }, { status: 500 });
+    console.error("Cron Execution Failed:", error.message);
+    return NextResponse.json({ success: false, error: error.message }, { status: 500 });
   }
 }
