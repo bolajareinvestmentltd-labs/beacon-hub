@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/astro",
       "schedule": "0 8 * * *"
+    },
+    {
+      "path": "/api/cron/news",
+      "schedule": "0 5,17 * * *"
     }
   ]
 }

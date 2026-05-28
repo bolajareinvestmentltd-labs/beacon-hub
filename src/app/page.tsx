@@ -1,96 +1,72 @@
-﻿import Link from "next/link";
-import { getHeroArticle, getLatestFeed } from "@/lib/queries";
+import React from 'react';
+import Link from 'next/link';
+import QuoteCard from '@/components/QuoteCard';
 
-export default async function HomePage() {
-  // Fetch live data directly from Neon!
-  const heroArticle = await getHeroArticle();
-  const feedArticles = await getLatestFeed(10);
-
-  // Time formatter helper
-  const timeAgo = (date: Date) => {
-    const minutes = Math.floor((new Date().getTime() - date.getTime()) / 60000);
-    if (minutes < 60) return `Updated ${minutes} min ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `Updated ${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
-    return `Updated ${Math.floor(hours / 24)} days ago`;
-  };
-
-  // If the database is empty, show a clean fallback
-  if (!heroArticle) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh] text-slate-500 font-playfair italic">
-        Awaiting global intelligence feed...
-      </div>
-    );
-  }
-
+export default function Home() {
   return (
-    <div className="w-full max-w-3xl mx-auto py-6 md:py-10">
+    <main className="min-h-screen bg-[#121212] pb-28 md:pb-12">
       
-      {/* 1. LIVE HERO SECTION */}
-      <article className="mb-12 border-b-2 border-black dark:border-white/20 pb-10">
-        <div className="flex items-center gap-3 mb-5">
-          <span className="bg-[#E2725B] text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-sm mb-4 mt-8 inline-block">Latest Briefing</span>
-          <span className="text-[10px] font-bold text-[#3A7B7A] uppercase tracking-wider">
-            {heroArticle.category}
-          </span>
-        </div>
-        
-        <Link href={`/read/${heroArticle.slug}`}>
-          <h1 className="text-4xl md:text-[3.5rem] font-black font-playfair leading-[1.1] mb-5 text-black dark:text-[#F9F6F0] hover:text-[#E2725B] transition-colors">
-            {heroArticle.title}
-          </h1>
-        </Link>
-        
-        <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed mb-6">
-          {heroArticle.excerpt}
+      {/* HEADER HERO AREA */}
+      <div className="max-w-6xl mx-auto pt-24 px-6 sm:px-12 pb-10">
+        <h1 className="text-5xl md:text-7xl lg:text-8xl font-serif font-black text-[#F9F6F0] tracking-tighter leading-none mb-4">
+          BEACON<span className="text-[#C85A32]">•</span>HUB
+        </h1>
+        <p className="font-mono text-neutral-500 uppercase tracking-widest text-xs md:text-sm max-w-lg">
+          The premium nexus for tech, real estate, and global trends.
         </p>
-        
-        <div className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.1em]">
-          By {"JCLS Editorial"} &bull; {heroArticle.publishedAt!.toLocaleDateString()}
-        </div>
-      </article>
-
-      {/* 2. THE LIVE HT MASONRY FEED */}
-      <div className="flex flex-col">
-        {feedArticles.map((article) => (
-          <article 
-            key={article.id} 
-            className="py-6 border-b border-black/10 dark:border-white/10 flex gap-4 md:gap-8 group"
-          >
-            {/* Left: Content */}
-            <div className="flex-1 flex flex-col justify-between">
-              <Link href={`/read/${article.slug}`}>
-                <h2 className="text-[1.35rem] md:text-2xl font-bold font-playfair leading-tight text-black dark:text-[#F9F6F0] group-hover:text-[#E2725B] transition-colors">
-                  {article.title}
-                </h2>
-              </Link>
-              
-              <div className="flex items-center gap-2 mt-4 text-[11px] font-bold tracking-wide">
-                <span className="text-[#3A7B7A] dark:text-[#4A9B9A] uppercase">{article.category}</span>
-                <span className="text-slate-300 dark:text-slate-600">&bull;</span>
-                <span className="text-slate-500">{timeAgo(article.publishedAt!)}</span>
-              </div>
-            </div>
-
-            {/* Right: Live Image */}
-            <Link href={`/read/${article.slug}`} className="block flex-shrink-0">
-              <div className="w-[100px] h-[75px] md:w-[160px] md:h-[100px] bg-slate-200 dark:bg-white/5 rounded-md overflow-hidden relative border border-black/5 dark:border-white/5">
-                {article.imageUrl ? (
-                  <img 
-                    src={article.imageUrl} 
-                    alt={article.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                  />
-                ) : (
-                  <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px] dark:bg-[radial-gradient(#fff_1px,transparent_1px)]"></div>
-                )}
-              </div>
-            </Link>
-          </article>
-        ))}
       </div>
 
-    </div>
+      {/* DAILY QUOTE INTEGRATION (Engineering as Marketing) */}
+      <QuoteCard 
+        quote="Code is currency. Engineering is the purest form of marketing."
+        author="Olowojare Muhammed"
+        role="Product Architect & Digital Strategist"
+      />
+
+      {/* BENTO GRID DASHBOARD */}
+      <div className="max-w-6xl mx-auto px-6 sm:px-12 mt-16">
+        <div className="flex items-center justify-between border-b border-neutral-800 pb-4 mb-8">
+           <h2 className="font-sans font-bold text-[#F9F6F0] uppercase tracking-[0.2em] text-sm">Top Stories</h2>
+           <div className="flex items-center gap-2">
+             <span className="text-[9px] font-mono text-neutral-500 uppercase tracking-widest">Live Updates</span>
+             <span className="flex h-2 w-2 rounded-full bg-[#C85A32] animate-pulse"></span>
+           </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4 md:auto-rows-[250px]">
+          
+          {/* Main Hero Block (Tech/Trending) */}
+          <Link href="/category/tech" className="md:col-span-8 md:row-span-2 group relative bg-[#1C1C1E] border border-neutral-800 rounded-2xl overflow-hidden hover:border-neutral-600 transition-all duration-300 flex flex-col justify-end p-8 min-h-[300px] md:min-h-0">
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent z-10" />
+            <div className="relative z-20">
+              <span className="px-2 py-1 bg-[#C85A32] text-white text-[10px] font-bold uppercase tracking-widest mb-4 inline-block rounded-sm">Tech Trends</span>
+              <h3 className="font-serif text-3xl md:text-5xl font-bold text-[#F9F6F0] leading-tight group-hover:text-[#C85A32] transition-colors">
+                The Next.js 15 Paradigm: Unmatched Speed for Real-Time Apps.
+              </h3>
+            </div>
+          </Link>
+
+          {/* Secondary Block 1 (Real Estate) */}
+          <Link href="/category/real-estate" className="md:col-span-4 md:row-span-1 group bg-[#1C1C1E] border border-neutral-800 rounded-2xl p-6 hover:border-neutral-600 transition-all duration-300 flex flex-col justify-between min-h-[200px] md:min-h-0">
+            <span className="text-neutral-500 text-[10px] font-mono uppercase tracking-widest">Real Estate</span>
+            <h3 className="font-serif text-xl md:text-2xl font-medium text-[#F9F6F0] group-hover:text-[#C85A32] transition-colors">
+              Redefining Real Estate: AI-Driven Urban Development.
+            </h3>
+          </Link>
+
+          {/* Secondary Block 2 (Election 2026 Focus) */}
+          <Link href="/category/election-2026" className="md:col-span-4 md:row-span-1 group bg-[#1C1C1E] border border-neutral-800 rounded-2xl p-6 hover:border-neutral-600 transition-all duration-300 flex flex-col justify-between relative overflow-hidden min-h-[200px] md:min-h-0">
+             <div className="absolute top-0 right-0 w-32 h-32 bg-[#C85A32]/10 rounded-bl-full blur-2xl" />
+            <span className="text-neutral-500 text-[10px] font-mono uppercase tracking-widest flex justify-between">
+              Election 2026 <span className="text-[#C85A32] font-black">NG</span>
+            </span>
+            <h3 className="font-serif text-xl md:text-2xl font-medium text-[#F9F6F0] group-hover:text-[#C85A32] transition-colors">
+              The Build-up to the Osun & Ekiti Gubernatorial Shifts.
+            </h3>
+          </Link>
+
+        </div>
+      </div>
+    </main>
   );
 }
