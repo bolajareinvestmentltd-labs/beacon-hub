@@ -2,6 +2,8 @@
 import Link from "next/link";
 import { Sparkles } from "lucide-react";
 
+export const dynamic = 'force-dynamic';
+
 // Static array of signs to ensure all 12 always render, even if the DB reading is missing
 const ZODIAC_SIGNS = [
   { name: "Aries", date: "Mar 21 - Apr 19", element: "Fire" },

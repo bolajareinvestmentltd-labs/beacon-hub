@@ -4,6 +4,8 @@ import { db } from "@/db";
 import { deals } from "@/db/schema";
 import { desc, eq } from "drizzle-orm";
 
+export const dynamic = 'force-dynamic';
+
 export default async function DealsPage() {
   // ARCHITECT INJECTION: Fetch live active deals directly from Neon Database
   const assets = await db.select().from(deals).where(eq(deals.isActive, true)).orderBy(desc(deals.createdAt));

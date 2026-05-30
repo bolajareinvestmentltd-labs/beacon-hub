@@ -1,6 +1,8 @@
 ﻿import Link from "next/link";
 import { getHeroArticle, getLatestFeed } from "@/lib/queries";
 
+export const dynamic = 'force-dynamic';
+
 export default async function HomePage() {
   // Fetch live data directly from Neon!
   const heroArticle = await getHeroArticle();

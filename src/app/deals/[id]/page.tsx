@@ -51,48 +51,45 @@ export default async function EscrowDetailPage({ params }: { params: Promise<{ i
             <p className="text-slate-600 dark:text-slate-400 leading-relaxed text-sm md:text-base">
               {asset.description}
             </p>
-          </div>
-        </div>
-
-        {/* RIGHT COLUMN: The Financial Engine */}
-<div className="lg:col-span-1">
-  <div className="bg-white dark:bg-[#1C1C1E] p-6 md:p-8 rounded-xl border border-black/10 dark:border-white/10 shadow-xl sticky top-24">
-    
-    <div className="flex items-center gap-2 text-black dark:text-[#F9F6F0] mb-6 border-b border-black/10 dark:border-white/10 pb-4">
-      <ShieldCheck size={20} className="text-[#E2725B]" />
-      <h2 className="font-playfair font-bold text-xl">Direct Connection</h2>
-    </div>
-
-    <div className="flex flex-col gap-4 mb-6 text-sm">
-      <div className="flex justify-between items-center text-slate-600 dark:text-slate-400 font-medium">
-        <span>Asset Principal <span className="text-[10px] uppercase ml-1">(Paid to Owner)</span></span>
-        <span>₦{(asset.price || 0).toLocaleString()}</span>
-      </div>
-      <div className="flex justify-between items-center text-slate-600 dark:text-slate-400 font-medium">
-        <span>Beacon Fee</span>
-        <span className="text-[#E2725B] font-bold text-lg">₦{BEACON_FEE || 50}</span>
-      </div>
-    </div>
-
-    <div className="bg-slate-50 dark:bg-black p-4 rounded-lg border border-black/5 dark:border-white/5 mb-8">
-      <div className="flex justify-between items-center">
-        <span className="text-xs font-bold uppercase tracking-widest text-slate-500">Total Due Now</span>
-        {/* DO NOT use TOTAL_PRICE here if it adds the asset price. Only charge the Beacon Fee! */}
-        <span className="text-2xl font-black text-black dark:text-[#F9F6F0]">₦{BEACON_FEE || 50}</span>
-      </div>
-    </div>
-
-    <button className="w-full bg-[#E2725B] hover:bg-[#c95b46] text-white font-black py-4 rounded-md transition-all duration-300 uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-2 group">
-      UNLOCK OWNER DETAILS &rarr;
-    </button>
-  </div>
-</div>
 
             <div className="mt-6 flex gap-3 text-[10px] text-slate-500 uppercase tracking-wider leading-relaxed">
               <AlertCircle size={16} className="shrink-0 text-[#E2725B]" />
               <p>Funds are held in secure JCLs Escrow until asset delivery is confirmed by both parties. Zero hidden charges.</p>
             </div>
+          </div>
+        </div>
 
+        {/* RIGHT COLUMN: The Financial Engine */}
+        <div className="lg:col-span-1">
+          <div className="bg-white dark:bg-[#1C1C1E] p-6 md:p-8 rounded-xl border border-black/10 dark:border-white/10 shadow-xl sticky top-24">
+            
+            <div className="flex items-center gap-2 text-black dark:text-[#F9F6F0] mb-6 border-b border-black/10 dark:border-white/10 pb-4">
+              <ShieldCheck size={20} className="text-[#E2725B]" />
+              <h2 className="font-playfair font-bold text-xl">Direct Connection</h2>
+            </div>
+
+            <div className="flex flex-col gap-4 mb-6 text-sm">
+              <div className="flex justify-between items-center text-slate-600 dark:text-slate-400 font-medium">
+                <span>Asset Principal <span className="text-[10px] uppercase ml-1">(Paid to Owner)</span></span>
+                <span>₦{(asset.price || 0).toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between items-center text-slate-600 dark:text-slate-400 font-medium">
+                <span>Beacon Fee</span>
+                <span className="text-[#E2725B] font-bold text-lg">₦{JCLS_FEE || 50}</span>
+              </div>
+            </div>
+
+            <div className="bg-slate-50 dark:bg-black p-4 rounded-lg border border-black/5 dark:border-white/5 mb-8">
+              <div className="flex justify-between items-center">
+                <span className="text-xs font-bold uppercase tracking-widest text-slate-500">Total Due Now</span>
+                {/* DO NOT use TOTAL_PRICE here if it adds the asset price. Only charge the Beacon Fee! */}
+                <span className="text-2xl font-black text-black dark:text-[#F9F6F0]">₦{JCLS_FEE || 50}</span>
+              </div>
+            </div>
+
+            <button className="w-full bg-[#E2725B] hover:bg-[#c95b46] text-white font-black py-4 rounded-md transition-all duration-300 uppercase tracking-[0.2em] text-[11px] flex items-center justify-center gap-2 group">
+              UNLOCK OWNER DETAILS &rarr;
+            </button>
           </div>
         </div>
 

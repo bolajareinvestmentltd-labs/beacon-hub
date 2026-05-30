@@ -1,10 +1,9 @@
 "use server";
 
 import { db } from "@/db";
-import { articles, deals } from "@/db/schema";
+import { articles, deals, subscribers } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { put } from "@vercel/blob";
-import { articles, deals, subscribers } from "@/db/schema";
 
 const generateSlug = (title: string) => {
   return title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + `-${Date.now().toString().slice(-4)}`;
@@ -71,23 +70,8 @@ export async function publishDeal(formData: FormData) {
   revalidatePath("/admin");
 }
 
-export async function subscribeUser(formData: FormData) {
-  const email = formData.get("email");
-  
-  if (!email || typeof email !== "string") {
-    return { error: "Invalid email" };
-  }
-
-  try {
-    console.log("Subscribed:", email);
-    return { success: true };
-  } catch (error) {
-    return { error: "Failed to subscribe. Please try again." };
-  }
-}
-
 // ========================================================
-// 3. NETWORK ENGINE (Newsletter Subscribers)
+// 2. NETWORK ENGINE (Newsletter Subscribers)
 // ========================================================
 export async function subscribeUser(formData: FormData) {
   const email = formData.get("email") as string;

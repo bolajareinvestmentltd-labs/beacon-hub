@@ -1,17 +1,27 @@
 import { db } from "@/db";
 import { articles, horoscopes, deals } from "@/db/schema";
-import { desc, ilike, eq, and } from "drizzle-orm";
+import { desc, ilike, eq, and, gte, lte } from "drizzle-orm";
 
 // 1. Hero Article
 export async function getHeroArticle() {
-  const result = await db.select().from(articles).orderBy(desc(articles.publishedAt)).limit(1);
-  return result[0] || null;
+  try {
+    const result = await db.select().from(articles).orderBy(desc(articles.publishedAt)).limit(1);
+    return result[0] || null;
+  } catch (error) {
+    console.warn("Failed to fetch hero article:", error);
+    return null;
+  }
 }
 
 // 2. Main Feed
 export async function getLatestFeed(limit = 10) {
-  const result = await db.select().from(articles).orderBy(desc(articles.publishedAt)).offset(1).limit(limit);
-  return result;
+  try {
+    const result = await db.select().from(articles).orderBy(desc(articles.publishedAt)).offset(1).limit(limit);
+    return result;
+  } catch (error) {
+    console.warn("Failed to fetch latest feed:", error);
+    return [];
+  }
 }
 
 // 3. Category Feed
@@ -47,11 +57,8 @@ export async function getHoroscopeBySign(sign: string, date?: Date) {
       .where(
         and(
           eq(horoscopes.sign, normalizedSign),
-          and(
-            // @ts-ignore - comparing dates with Drizzle ORM
-            horoscopes.publishDate.gte(startOfDay),
-            horoscopes.publishDate.lte(endOfDay)
-          )
+          gte(horoscopes.publishDate, startOfDay),
+          lte(horoscopes.publishDate, endOfDay)
         )
       )
       .limit(1);
@@ -69,8 +76,16 @@ export async function getHoroscopeBySign(sign: string, date?: Date) {
 
 // 6. Daily Horoscopes Grid
 export async function getDailyHoroscopes() {
-  const result = await db.select().from(horoscopes).orderBy(desc(horoscopes.publishDate)).limit(12);
-  return result;
+  try {
+    const result = await db.select({
+      id: horoscopes.id,
+      sign: horoscopes.sign,
+    }).from(horoscopes).orderBy(desc(horoscopes.publishDate)).limit(12);
+    return result;
+  } catch (error) {
+    console.warn("Failed to fetch horoscopes, returning empty array:", error);
+    return [];
+  }
 }
 
 // 7. Marketplace Deals

@@ -1,6 +1,8 @@
 ﻿import Link from "next/link";
 import { getArticlesByCategory } from "@/lib/queries";
 
+export const dynamic = 'force-dynamic';
+
 // Helper function for time
 const timeAgo = (date: Date) => {
   const minutes = Math.floor((new Date().getTime() - date.getTime()) / 60000);
