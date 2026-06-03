@@ -1,0 +1,28 @@
+# Beacon-Hub robots.txt
+# Generated: May 2026
+
+# Allow all crawlers
+User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/cron
+Disallow: *.mp4
+Disallow: *.webm
+
+# Specific rules for Google
+User-agent: Googlebot
+Allow: /
+
+# Specific rules for Bing
+User-agent: Bingbot
+Allow: /
+
+# Sitemap location
+Sitemap: https://beacon-hub.vercel.app/sitemap.xml
+
+# Crawl delay (in seconds) - adjust as needed
+Crawl-delay: 1
+
+# Cache settings
+User-agent: *
+Request-rate: 1/1s
