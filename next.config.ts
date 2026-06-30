@@ -4,6 +4,29 @@ const nextConfig: NextConfig = {
   // Allow your local phone IP to connect to the dev server
   allowedDevOrigins: ['192.168.43.104'],
   
+  // Security headers
+  async headers() {
+    return [
+      {
+        source: '/:path*',
+        headers: [
+          // Prevent MIME type sniffing
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          // Prevent clickjacking
+          { key: 'X-Frame-Options', value: 'DENY' },
+          // XSS protection
+          { key: 'X-XSS-Protection', value: '1; mode=block' },
+          // Referrer policy
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          // Permissions policy (restrict powerful features)
+          { key: 'Permissions-Policy', value: 'geolocation=(), microphone=(), camera=()' },
+          // HSTS (strict transport security)
+          { key: 'Strict-Transport-Security', value: 'max-age=31536000; includeSubDomains; preload' },
+        ],
+      },
+    ];
+  },
+  
   images: {
     remotePatterns: [
       // GNews API image sources

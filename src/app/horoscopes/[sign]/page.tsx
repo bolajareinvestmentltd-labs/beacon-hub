@@ -1,133 +1,135 @@
-import React from "react";
+import { getHoroscopeBySign } from "@/lib/queries";
+import AstroColumnarLayout from "@/components/AstroColumnarLayout";
+import SectionHeaderComponent from "@/components/SectionHeaderComponent";
 import Link from "next/link";
-import { notFound } from "next/navigation";
-import { ArrowLeft, Sparkles, Moon, Sun, Compass } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 
-const ZODIAC_SIGNS = [
-  "aries", "taurus", "gemini", "cancer", "leo", "virgo",
-  "libra", "scorpio", "sagittarius", "capricorn", "aquarius", "pisces"
-];
+export const dynamic = 'force-dynamic';
 
-interface PageProps {
-  params: Promise<{ sign: string }>;
-}
+export default async function HoroscopePage({ params }: { params: { sign: string } }) {
+  // Fetch the live reading from Neon
+  const reading = await getHoroscopeBySign(params.sign);
 
-// Function to fetch dynamic horoscope from Gemini directly via REST API
-async function getDailyHoroscope(sign: string) {
-  const apiKey = process.env.GEMINI_API_KEY;
-  if (!apiKey) return null;
-
-  const prompt = `You are a professional astrologer. Write a daily horoscope for ${sign}. 
-  Return ONLY a raw JSON object with no markdown formatting, no code blocks, and no extra text.
-  Format: {"overview": "3 sentences about their career and alignment today.", "lucky_number": "A number between 1 and 99", "power_color": "A highly specific, creative color name like 'Alabaster Gold' or 'Midnight Obsidian'", "trajectory": "1 sentence on professional trajectory", "synergy": "1 sentence on relational synergy"}`;
-
-  try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }]
-      }),
-      // CACHE THIS REQUEST FOR 24 HOURS (86400 seconds)
-      next: { revalidate: 86400 } 
-    });
-
-    const data = await res.json();
-    const textResponse = data.candidates[0].content.parts[0].text;
-    
-    // Clean any accidental markdown the AI might include
-    const cleanJson = textResponse.replace(/```json/g, '').replace(/```/g, '').trim();
-    return JSON.parse(cleanJson);
-  } catch (error) {
-    console.error("Failed to fetch horoscope:", error);
-    return null;
-  }
-}
-
-export default async function HoroscopeSignPage({ params }: PageProps) {
-  const resolvedParams = await params;
-  const sign = resolvedParams.sign.toLowerCase();
-
-  if (!ZODIAC_SIGNS.includes(sign)) {
-    notFound();
-  }
-
-  const signName = sign.charAt(0).toUpperCase() + sign.slice(1);
-  const horoscope = await getDailyHoroscope(signName);
-
-  // Fallback text if the AI API fails
-  const fallback = {
-    overview: "The celestial alignments are currently shifting. Focus on structural dynamics and strategic restraint today.",
-    lucky_number: "7",
-    power_color: "Neutral Gray",
-    trajectory: "Keep negotiations transparent.",
-    synergy: "Maintain clear communication channels."
-  };
-
-  const data = horoscope || fallback;
-
-  return (
-    <main className="min-h-screen bg-[#F9F6F0] dark:bg-[#121212] text-[#121212] dark:text-[#F9F6F0] pt-40 pb-24 px-4 transition-colors duration-300 flex flex-col">
-      <div className="max-w-3xl mx-auto w-full flex-grow">
-        
-        <Link href="/horoscopes" className="inline-flex items-center gap-2 text-xs font-mono uppercase tracking-widest text-neutral-500 hover:text-[#C85A32] mb-12 transition-colors">
-          <ArrowLeft size={14} /> Back to Constellations
+  if (!reading) {
+    return (
+      <div className="w-full max-w-3xl mx-auto py-12 px-4">
+        <Link 
+          href="/horoscopes" 
+          className="flex items-center gap-2 text-[#E2725B] hover:text-[#E2725B]/80 transition-colors mb-8 font-bold"
+        >
+          <ArrowLeft size={18} />
+          Back to All Signs
         </Link>
 
-        <div className="border-b-4 border-[#121212] dark:border-[#F9F6F0] pb-8 mb-12">
-          <div className="flex items-center gap-3 text-[#C85A32] font-mono text-xs uppercase tracking-[0.2em] mb-3">
-            <Sparkles size={16} /> Daily Cosmic Intelligence
-          </div>
-          <h1 className="font-serif text-5xl md:text-6xl font-black tracking-tight uppercase">
-            {signName}
-          </h1>
-          <p className="font-mono text-xs text-neutral-500 uppercase tracking-wider mt-2">
-            Alignment for {new Date().toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })}
+        <div className="text-center py-16">
+          <p className="text-slate-500 dark:text-slate-400 font-playfair text-lg italic">
+            The cosmic intelligence is still computing this reading... please check back shortly.
           </p>
         </div>
+      </div>
+    );
+  }
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="md:col-span-2 bg-white dark:bg-[#1C1C1E] border border-neutral-200 dark:border-neutral-800 p-8 rounded-2xl shadow-sm">
-            <h3 className="font-serif text-xl font-bold mb-4 flex items-center gap-2">
-              <Compass className="text-[#C85A32]" size={20} /> Overview & Outlook
-            </h3>
-            <p className="font-sans text-base leading-relaxed text-neutral-700 dark:text-neutral-300">
-              {data.overview}
-            </p>
-          </div>
+  // Format reading for the AstroColumnarLayout component
+  const formattedReading = {
+    sign: reading.sign,
+    zodiacSymbol: getZodiacSymbol(reading.sign),
+    dateRange: getDateRangeForSign(reading.sign),
+    reading: reading.reading || "",
+    lunarPhase: reading.lunarPhase || "Unknown Phase",
+    fortuneLevel: reading.fortuneLevel || 3,
+    luckyColor: reading.luckyColor || "Silver",
+    luckyNumber: reading.luckyNumber || 7,
+    compatibleSigns: reading.compatibleSigns || [],
+    careerForecast: reading.careerForecast || "Focus on steady professional growth.",
+    loveForecast: reading.loveForecast || "Relationships flourish through honest communication.",
+    financialTip: reading.financialTip || "Review your spending patterns and adjust as needed.",
+    powerAffirmation: reading.powerAffirmation || "I embrace my potential and create my destiny.",
+  };
 
-          <div className="flex flex-col gap-6">
-            <div className="bg-white dark:bg-[#1C1C1E] border border-neutral-200 dark:border-neutral-800 p-6 rounded-2xl flex-1">
-              <span className="font-mono text-[10px] text-neutral-400 uppercase tracking-widest block mb-1">Lucky Number</span>
-              <span className="font-serif text-3xl font-black text-[#C85A32]">{data.lucky_number}</span>
-            </div>
-            <div className="bg-white dark:bg-[#1C1C1E] border border-neutral-200 dark:border-neutral-800 p-6 rounded-2xl flex-1">
-              <span className="font-mono text-[10px] text-neutral-400 uppercase tracking-widest block mb-1">Power Color</span>
-              <span className="font-sans text-sm font-bold tracking-wide uppercase">{data.power_color}</span>
-            </div>
-          </div>
-        </div>
+  return (
+    <div className="w-full bg-gradient-to-b from-slate-50 to-white dark:from-black dark:to-slate-950">
+      {/* Back Button */}
+      <div className="max-w-3xl mx-auto px-4 pt-6 md:pt-8">
+        <Link 
+          href="/horoscopes" 
+          className="inline-flex items-center gap-2 text-[#E2725B] hover:text-[#E2725B]/80 transition-colors font-bold text-sm uppercase tracking-wider"
+        >
+          <ArrowLeft size={16} />
+          Back to Astro Desk
+        </Link>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-[#1C1C1E] border border-neutral-200 dark:border-neutral-800 p-6 rounded-2xl">
-            <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-neutral-400 mb-3 flex items-center gap-2">
-              <Sun size={14} className="text-[#C85A32]" /> Professional Trajectory
-            </h4>
-            <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-              {data.trajectory}
-            </p>
-          </div>
+      {/* MAIN HOROSCOPE READING */}
+      <AstroColumnarLayout reading={formattedReading} />
 
-          <div className="bg-white dark:bg-[#1C1C1E] border border-neutral-200 dark:border-neutral-800 p-6 rounded-2xl">
-            <h4 className="font-mono text-xs font-bold uppercase tracking-wider text-neutral-400 mb-3 flex items-center gap-2">
-              <Moon size={14} className="text-indigo-500" /> Relational Synergy
-            </h4>
-            <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-400">
-              {data.synergy}
-            </p>
-          </div>
+      {/* EXPLORE OTHER SIGNS */}
+      <div className="max-w-3xl mx-auto px-4 py-16 border-t border-slate-200 dark:border-white/10">
+        <SectionHeaderComponent
+          eyebrow="EXPLORE"
+          title="Other Zodiac Signs"
+          description="Discover cosmic intelligence for all 12 signs"
+        />
+
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4">
+          {[
+            "Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo",
+            "Libra", "Scorpio", "Sagittarius", "Capricorn", "Aquarius", "Pisces"
+          ].map((sign) => (
+            <Link
+              key={sign}
+              href={`/horoscopes/${sign.toLowerCase()}`}
+              className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all duration-300 ${
+                sign.toLowerCase() === params.sign.toLowerCase()
+                  ? "bg-[#E2725B] text-white border-[#E2725B]"
+                  : "border-slate-200 dark:border-white/10 hover:border-[#E2725B] hover:shadow-lg"
+              }`}
+            >
+              <span className="text-xs md:text-sm font-bold text-center">
+                {sign}
+              </span>
+            </Link>
+          ))}
         </div>
       </div>
-    </main>
+
+    </div>
   );
+}
+
+// Helper functions
+function getZodiacSymbol(sign: string): string {
+  const symbols: Record<string, string> = {
+    Aries: "♈",
+    Taurus: "♉",
+    Gemini: "♊",
+    Cancer: "♋",
+    Leo: "♌",
+    Virgo: "♍",
+    Libra: "♎",
+    Scorpio: "♏",
+    Sagittarius: "♐",
+    Capricorn: "♑",
+    Aquarius: "♒",
+    Pisces: "♓",
+  };
+  return symbols[sign] || "✦";
+}
+
+function getDateRangeForSign(sign: string): string {
+  const dateRanges: Record<string, string> = {
+    Aries: "Mar 21 - Apr 19",
+    Taurus: "Apr 20 - May 20",
+    Gemini: "May 21 - Jun 20",
+    Cancer: "Jun 21 - Jul 22",
+    Leo: "Jul 23 - Aug 22",
+    Virgo: "Aug 23 - Sep 22",
+    Libra: "Sep 23 - Oct 22",
+    Scorpio: "Oct 23 - Nov 21",
+    Sagittarius: "Nov 22 - Dec 21",
+    Capricorn: "Dec 22 - Jan 19",
+    Aquarius: "Jan 20 - Feb 18",
+    Pisces: "Feb 19 - Mar 20",
+  };
+  return dateRanges[sign] || "Unknown";
 }

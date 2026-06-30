@@ -1,111 +1,243 @@
-﻿import Link from "next/link";
-import { getHeroArticle, getLatestFeed } from "@/lib/queries";
-import AdSense from "@/components/AdSense";
+﻿import Link from 'next/link';
+import { getArticles, getFeaturedArticles, getBreakingNews } from '@/lib/queries';
+import AsymmetricalHeroLayout from '@/components/AsymmetricalHeroLayout';
+import SectionHeaderComponent from '@/components/SectionHeaderComponent';
+import AdPlacementManager from '@/components/AdPlacementManager';
+import { premiumClasses } from '@/lib/premiumStyles';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  // Fetch live data directly from Neon!
-  const heroArticle = await getHeroArticle();
-  const feedArticles = await getLatestFeed(10);
+  const [featured, breaking, all] = await Promise.all([
+    getFeaturedArticles(),
+    getBreakingNews(),
+    getArticles(),
+  ]);
 
-  // Time formatter helper
-  const timeAgo = (date: Date) => {
-    const minutes = Math.floor((new Date().getTime() - date.getTime()) / 60000);
-    if (minutes < 60) return `Updated ${minutes} min ago`;
-    const hours = Math.floor(minutes / 60);
-    if (hours < 24) return `Updated ${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
-    return `Updated ${Math.floor(hours / 24)} days ago`;
-  };
-
-  // If the database is empty, show a clean fallback
-  if (!heroArticle) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh] text-slate-500 font-playfair italic">
-        Awaiting global intelligence feed...
-      </div>
-    );
-  }
+  const heroArticle = featured?.[0] || null;
+  const featuredArticles = featured?.slice(1, 4) || [];
+  const breakingNews = breaking || [];
+  const allArticles = all || [];
 
   return (
-    <div className="w-full max-w-3xl mx-auto py-6 md:py-10">
-      
-      {/* 1. LIVE HERO SECTION */}
-      <article className="mb-12 border-b-2 border-black dark:border-white/20 pb-10">
-        <div className="flex items-center gap-3 mb-5">
-          <span className="bg-[#E2725B] text-white text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-sm mb-4 mt-8 inline-block">Latest Briefing</span>
-          <span className="text-[10px] font-bold text-[#3A7B7A] uppercase tracking-wider">
-            {heroArticle.category}
-          </span>
-        </div>
-        
-        <Link href={`/read/${heroArticle.slug}`}>
-          <h1 className="text-4xl md:text-[3.5rem] font-black font-playfair leading-[1.1] mb-5 text-black dark:text-[#F9F6F0] hover:text-[#E2725B] transition-colors">
-            {heroArticle.title}
-          </h1>
-        </Link>
-        
-        <p className="text-slate-600 dark:text-slate-400 text-sm md:text-base leading-relaxed mb-6">
-          {heroArticle.excerpt}
-        </p>
-        
-        <div className="text-[10px] text-slate-500 font-bold uppercase tracking-[0.1em]">
-          By {heroArticle.author} &bull; {heroArticle.publishedAt.toLocaleDateString()}
-        </div>
-      </article>
+    <div className="w-full bg-background min-h-screen text-foreground">
+      {/* Top Banner Ad Zone */}
+      <div className="w-full border-b border-border/60 bg-card/50 py-3">
+        <AdPlacementManager zone="header" />
+      </div>
 
-      {/* 2. THE LIVE HT MASONRY FEED */}
-      <div className="flex flex-col">
-        {feedArticles.map((article, index) => (
-          <div key={article.id}>
-            <article 
-              className="py-6 border-b border-black/10 dark:border-white/10 flex gap-4 md:gap-8 group"
-            >
-              {/* Left: Content */}
-              <div className="flex-1 flex flex-col justify-between">
-                <Link href={`/read/${article.slug}`}>
-                  <h2 className="text-[1.35rem] md:text-2xl font-bold font-playfair leading-tight text-black dark:text-[#F9F6F0] group-hover:text-[#E2725B] transition-colors">
-                    {article.title}
-                  </h2>
-                </Link>
-                
-                <div className="flex items-center gap-2 mt-4 text-[11px] font-bold tracking-wide">
-                  <span className="text-[#3A7B7A] dark:text-[#4A9B9A] uppercase">{article.category}</span>
-                  <span className="text-slate-300 dark:text-slate-600">&bull;</span>
-                  <span className="text-slate-500">{timeAgo(article.publishedAt)}</span>
+      {/* THE MASTER INSTITUTIONAL 3-COLUMN DESK */}
+      <main className={`${premiumClasses.container} py-8`}>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* =========================================================
+              COLUMN 1: THE QUICK WIRE (Left - 3 Cols on Desktop)
+             ========================================================= */}
+          <aside className="lg:col-span-3 lg:border-r lg:border-border/80 lg:pr-6 order-2 lg:order-1">
+            <div className="flex items-center justify-between pb-3 border-b-2 border-primary mb-4">
+              <h2 className="font-sans font-black text-xs tracking-[0.2em] uppercase text-foreground">
+                The Quick Wire
+              </h2>
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+              </span>
+            </div>
+
+            {breakingNews.length > 0 ? (
+              <div className="divide-y divide-border/50">
+                {breakingNews.slice(0, 5).map((story) => (
+                  <Link
+                    key={story.id}
+                    href={`/read/${story.slug}`}
+                    className="group block py-3.5 hover:translate-x-1 transition-transform"
+                  >
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                      {story.category}
+                    </span>
+                    <h3 className="font-serif font-bold text-sm leading-snug text-foreground group-hover:text-primary transition-colors mt-0.5">
+                      {story.title}
+                    </h3>
+                  </Link>
+                ))}
+              </div>
+            ) : (
+              <p className="text-xs text-muted-foreground italic py-4">Wire currently quiet.</p>
+            )}
+          </aside>
+
+
+          {/* =========================================================
+              COLUMN 2: THE FLAGSHIP LEAD (Center - 6 Cols on Desktop)
+             ========================================================= */}
+          <section className="lg:col-span-6 order-1 lg:order-2">
+            {heroArticle ? (
+              <div className="pb-8 border-b border-border/80">
+                <AsymmetricalHeroLayout article={heroArticle} />
+              </div>
+            ) : null}
+
+            {/* Editor's Picks Sub-stream */}
+            {featuredArticles.length > 0 && (
+              <div className="pt-8">
+                <SectionHeaderComponent
+                  eyebrow="CURATED"
+                  title="Editor's Picks"
+                  description="Handpicked reporting from our senior desks"
+                />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                  {featuredArticles.map((article) => (
+                    <Link
+                      key={article.id}
+                      href={`/read/${article.slug}`}
+                      className="group flex flex-col justify-between bg-card border border-border/60 rounded-xl overflow-hidden hover:shadow-md transition-all"
+                    >
+                      {article.featuredImage && (
+                        <div className="relative w-full h-40 overflow-hidden bg-muted">
+                          <img
+                            src={article.featuredImage}
+                            alt={article.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                          />
+                        </div>
+                      )}
+                      <div className="p-4 flex flex-col flex-1 justify-between">
+                        <div>
+                          <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-1">
+                            {article.category}
+                          </p>
+                          <h4 className="font-serif font-bold text-base leading-tight text-foreground group-hover:text-primary transition-colors">
+                            {article.title}
+                          </h4>
+                          <p className="text-xs text-muted-foreground line-clamp-2 mt-2">
+                            {article.metaDescription}
+                          </p>
+                        </div>
+                        <span className="text-[10px] text-muted-foreground font-medium pt-4 mt-4 border-t border-border/40 block">
+                          By {article.author}
+                        </span>
+                      </div>
+                    </Link>
+                  ))}
                 </div>
               </div>
+            )}
+          </section>
 
-              {/* Right: Live Image */}
-              <Link href={`/read/${article.slug}`} className="block flex-shrink-0">
-                <div className="w-[100px] h-[75px] md:w-[160px] md:h-[100px] bg-slate-200 dark:bg-white/5 rounded-md overflow-hidden relative border border-black/5 dark:border-white/5">
-                  {article.coverImage ? (
-                    <img 
-                      src={article.coverImage} 
+
+          {/* =========================================================
+              COLUMN 3: MONETIZATION & ASTRO (Right - 3 Cols on Desktop)
+             ========================================================= */}
+          <aside className="lg:col-span-3 lg:border-l lg:border-border/80 lg:pl-6 order-3 space-y-8">
+            
+            {/* Native Sidebar Ad Container */}
+            <div className="sticky top-24 bg-card border border-border/80 rounded-xl p-4 text-center">
+              <span className="text-[9px] font-mono tracking-widest uppercase text-muted-foreground block mb-2">
+                Advertisement
+              </span>
+              <AdPlacementManager zone="sidebar" />
+            </div>
+
+            {/* Daily Horoscope Teaser Widget */}
+            <div className="bg-gradient-to-br from-purple-950/10 via-card to-card border border-purple-500/20 rounded-xl p-5 shadow-sm">
+              <div className="flex items-center justify-between border-b border-purple-500/20 pb-3 mb-3">
+                <span className="font-sans font-bold text-xs tracking-widest uppercase text-purple-600 dark:text-purple-400">
+                  ✨ Astro Desk
+                </span>
+                <span className="text-[9px] bg-purple-500/10 text-purple-600 dark:text-purple-300 font-semibold px-2 py-0.5 rounded-full">
+                  Daily
+                </span>
+              </div>
+              <p className="text-xs text-muted-foreground mb-4">
+                Rolling astrological charts and daily readings for all 12 zodiac signs.
+              </p>
+              <Link
+                href="/horoscopes"
+                className="block w-full py-2 bg-purple-600 hover:bg-purple-700 text-white text-center font-sans font-bold text-xs rounded-lg transition-colors shadow-sm"
+              >
+                Read Your Sign &rarr;
+              </Link>
+            </div>
+
+          </aside>
+
+        </div>
+      </main>
+
+      {/* Mid-Stream Interstitial Ad */}
+      <div className="w-full bg-card/40 border-y border-border/60 py-6 my-6">
+        <div className="max-w-3xl mx-auto px-4">
+          <AdPlacementManager zone="mid-story" />
+        </div>
+      </div>
+
+      {/* LATEST STORIES STREAM (Full Width Below Grid) */}
+      {allArticles && allArticles.length > 0 && (
+        <section className={`${premiumClasses.container} py-12`}>
+          <SectionHeaderComponent
+            eyebrow="THE WIRE"
+            title="All Stories"
+            description="Chronological reporting from across the globe"
+          />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mt-8">
+            {allArticles.slice(0, 6).map((article) => (
+              <Link
+                key={article.id}
+                href={`/read/${article.slug}`}
+                className="group flex flex-col bg-card border border-border/60 rounded-xl overflow-hidden hover:border-border transition-colors"
+              >
+                {article.featuredImage && (
+                  <div className="relative w-full h-48 bg-muted overflow-hidden">
+                    <img
+                      src={article.featuredImage}
                       alt={article.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
-                  ) : (
-                    <div className="absolute inset-0 opacity-20 bg-[radial-gradient(#000_1px,transparent_1px)] [background-size:16px_16px] dark:bg-[radial-gradient(#fff_1px,transparent_1px)]"></div>
-                  )}
+                  </div>
+                )}
+                <div className="p-5 flex flex-col flex-1 justify-between">
+                  <div>
+                    <p className="text-[10px] font-black uppercase tracking-wider text-primary mb-1.5">
+                      {article.category}
+                    </p>
+                    <h3 className="font-serif font-bold text-lg leading-snug text-foreground group-hover:text-primary transition-colors">
+                      {article.title}
+                    </h3>
+                    <p className="text-xs text-muted-foreground line-clamp-2 mt-2.5 leading-relaxed">
+                      {article.metaDescription}
+                    </p>
+                  </div>
+                  <div className="text-[10px] font-medium text-muted-foreground pt-4 mt-4 border-t border-border/40">
+                    By {article.author}
+                  </div>
                 </div>
               </Link>
-            </article>
-            
-            {/* AdSense - Insert after every 3 articles */}
-            {(index + 1) % 3 === 0 && (
-              <div className="py-6 flex justify-center">
-                <AdSense adSlot="1234567890" adFormat="rectangle" />
-              </div>
-            )}
+            ))}
           </div>
-        ))}
-      </div>
+        </section>
+      )}
 
-      {/* Bottom AdSense Unit */}
-      <div className="py-12 flex justify-center border-t border-black/10 dark:border-white/10">
-        <AdSense adSlot="0987654321" adFormat="auto" fullWidth />
-      </div>
+      {/* Footer Newsletter Module */}
+      <section className="w-full bg-card border-t border-border py-16 mt-12">
+        <div className="max-w-xl mx-auto text-center px-4">
+          <h2 className="font-serif font-bold text-3xl text-foreground mb-3">Beacon Hub Direct</h2>
+          <p className="text-sm text-muted-foreground mb-6">
+            Institutional journalism, market analysis, and astrological briefings delivered straight to your inbox.
+          </p>
+          <div className="flex gap-2 max-w-md mx-auto">
+            <input 
+              type="email" 
+              placeholder="Enter your email address" 
+              className="flex-1 px-4 py-2.5 text-xs bg-background border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary/20"
+            />
+            <button className="px-5 py-2.5 bg-primary hover:bg-primary/90 text-white font-sans font-bold text-xs rounded-lg transition-colors cursor-pointer shrink-0">
+              Subscribe
+            </button>
+          </div>
+        </div>
+      </section>
 
     </div>
   );

@@ -1,95 +1,195 @@
-import { db } from "@/db";
-import { articles, horoscopes, deals } from "@/db/schema";
-import { desc, ilike, eq, and, gte, lte } from "drizzle-orm";
+'use server';
 
-// 1. Hero Article
+import { db } from '@/db';
+import { articles, horoscopes, deals, contentMetrics, editorialSections } from '@/db/schema';
+import { desc, eq } from 'drizzle-orm';
+
 export async function getHeroArticle() {
   try {
-    const result = await db.select().from(articles).orderBy(desc(articles.publishedAt)).limit(1);
-    return result[0] || null;
+    const hero = await db
+      .select()
+      .from(articles)
+      .orderBy(desc(articles.publishedAt))
+      .limit(1);
+    return hero[0] || null;
   } catch (error) {
-    console.warn("Failed to fetch hero article:", error);
+    console.error('Error fetching hero article:', error);
     return null;
   }
 }
 
-// 2. Main Feed
-export async function getLatestFeed(limit = 10) {
+export async function getFeaturedArticles(limit = 4) {
   try {
-    const result = await db.select().from(articles).orderBy(desc(articles.publishedAt)).offset(1).limit(limit);
-    return result;
+    const featured = await db
+      .select()
+      .from(articles)
+      .orderBy(desc(articles.publishedAt))
+      .limit(limit);
+    return featured;
   } catch (error) {
-    console.warn("Failed to fetch latest feed:", error);
+    console.error('Error fetching featured articles:', error);
     return [];
   }
 }
 
-// 3. Category Feed
-export async function getArticlesByCategory(categorySlug: string, limit = 10) {
-  const searchPattern = `%${categorySlug.replace(/-/g, '%')}%`;
-  const result = await db.select().from(articles).where(ilike(articles.category, searchPattern)).orderBy(desc(articles.publishedAt)).limit(limit);
-  return result;
+export async function getBreakingNews(limit = 5) {
+  try {
+    const breaking = await db
+      .select()
+      .from(articles)
+      .where(eq(articles.isBreaking, true))
+      .orderBy(desc(articles.publishedAt))
+      .limit(limit);
+    return breaking;
+  } catch (error) {
+    console.error('Error fetching breaking news:', error);
+    return [];
+  }
 }
 
-// 4. Single Article Reading (THE MISSING FIX!)
+export async function getArticles(limit = 12) {
+  try {
+    const allArticles = await db
+      .select()
+      .from(articles)
+      .orderBy(desc(articles.publishedAt))
+      .limit(limit);
+    return allArticles;
+  } catch (error) {
+    console.error('Error fetching articles:', error);
+    return [];
+  }
+}
+
 export async function getArticleBySlug(slug: string) {
-  const result = await db.select()
-    .from(articles)
-    .where(eq(articles.slug, slug))
-    .limit(1);
-  return result[0] || null;
-}
-
-// 5. Single Horoscope (with optional date filter)
-export async function getHoroscopeBySign(sign: string, date?: Date) {
-  const normalizedSign = sign.charAt(0).toUpperCase() + sign.slice(1).toLowerCase();
-  
-  if (date) {
-    // Fetch reading for a specific date
-    const startOfDay = new Date(date);
-    startOfDay.setHours(0, 0, 0, 0);
-    
-    const endOfDay = new Date(date);
-    endOfDay.setHours(23, 59, 59, 999);
-    
-    const result = await db.select()
-      .from(horoscopes)
-      .where(
-        and(
-          eq(horoscopes.sign, normalizedSign),
-          gte(horoscopes.publishDate, startOfDay),
-          lte(horoscopes.publishDate, endOfDay)
-        )
-      )
-      .limit(1);
-    return result[0] || null;
-  }
-  
-  // Default: get latest reading for this sign
-  const result = await db.select()
-    .from(horoscopes)
-    .where(eq(horoscopes.sign, normalizedSign))
-    .orderBy(desc(horoscopes.publishDate))
-    .limit(1);
-  return result[0] || null;
-}
-
-// 6. Daily Horoscopes Grid
-export async function getDailyHoroscopes() {
   try {
-    const result = await db.select({
-      id: horoscopes.id,
-      sign: horoscopes.sign,
-    }).from(horoscopes).orderBy(desc(horoscopes.publishDate)).limit(12);
-    return result;
+    const article = await db
+      .select()
+      .from(articles)
+      .where(eq(articles.slug, slug))
+      .limit(1);
+    return article[0] || null;
   } catch (error) {
-    console.warn("Failed to fetch horoscopes, returning empty array:", error);
+    console.error('Error fetching article by slug:', error);
+    return null;
+  }
+}
+
+export async function getArticleMetrics(articleId: string) {
+  try {
+    const metrics = await db
+      .select()
+      .from(contentMetrics)
+      .where(eq(contentMetrics.articleId, articleId))
+      .limit(1);
+    return metrics[0] || null;
+  } catch (error) {
+    console.error('Error fetching article metrics:', error);
+    return null;
+  }
+}
+
+export async function incrementArticleViews(articleId: string) {
+  try {
+    const existing = await getArticleMetrics(articleId);
+    if (existing) {
+      await db
+        .update(contentMetrics)
+        .set({ views: (existing.views || 0) + 1 })
+        .where(eq(contentMetrics.articleId, articleId));
+    } else {
+      await db.insert(contentMetrics).values({
+        articleId,
+        views: 1,
+        likes: 0,
+        shares: 0,
+        comments: 0,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      });
+    }
+  } catch (error) {
+    console.error('Error incrementing article views:', error);
+  }
+}
+
+export async function getRelatedArticles(articleId: string, limit = 4) {
+  try {
+    const related = await db
+      .select()
+      .from(articles)
+      .orderBy(desc(articles.publishedAt))
+      .limit(limit + 1);
+    return related.filter((a) => a.id !== articleId).slice(0, limit);
+  } catch (error) {
+    console.error('Error fetching related articles:', error);
     return [];
   }
 }
 
-// 7. Marketplace Deals
-export async function getActiveListings() {
-  const result = await db.select().from(deals).where(eq(deals.isActive, true)).orderBy(desc(deals.createdAt));
-  return result;
+export async function getEditorialSections() {
+  try {
+    const sections = await db
+      .select()
+      .from(editorialSections)
+      .orderBy(editorialSections.name);
+    return sections;
+  } catch (error) {
+    console.error('Error fetching editorial sections:', error);
+    return [];
+  }
+}
+
+export async function getHoroscopeBySign(sign: string) {
+  try {
+    const reading = await db
+      .select()
+      .from(horoscopes)
+      .where(eq(horoscopes.sign, sign))
+      .limit(1);
+    return reading[0] || null;
+  } catch (error) {
+    console.error('Error fetching horoscope:', error);
+    return null;
+  }
+}
+
+export async function getAllHoroscopes() {
+  try {
+    const allReadings = await db
+      .select()
+      .from(horoscopes)
+      .orderBy(horoscopes.sign);
+    return allReadings;
+  } catch (error) {
+    console.error('Error fetching all horoscopes:', error);
+    return [];
+  }
+}
+
+export async function getDeals(limit = 8) {
+  try {
+    const allDeals = await db
+      .select()
+      .from(deals)
+      .orderBy(desc(deals.createdAt))
+      .limit(limit);
+    return allDeals;
+  } catch (error) {
+    console.error('Error fetching deals:', error);
+    return [];
+  }
+}
+
+export async function searchArticles(query: string, limit = 10) {
+  try {
+    const results = await db
+      .select()
+      .from(articles)
+      .limit(limit);
+    return results;
+  } catch (error) {
+    console.error('Error searching articles:', error);
+    return [];
+  }
 }

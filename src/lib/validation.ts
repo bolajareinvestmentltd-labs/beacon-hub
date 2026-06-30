@@ -5,9 +5,7 @@ export const ArticleSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(200, 'Title must be at most 200 characters'),
   slug: z.string().regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
   content: z.string().min(10, 'Content must be at least 10 characters').max(50000, 'Content too long'),
-  category: z.enum(['Technology', 'Business', 'Science', 'Health', 'Entertainment', 'Politics', 'Sports', 'World'], {
-    errorMap: () => ({ message: 'Invalid category' }),
-  }),
+  category: z.enum(['Technology', 'Business', 'Science', 'Health', 'Entertainment', 'Politics', 'Sports', 'World']),
   author: z.string().min(2, 'Author name too short').max(100, 'Author name too long'),
   excerpt: z.string().max(500, 'Excerpt too long').optional(),
   coverImage: z.string().url('Invalid image URL').optional(),
@@ -25,9 +23,7 @@ export const ContactSchema = z.object({
   email: z.string().email('Invalid email address'),
   subject: z.string().min(5, 'Subject too short').max(200, 'Subject too long'),
   message: z.string().min(10, 'Message too short').max(5000, 'Message too long'),
-  category: z.enum(['Support', 'Partnership', 'Bug Report', 'Feature Request', 'Other'], {
-    errorMap: () => ({ message: 'Please select a valid category' }),
-  }),
+  category: z.enum(['Support', 'Partnership', 'Bug Report', 'Feature Request', 'Other']),
 });
 
 // Deal validation
