@@ -141,6 +141,7 @@ export async function getEditorialSections() {
 }
 
 export async function getHoroscopeBySign(sign: string) {
+<<<<<<< HEAD
   try {
     const reading = await db
       .select()
@@ -165,6 +166,16 @@ export async function getAllHoroscopes() {
     console.error('Error fetching all horoscopes:', error);
     return [];
   }
+=======
+  const result = await db.select().from(horoscopes).where(eq(horoscopes.sign, sign.charAt(0).toUpperCase() + sign.slice(1).toLowerCase())).orderBy(desc(horoscopes.createdAt)).limit(1);
+  return result[0] || null;
+}
+
+// 6. Daily Horoscopes Grid
+export async function getDailyHoroscopes() {
+  const result = await db.select().from(horoscopes).orderBy(desc(horoscopes.createdAt)).limit(12);
+  return result;
+>>>>>>> 73f3f1d2fbbee024e1f7160accdfdd2e8eae7d6c
 }
 
 export async function getDeals(limit = 8) {

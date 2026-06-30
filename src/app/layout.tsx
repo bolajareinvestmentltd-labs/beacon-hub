@@ -1,8 +1,16 @@
 import type { Metadata } from 'next';
-import ThemeProvider from '@/components/ThemeProvider';
+import type { ReactNode } from 'react';
+import { Inter, Playfair_Display } from 'next/font/google';
+import { ThemeProvider } from '@/components/ThemeProvider';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+import CategoryBar from '@/components/CategoryBar';
 import MobileDock from '@/components/MobileDock';
 import './globals.css';
 import Script from 'next/script';
+
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
+const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
 
 export const metadata: Metadata = {
   title: 'Beacon Hub - Premium News Platform',
@@ -37,14 +45,10 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className="pb-28 md:pb-0">
+      <body className={`${inter.variable} ${playfair.variable} antialiased font-sans selection:bg-[#C85A32] selection:text-white flex min-h-screen flex-col`}>
         <Script
           id="google-adsense-master"
           async
@@ -53,10 +57,13 @@ export default function RootLayout({
           strategy="lazyOnload"
         />
 
-        <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-          <main className="relative min-h-screen pb-16 md:pb-0">
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <Navbar />
+          <CategoryBar />
+          <main className="flex-grow">
             {children}
           </main>
+          <Footer />
           <MobileDock />
         </ThemeProvider>
       </body>

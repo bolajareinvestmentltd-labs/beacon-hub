@@ -1,12 +1,17 @@
 {
   "crons": [
     {
+<<<<<<< HEAD
       "path": "/api/cron/news",
       "schedule": "0 */2 * * *"
+=======
+      "path": "/api/cron/astro",
+      "schedule": "0 8 * * *"
+>>>>>>> 73f3f1d2fbbee024e1f7160accdfdd2e8eae7d6c
     },
     {
-      "path": "/api/cron/astro",
-      "schedule": "0 0 * * *"
+      "path": "/api/cron/news",
+      "schedule": "0 5,17 * * *"
     }
   ]
 }

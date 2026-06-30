@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ﻿@import "tailwindcss";
 
 @theme {
@@ -42,5 +43,60 @@
 @layer base {
   body {
     @apply bg-background text-foreground transition-colors duration-300 antialiased selection:bg-primary/10 selection:text-primary;
+=======
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    /* --- JCLS Alabaster (Light Mode - Default) --- */
+    --background: #FDFDFB; 
+    --foreground: #0B0B0B; 
+    --card: #FFFFFF;
+    --border: #E5E7EB; 
+    
+    /* Brand Accent */
+    --accent: #C85A32; 
+    --accent-foreground: #FFFFFF;
+
+    /* Subtle utility colors */
+    --muted: #F3F4F6; 
+    --muted-foreground: #6B7280; 
+>>>>>>> 73f3f1d2fbbee024e1f7160accdfdd2e8eae7d6c
+  }
+
+  .dark {
+    /* --- JCLS Executive Charcoal (Dark Mode Override) --- */
+    --background: #0B0B0B; 
+    --foreground: #FDFDFB; 
+    --card: #101010; 
+    --border: #1F2937; 
+    
+    /* Muted colors adapt for dark background */
+    --muted: #111827; 
+    --muted-foreground: #9CA3AF; 
+  }
+}
+
+@layer base {
+  * {
+    /* FIX: Using native CSS instead of Tailwind @apply */
+    border-color: var(--border);
+  }
+  body {
+    /* FIX: Using native CSS instead of Tailwind @apply */
+    background-color: var(--background);
+    color: var(--foreground);
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+  }
+  
+  /* Apply font-serif to global headings for editorial maturity */
+  h1, h2, h3, h4 {
+    @apply font-serif tracking-tight font-medium;
+  }
+  
+  /* Apply monospace to utility text / data points */
+  .font-mono {
+    @apply text-xs tracking-widest uppercase;
   }
 }
