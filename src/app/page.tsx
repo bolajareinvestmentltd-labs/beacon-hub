@@ -4,20 +4,15 @@ import AsymmetricalHeroLayout from '@/components/AsymmetricalHeroLayout';
 import SectionHeaderComponent from '@/components/SectionHeaderComponent';
 import AdPlacementManager from '@/components/AdPlacementManager';
 import { premiumClasses } from '@/lib/premiumStyles';
+import { latestNews } from '@/lib/news';
 
 export const dynamic = 'force-dynamic';
 
 export default async function HomePage() {
-  const [featured, breaking, all] = await Promise.all([
-    getFeaturedArticles(),
-    getBreakingNews(),
-    getArticles(),
-  ]);
-
-  const heroArticle = featured?.[0] || null;
-  const featuredArticles = featured?.slice(1, 4) || [];
-  const breakingNews = breaking || [];
-  const allArticles = all || [];
+  const allArticles = await getPublishedArticles();
+  const newest = latestNews(allArticles, 6);
+  const heroArticle = newest[0];
+  const feedArticles = newest.slice(1);
 
   return (
     <div className="w-full bg-background min-h-screen text-foreground">

@@ -7,6 +7,34 @@ import Script from 'next/script';
 export const metadata: Metadata = {
   title: 'Beacon Hub - Premium News Platform',
   description: 'World-class news journalism with premium editorial design',
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+  ],
+  icons: {
+    icon: '/beacon-logo.svg',
+    apple: '/beacon-logo.svg',
+  },
+  openGraph: {
+    title: 'Beacon Hub - Premium News Platform',
+    description: 'World-class news journalism with premium editorial design',
+    url: '/',
+    siteName: 'Beacon Hub',
+    type: 'website',
+    images: [
+      {
+        url: '/beacon-logo.svg',
+        alt: 'Beacon Hub logo',
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Beacon Hub - Premium News Platform',
+    description: 'World-class news journalism with premium editorial design',
+    images: ['/beacon-logo.svg'],
+  },
 };
 
 export default function RootLayout({
@@ -16,12 +44,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      {/* NOTE: <head> and manual dark-mode scripts removed. 
-        Next.js auto-generates the head, and ThemeProvider auto-handles theme hydration.
-      */}
       <body className="pb-28 md:pb-0">
-        
-        {/* MASTER GOOGLE ADSENSE ENGINE */}
         <Script
           id="google-adsense-master"
           async
@@ -34,7 +57,6 @@ export default function RootLayout({
           <main className="relative min-h-screen pb-16 md:pb-0">
             {children}
           </main>
-          
           <MobileDock />
         </ThemeProvider>
       </body>
