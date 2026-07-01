@@ -1,102 +1,53 @@
-<<<<<<< HEAD
-﻿@import "tailwindcss";
-
-@theme {
-  --animate-spin-slow: spin 3s linear infinite;
-
-  /* Institutional & Editorial Palette Definitions */
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-border: var(--border);
-  --color-primary: var(--primary);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-astro: var(--astro);
-}
-
-/* // UPDATE START: Flagship Editorial Theme Variables */
-:root {
-  --background: #FDFBF7; /* Warm Newsprint Alabaster */
-  --foreground: #0F172A; /* Deep Slate Navy */
-  --card: #FFFFFF;
-  --border: #E2E8F0; /* slate-200 */
-  
-  /* New Flagship Accents */
-  --primary: #991B1B; /* Editorial Crimson (red-800) */
-  --muted-foreground: #64748B; /* slate-500 for datelines/bylines */
-  --astro: #7C3AED; /* Deep Violet (violet-600) for Horoscope tagging */
-}
-
-.dark {
-  --background: #090D16; /* Rich Obsidian */
-  --foreground: #F8FAFC; /* slate-50 */
-  --card: #111827;       /* Surface Dark */
-  --border: #1E293B;     /* slate-800 */
-  
-  /* New Flagship Accents (Dark Mode Adjusted) */
-  --primary: #EF4444; /* Vibrant Crimson (red-500) */
-  --muted-foreground: #94A3B8; /* slate-400 */
-  --astro: #A78BFA; /* Soft Violet (violet-400) */
-}
-/* // UPDATE END */
-
-@layer base {
-  body {
-    @apply bg-background text-foreground transition-colors duration-300 antialiased selection:bg-primary/10 selection:text-primary;
-=======
 @import "tailwindcss";
 
 @layer base {
   :root {
     /* --- JCLS Alabaster (Light Mode - Default) --- */
-    --background: #FDFDFB; 
-    --foreground: #0B0B0B; 
+    --background: #FDFDFB;
+    --foreground: #0B0B0B;
     --card: #FFFFFF;
-    --border: #E5E7EB; 
-    
+    --border: #E5E7EB;
+
     /* Brand Accent */
-    --accent: #C85A32; 
+    --accent: #C85A32;
     --accent-foreground: #FFFFFF;
 
     /* Subtle utility colors */
-    --muted: #F3F4F6; 
-    --muted-foreground: #6B7280; 
->>>>>>> 73f3f1d2fbbee024e1f7160accdfdd2e8eae7d6c
+    --muted: #F3F4F6;
+    --muted-foreground: #6B7280;
   }
 
   .dark {
     /* --- JCLS Executive Charcoal (Dark Mode Override) --- */
-    --background: #0B0B0B; 
-    --foreground: #FDFDFB; 
-    --card: #101010; 
-    --border: #1F2937; 
-    
+    --background: #0B0B0B;
+    --foreground: #FDFDFB;
+    --card: #101010;
+    --border: #1F2937;
+
     /* Muted colors adapt for dark background */
-    --muted: #111827; 
-    --muted-foreground: #9CA3AF; 
+    --muted: #111827;
+    --muted-foreground: #9CA3AF;
   }
 }
 
 @layer base {
   * {
-    /* FIX: Using native CSS instead of Tailwind @apply */
     border-color: var(--border);
   }
+
   body {
-    /* FIX: Using native CSS instead of Tailwind @apply */
     background-color: var(--background);
     color: var(--foreground);
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
   }
-  
-  /* Apply font-serif to global headings for editorial maturity */
+
   h1, h2, h3, h4 {
     @apply font-serif tracking-tight font-medium;
   }
-  
-  /* Apply monospace to utility text / data points */
+
   .font-mono {
     @apply text-xs tracking-widest uppercase;
   }
 }
+
