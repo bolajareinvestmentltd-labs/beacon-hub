@@ -1,7 +1,13 @@
 'use server';
 
 import { db } from '@/db';
-import { articles, horoscopes, deals, contentMetrics, editorialSections } from '@/db/schema';
+import {
+  articles,
+  horoscopes,
+  deals,
+  contentMetrics,
+  editorialSections,
+} from '@/db/schema';
 import { desc, eq } from 'drizzle-orm';
 
 export async function getHeroArticle() {
@@ -92,6 +98,7 @@ export async function getArticleMetrics(articleId: string) {
 export async function incrementArticleViews(articleId: string) {
   try {
     const existing = await getArticleMetrics(articleId);
+
     if (existing) {
       await db
         .update(contentMetrics)
@@ -113,13 +120,14 @@ export async function incrementArticleViews(articleId: string) {
   }
 }
 
-export async function getRelatedArticles(articleId: string, limit = 4) {
+export async function getRelatedArticles(articleId: number, limit = 4) {
   try {
     const related = await db
       .select()
       .from(articles)
       .orderBy(desc(articles.publishedAt))
       .limit(limit + 1);
+
     return related.filter((a) => a.id !== articleId).slice(0, limit);
   } catch (error) {
     console.error('Error fetching related articles:', error);
@@ -141,13 +149,17 @@ export async function getEditorialSections() {
 }
 
 export async function getHoroscopeBySign(sign: string) {
-<<<<<<< HEAD
   try {
+    const normalized =
+      sign.trim().charAt(0).toUpperCase() + sign.trim().slice(1).toLowerCase();
+
     const reading = await db
       .select()
       .from(horoscopes)
-      .where(eq(horoscopes.sign, sign))
+      .where(eq(horoscopes.sign, normalized))
+      .orderBy(desc(horoscopes.publishDate))
       .limit(1);
+
     return reading[0] || null;
   } catch (error) {
     console.error('Error fetching horoscope:', error);
@@ -157,25 +169,27 @@ export async function getHoroscopeBySign(sign: string) {
 
 export async function getAllHoroscopes() {
   try {
-    const allReadings = await db
+    return await db
       .select()
       .from(horoscopes)
-      .orderBy(horoscopes.sign);
-    return allReadings;
+      .orderBy(desc(horoscopes.publishDate));
   } catch (error) {
     console.error('Error fetching all horoscopes:', error);
     return [];
   }
-=======
-  const result = await db.select().from(horoscopes).where(eq(horoscopes.sign, sign.charAt(0).toUpperCase() + sign.slice(1).toLowerCase())).orderBy(desc(horoscopes.createdAt)).limit(1);
-  return result[0] || null;
 }
 
-// 6. Daily Horoscopes Grid
 export async function getDailyHoroscopes() {
-  const result = await db.select().from(horoscopes).orderBy(desc(horoscopes.createdAt)).limit(12);
-  return result;
->>>>>>> 73f3f1d2fbbee024e1f7160accdfdd2e8eae7d6c
+  try {
+    return await db
+      .select()
+      .from(horoscopes)
+      .orderBy(desc(horoscopes.publishDate))
+      .limit(12);
+  } catch (error) {
+    console.error('Error fetching daily horoscopes:', error);
+    return [];
+  }
 }
 
 export async function getDeals(limit = 8) {
@@ -192,11 +206,18 @@ export async function getDeals(limit = 8) {
   }
 }
 
-export async function searchArticles(query: string, limit = 10) {
+// Compatibility export (older pages reference this name)
+export async function getHoroscopes() {
+  return getAllHoroscopes();
+}
+
+export async function searchArticles(_query: string, limit = 10) {
   try {
+    // NOTE: kept intentionally simple; full search can be added later.
     const results = await db
       .select()
       .from(articles)
+      .orderBy(desc(articles.publishedAt))
       .limit(limit);
     return results;
   } catch (error) {
@@ -204,3 +225,4 @@ export async function searchArticles(query: string, limit = 10) {
     return [];
   }
 }
+

@@ -22,9 +22,10 @@ const ZODIAC_SIGNS = [
 ];
 
 export default async function HoroscopesPage() {
-  const fetchHoroscopes =
+const fetchHoroscopes =
     queries.getDailyHoroscopes ??
     queries.getHoroscopes ??
+    queries.getAllHoroscopes ??
     (async () => []);
   const horoscopes = await fetchHoroscopes();
 

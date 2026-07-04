@@ -4,19 +4,15 @@ import { db } from "@/db";
 import { articles, deals, subscribers } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { put } from "@vercel/blob";
-<<<<<<< HEAD
 import { ArticleSchema, DealSchema, SubscribeSchema } from "./validation";
-import { sanitizeHTML, sanitizeInput, sanitizeEmail } from "./sanitize";
+import { sanitizeHTML, sanitizeEmail } from "./sanitize";
 import { logger } from "./logger";
 import { checkSubscribeLimit } from "./rateLimit";
-=======
->>>>>>> 73f3f1d2fbbee024e1f7160accdfdd2e8eae7d6c
 
 const generateSlug = (title: string) => {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, '-') + `-${Date.now().toString().slice(-4)}`;
+  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-") + `-${Date.now().toString().slice(-4)}`;
 };
 
-<<<<<<< HEAD
 // ========================================================
 // 1. INTELLIGENCE ENGINE (News Override)
 // ========================================================
@@ -25,7 +21,7 @@ export async function publishArticle(formData: FormData) {
     const title = formData.get("title") as string;
     const category = formData.get("category") as string;
     const content = formData.get("content") as string;
-    const excerpt = formData.get("excerpt") as string;
+    const excerpt = (formData.get("excerpt") as string) || "";
     const imageFile = formData.get("coverImage") as File;
 
     // Validate input
@@ -39,10 +35,13 @@ export async function publishArticle(formData: FormData) {
       coverImage: null,
     });
 
-    let imageUrl = null;
+    let imageUrl: string | null = null;
     if (imageFile && imageFile.size > 0) {
       try {
-        const blob = await put(`articles/${imageFile.name}`, imageFile, { access: 'public', addRandomSuffix: true });
+        const blob = await put(`articles/${imageFile.name}`, imageFile, {
+          access: "public",
+          addRandomSuffix: true,
+        });
         imageUrl = blob.url;
       } catch (error) {
         logger.warning("Failed to upload article image", { error });
@@ -56,7 +55,7 @@ export async function publishArticle(formData: FormData) {
       category: validated.category,
       content: validated.content,
       excerpt: validated.excerpt,
-      coverImage: imageUrl,
+      coverImage: imageUrl ?? null,
       author: validated.author,
     });
 
@@ -82,7 +81,7 @@ export async function publishDeal(formData: FormData) {
     const imageFile = formData.get("coverImage") as File;
 
     // Validate and sanitize input
-    const price = parseInt(priceString.replace(/,/g, ''), 10);
+    const price = parseInt(priceString.replace(/,/g, ""), 10);
     const validated = DealSchema.parse({
       title,
       vendorName,
@@ -93,10 +92,13 @@ export async function publishDeal(formData: FormData) {
       videoUrl: null,
     });
 
-    let imageUrl = null;
+    let imageUrl: string | null = null;
     if (imageFile && imageFile.size > 0) {
       try {
-        const blob = await put(`deals/${imageFile.name}`, imageFile, { access: 'public', addRandomSuffix: true });
+        const blob = await put(`deals/${imageFile.name}`, imageFile, {
+          access: "public",
+          addRandomSuffix: true,
+        });
         imageUrl = blob.url;
       } catch (error) {
         logger.warning("Failed to upload deal image", { error });
@@ -119,72 +121,15 @@ export async function publishDeal(formData: FormData) {
   } catch (error) {
     logger.error("Failed to publish deal", { error });
     throw error;
-=======
-// 1. CONTENT ENGINE (Articles) - Stripped return to satisfy TS void constraint
-export async function publishArticle(formData: FormData): Promise<void> {
-  try {
-    const title = formData.get("title") as string;
-    const excerpt = formData.get("excerpt") as string;
-    const content = formData.get("content") as string;
-    const category = formData.get("category") as string;
-    const isBreaking = formData.get("isBreaking") === "on";
-    const imageFile = formData.get("image") as File;
-
-    let imageUrl = "";
-    if (imageFile && imageFile.size > 0) {
-      const blob = await put(imageFile.name, imageFile, { access: 'public' });
-      imageUrl = blob.url;
-    }
-
-    const slug = generateSlug(title);
-
-    await db.insert(articles).values({
-      title, slug, excerpt, content, category, isBreaking, imageUrl
-    });
-
-    revalidatePath("/");
-  } catch (error: any) {
-    console.error("Failed to publish article:", error);
->>>>>>> 73f3f1d2fbbee024e1f7160accdfdd2e8eae7d6c
   }
 }
 
-// 2. ESCROW ENGINE (Deals) - Stripped return to satisfy TS void constraint
-export async function publishDeal(formData: FormData): Promise<void> {
-  try {
-    const title = formData.get("title") as string;
-    const description = formData.get("description") as string;
-    const category = formData.get("category") as string;
-    const price = parseInt(formData.get("price") as string, 10);
-    const vendorName = formData.get("vendorName") as string;
-    const imageFile = formData.get("image") as File;
-
-    let imageUrl = "";
-    if (imageFile && imageFile.size > 0) {
-      const blob = await put(imageFile.name, imageFile, { access: 'public' });
-      imageUrl = blob.url;
-    }
-
-    await db.insert(deals).values({
-      title, description, category, price, vendorName, imageUrl, platformFee: 50
-    });
-
-    revalidatePath("/deals");
-  } catch (error: any) {
-    console.error("Failed to list deal:", error);
-  }
-}
-
-// 3. NETWORK ENGINE (Newsletter Subscribers) - Return kept for client-side modal
+// 3. NETWORK ENGINE (Newsletter Subscribers)
 export async function subscribeUser(formData: FormData) {
-<<<<<<< HEAD
-=======
   const email = formData.get("email") as string;
   if (!email) return { error: "Email is required." };
->>>>>>> 73f3f1d2fbbee024e1f7160accdfdd2e8eae7d6c
-  try {
-    const email = formData.get("email") as string;
 
+  try {
     // Validate input
     const validated = SubscribeSchema.parse({ email });
     const sanitizedEmail = sanitizeEmail(validated.email);
@@ -192,22 +137,23 @@ export async function subscribeUser(formData: FormData) {
     // Check rate limit (10 per hour)
     const rateLimitOk = await checkSubscribeLimit(sanitizedEmail);
     if (!rateLimitOk) {
-      logger.logRateLimitHit(sanitizedEmail, '10 subscriptions per hour');
+      logger.logRateLimitHit(sanitizedEmail, "10 subscriptions per hour");
       return { error: "Too many subscriptions. Please try again later." };
     }
 
     await db.insert(subscribers).values({ email: sanitizedEmail });
-    
+
     logger.info("User subscribed", { email: sanitizedEmail });
     return { success: true };
   } catch (error: any) {
     // Handle duplicate email error
-    if (error.code === '23505' || error.message?.includes('unique')) {
-      logger.info("Duplicate subscription attempt", { error: error.message });
+    if (error?.code === "23505" || error?.message?.includes("unique")) {
+      logger.info("Duplicate subscription attempt", { error: error?.message });
       return { error: "You are already connected to the Network." };
     }
-    
+
     logger.error("Failed to subscribe user", { error });
     return { error: "Failed to connect to the Network." };
   }
 }
+
