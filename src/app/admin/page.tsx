@@ -120,7 +120,7 @@ export default function AdminPage() {
             </div>
 
             <button type="submit" className="mt-2 bg-[#E2725B] hover:bg-[#c95b46] text-white font-black py-4 rounded-md transition-colors duration-300 w-full uppercase tracking-[0.2em] text-[10px]">
-              List Asset to Network
+              List Assets to Network
             </button>
           </form>
         </div>
