@@ -42,8 +42,33 @@ export async function GET(req: Request) {
   );
 
   const data = await response.json();
+
+  // Graceful failure: avoid throwing so the cron runner doesn't hard-fail.
+  // Gemini quota/rate-limit errors often come back with 4xx/5xx and/or { error: { message } }.
+  if (!response.ok) {
+    const msg =
+      (data as any)?.error?.message ||
+      (data as any)?.error?.status ||
+      `Gemini request failed with status ${response.status}`;
+
+    return NextResponse.json(
+      {
+        success: false,
+        error: msg,
+        httpStatus: response.status,
+      },
+      { status: 200 }
+    );
+  }
+
   if (data?.error) {
-    throw new Error(data.error.message || "Gemini API error");
+    return NextResponse.json(
+      {
+        success: false,
+        error: data.error.message || "Gemini API error",
+      },
+      { status: 200 }
+    );
   }
 
   const textResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text;
