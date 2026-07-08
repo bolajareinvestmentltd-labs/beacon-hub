@@ -24,8 +24,7 @@ export async function publishArticle(formData: FormData) {
     const excerpt = (formData.get("excerpt") as string) || "";
     const imageFile = formData.get("coverImage") as File;
 
-    // Validate input
-    const validated = ArticleSchema.parse({
+    const validatedResult = ArticleSchema.safeParse({
       title,
       slug: generateSlug(title),
       category,
@@ -34,6 +33,15 @@ export async function publishArticle(formData: FormData) {
       excerpt,
       coverImage: null,
     });
+
+    if (!validatedResult.success) {
+      return {
+        success: false,
+        message: "Please complete all required fields before publishing.",
+      };
+    }
+
+    const validated = validatedResult.data;
 
     let imageUrl: string | null = null;
     if (imageFile && imageFile.size > 0) {
@@ -65,9 +73,17 @@ export async function publishArticle(formData: FormData) {
     logger.info("Article published", { title, slug: validated.slug });
     revalidatePath("/");
     revalidatePath("/admin");
+
+    return {
+      success: true,
+      message: `Article "${validated.title}" published successfully.`,
+    };
   } catch (error) {
     logger.error("Failed to publish article", { error });
-    throw error;
+    return {
+      success: false,
+      message: "We could not publish the article. Please try again.",
+    };
   }
 }
 
@@ -83,9 +99,8 @@ export async function publishDeal(formData: FormData) {
     const description = formData.get("description") as string;
     const imageFile = formData.get("coverImage") as File;
 
-    // Validate and sanitize input
     const price = parseInt(priceString.replace(/,/g, ""), 10);
-    const validated = DealSchema.parse({
+    const validatedResult = DealSchema.safeParse({
       title,
       vendorName,
       price,
@@ -94,6 +109,15 @@ export async function publishDeal(formData: FormData) {
       imageUrl: null,
       videoUrl: null,
     });
+
+    if (!validatedResult.success) {
+      return {
+        success: false,
+        message: "Please complete the asset details before listing.",
+      };
+    }
+
+    const validated = validatedResult.data;
 
     let imageUrl: string | null = null;
     if (imageFile && imageFile.size > 0) {
@@ -121,9 +145,17 @@ export async function publishDeal(formData: FormData) {
     logger.info("Deal published", { title, vendorName });
     revalidatePath("/deals");
     revalidatePath("/admin");
+
+    return {
+      success: true,
+      message: `Asset "${validated.title}" was listed successfully.`,
+    };
   } catch (error) {
     logger.error("Failed to publish deal", { error });
-    throw error;
+    return {
+      success: false,
+      message: "We could not list the asset. Please try again.",
+    };
   }
 }
 

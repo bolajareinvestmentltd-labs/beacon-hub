@@ -1,9 +1,59 @@
+"use client";
+
+import { useActionState, useEffect, useState } from "react";
 import { publishArticle, publishDeal } from "@/lib/actions";
 import { ShieldCheck, Database, LineChart } from "lucide-react";
 
+type ActionState = {
+  success: boolean;
+  message: string;
+};
+
+const initialState: ActionState = {
+  success: false,
+  message: "",
+};
+
 export default function AdminPage() {
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+
+  const [articleState, articleAction, isArticlePending] = useActionState(
+    async (_prevState: ActionState, formData: FormData) => {
+      return await publishArticle(formData);
+    },
+    initialState
+  );
+
+  const [dealState, dealAction, isDealPending] = useActionState(
+    async (_prevState: ActionState, formData: FormData) => {
+      return await publishDeal(formData);
+    },
+    initialState
+  );
+
+  useEffect(() => {
+    if (articleState.success && articleState.message) {
+      setToastMessage(articleState.message);
+      const timeout = window.setTimeout(() => setToastMessage(null), 4000);
+      return () => window.clearTimeout(timeout);
+    }
+  }, [articleState]);
+
+  useEffect(() => {
+    if (dealState.success && dealState.message) {
+      setToastMessage(dealState.message);
+      const timeout = window.setTimeout(() => setToastMessage(null), 4000);
+      return () => window.clearTimeout(timeout);
+    }
+  }, [dealState]);
+
   return (
     <div className="w-full max-w-7xl mx-auto py-12 px-4 min-h-screen">
+      {toastMessage && (
+        <div className="fixed top-4 right-4 z-50 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 shadow-lg dark:border-emerald-900/40 dark:bg-emerald-950/80 dark:text-emerald-300">
+          {toastMessage}
+        </div>
+      )}
       
       <div className="mb-12 border-b border-black/10 dark:border-white/10 pb-8 flex items-center gap-4">
         <div className="bg-[#E2725B] text-white p-3 rounded-lg">
@@ -29,15 +79,15 @@ export default function AdminPage() {
             <h2 className="text-lg font-bold font-playfair text-black dark:text-[#F9F6F0]">Manual Intel Override</h2>
           </div>
 
-          <form action={publishArticle} className="flex flex-col gap-5">
+          <form action={articleAction} className="flex flex-col gap-5">
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Headline</label>
-              <input type="text" name="title" required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] focus:ring-1 focus:ring-[#E2725B] outline-none" />
+              <input type="text" name="title" title="Article headline" placeholder="Enter the headline" required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] focus:ring-1 focus:ring-[#E2725B] outline-none" />
             </div>
 
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Sector</label>
-              <select name="category" className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none">
+              <select name="category" title="Article category" className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none">
                 <option value="Top News">Top News</option>
                 <option value="Elections 2026">Elections 2026</option>
                 <option value="Global News">Global News</option>
@@ -51,21 +101,25 @@ export default function AdminPage() {
 
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Cover Image</label>
-              <input type="file" name="coverImage" accept="image/*" className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#E2725B]/10 file:text-[#E2725B] hover:file:bg-[#E2725B]/20 transition-all cursor-pointer" />
+              <input type="file" name="coverImage" title="Article cover image" accept="image/*" className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#E2725B]/10 file:text-[#E2725B] hover:file:bg-[#E2725B]/20 transition-all cursor-pointer" />
             </div>
 
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Brief Excerpt</label>
-              <textarea name="excerpt" rows={2} required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
+              <textarea name="excerpt" title="Article excerpt" rows={2} required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
             </div>
 
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Full Briefing</label>
-              <textarea name="content" rows={5} required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
+              <textarea name="content" title="Article content" rows={5} required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
             </div>
 
-            <button type="submit" className="mt-2 bg-black dark:bg-[#F9F6F0] hover:bg-[#E2725B] dark:hover:bg-[#E2725B] text-white dark:text-black hover:text-white font-black py-4 rounded-md transition-colors duration-300 w-full uppercase tracking-[0.2em] text-[10px]">
-              Deploy Intelligence
+            {articleState.message && !articleState.success && (
+              <p className="text-sm text-red-600 dark:text-red-400">{articleState.message}</p>
+            )}
+
+            <button type="submit" disabled={isArticlePending} className="mt-2 bg-black dark:bg-[#F9F6F0] hover:bg-[#E2725B] dark:hover:bg-[#E2725B] text-white dark:text-black hover:text-white font-black py-4 rounded-md transition-colors duration-300 w-full uppercase tracking-[0.2em] text-[10px] disabled:cursor-not-allowed disabled:opacity-70">
+              {isArticlePending ? "Publishing..." : "Deploy Intelligence"}
             </button>
           </form>
         </div>
@@ -79,26 +133,26 @@ export default function AdminPage() {
             <h2 className="text-lg font-bold font-playfair text-black dark:text-[#F9F6F0]">Escrow Asset Deployment</h2>
           </div>
 
-          <form action={publishDeal} className="flex flex-col gap-5">
+          <form action={dealAction} className="flex flex-col gap-5">
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Asset Name / Title</label>
-              <input type="text" name="title" required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
+              <input type="text" name="title" title="Asset title" placeholder="Enter the asset name" required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Vendor Name</label>
-                <input type="text" name="vendorName" required placeholder="e.g. Ay'Smart" className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
+                <input type="text" name="vendorName" title="Vendor name" required placeholder="e.g. Ay'Smart" className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
               </div>
               <div>
                 <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Base Price (₦)</label>
-                <input type="number" name="price" required placeholder="150000" className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
+                <input type="number" name="price" title="Base price" required placeholder="150000" className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
               </div>
             </div>
 
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Asset Category</label>
-              <select name="category" className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none">
+              <select name="category" title="Asset category" className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none">
                 <option value="Real Estate">Real Estate</option>
                 <option value="Vehicles & Autos">Vehicles & Autos</option>
                 <option value="Tech & Gadgets">Tech & Gadgets</option>
@@ -111,16 +165,20 @@ export default function AdminPage() {
 
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Cover Image</label>
-              <input type="file" name="coverImage" required accept="image/*" className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#E2725B]/10 file:text-[#E2725B] hover:file:bg-[#E2725B]/20 transition-all cursor-pointer" />
+              <input type="file" name="coverImage" title="Asset cover image" required accept="image/*" className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#E2725B]/10 file:text-[#E2725B] hover:file:bg-[#E2725B]/20 transition-all cursor-pointer" />
             </div>
 
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Asset Details / Contract Terms</label>
-              <textarea name="description" rows={4} required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
+              <textarea name="description" title="Asset details" rows={4} required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
             </div>
 
-            <button type="submit" className="mt-2 bg-[#E2725B] hover:bg-[#c95b46] text-white font-black py-4 rounded-md transition-colors duration-300 w-full uppercase tracking-[0.2em] text-[10px]">
-              List Assets to Network
+            {dealState.message && !dealState.success && (
+              <p className="text-sm text-red-600 dark:text-red-400">{dealState.message}</p>
+            )}
+
+            <button type="submit" disabled={isDealPending} className="mt-2 bg-[#E2725B] hover:bg-[#c95b46] text-white font-black py-4 rounded-md transition-colors duration-300 w-full uppercase tracking-[0.2em] text-[10px] disabled:cursor-not-allowed disabled:opacity-70">
+              {isDealPending ? "Listing asset..." : "List Assets to Network"}
             </button>
           </form>
         </div>
