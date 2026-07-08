@@ -1,6 +1,7 @@
 'use client';
 
-import { ReactNode, useState, useEffect } from 'react';
+import type { ReactNode } from 'react';
+import { useState, useEffect } from 'react';
 import AdSense from './AdSense';
 
 export interface AdZoneConfig {
@@ -12,13 +13,13 @@ export interface AdZoneConfig {
 }
 
 export interface AdPlacementManagerProps {
-  zone?: 'header' | 'mid-story' | 'sidebar'; // <-- ADDED: Supports standalone grid injection
+  zone?: 'header' | 'mid-story' | 'sidebar';
   articleContent?: string;
-  children?: ReactNode;
   showHeaderAd?: boolean;
   showMidStoryAd?: boolean;
   showSidebarAd?: boolean;
   customAds?: AdZoneConfig[];
+  children?: ReactNode;
 }
 
 // Default production slot IDs
@@ -46,7 +47,7 @@ const DEFAULT_ADS: AdZoneConfig[] = [
   },
 ];
 
-export default function AdPlacementManager({
+const AdPlacementManager = ({
   zone,
   articleContent,
   children,
@@ -54,7 +55,7 @@ export default function AdPlacementManager({
   showMidStoryAd = true,
   showSidebarAd = true,
   customAds,
-}: AdPlacementManagerProps) {
+}: AdPlacementManagerProps) => {
   const adsConfig = customAds || DEFAULT_ADS;
   const [contentHeight, setContentHeight] = useState(0);
 
@@ -81,7 +82,7 @@ export default function AdPlacementManager({
         />
       </div>
     );
-  }
+  };
 
   // ============================================================================
   // MODE 2: LEGACY WRAPPER LAYOUT (Used by /read/[slug] Article Pages)
@@ -149,3 +150,5 @@ export default function AdPlacementManager({
 export function getMidStoryAdPosition(wordCount: number): number {
   return Math.floor(wordCount / 2);
 }
+
+export default AdPlacementManager;

@@ -44,7 +44,7 @@ export default async function HoroscopePage({
     fortuneLevel: reading.fortuneLevel || 3,
     luckyColor: reading.luckyColor || "Silver",
     luckyNumber: reading.luckyNumber || 7,
-    compatibleSigns: reading.compatibleSigns || [],
+    compatibleSigns: Array.isArray(reading.compatibleSigns) ? reading.compatibleSigns : [],
     careerForecast:
       reading.careerForecast ||
       "Focus on steady professional growth.",

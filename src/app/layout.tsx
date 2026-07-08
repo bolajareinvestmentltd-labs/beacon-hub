@@ -12,10 +12,13 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
 
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://beacon-hub.vercel.app';
+const socialImage = new URL('/beacon-logo.svg', siteUrl).toString();
+
 export const metadata: Metadata = {
   title: 'Beacon Hub - Premium News Platform',
   description: 'World-class news journalism with premium editorial design',
-  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000'),
+  metadataBase: new URL(siteUrl),
   icons: {
     icon: '/beacon-logo.svg',
     apple: '/beacon-logo.svg',
@@ -23,16 +26,16 @@ export const metadata: Metadata = {
   openGraph: {
     title: 'Beacon Hub - Premium News Platform',
     description: 'World-class news journalism with premium editorial design',
-    url: '/',
+    url: siteUrl,
     siteName: 'Beacon Hub',
     type: 'website',
-    images: [{ url: '/beacon-logo.svg', alt: 'Beacon Hub logo' }],
+    images: [{ url: socialImage, width: 1200, height: 630, alt: 'Beacon Hub logo' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Beacon Hub - Premium News Platform',
     description: 'World-class news journalism with premium editorial design',
-    images: ['/beacon-logo.svg'],
+    images: [{ url: socialImage, alt: 'Beacon Hub logo' }],
   },
 };
 

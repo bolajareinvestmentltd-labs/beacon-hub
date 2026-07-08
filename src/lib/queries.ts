@@ -10,12 +10,14 @@ import {
 } from '@/db/schema';
 import { desc, eq } from 'drizzle-orm';
 
+const articleOrder = (column: typeof articles.publishedAt) => desc(column);
+
 export async function getHeroArticle() {
   try {
     const hero = await db
       .select()
       .from(articles)
-      .orderBy(desc(articles.publishedAt))
+      .orderBy(articleOrder(articles.publishedAt))
       .limit(1);
     return hero[0] || null;
   } catch (error) {
@@ -29,7 +31,7 @@ export async function getFeaturedArticles(limit = 4) {
     const featured = await db
       .select()
       .from(articles)
-      .orderBy(desc(articles.publishedAt))
+      .orderBy(articleOrder(articles.publishedAt))
       .limit(limit);
     return featured;
   } catch (error) {
@@ -44,7 +46,7 @@ export async function getBreakingNews(limit = 5) {
       .select()
       .from(articles)
       .where(eq(articles.isBreaking, true))
-      .orderBy(desc(articles.publishedAt))
+      .orderBy(articleOrder(articles.publishedAt))
       .limit(limit);
     return breaking;
   } catch (error) {
@@ -58,7 +60,7 @@ export async function getArticles(limit = 12) {
     const allArticles = await db
       .select()
       .from(articles)
-      .orderBy(desc(articles.publishedAt))
+      .orderBy(articleOrder(articles.publishedAt))
       .limit(limit);
     return allArticles;
   } catch (error) {
@@ -86,7 +88,7 @@ export async function getArticleMetrics(articleId: string) {
     const metrics = await db
       .select()
       .from(contentMetrics)
-      .where(eq(contentMetrics.articleId, articleId))
+      .where(eq(contentMetrics.articleId, Number(articleId)))
       .limit(1);
     return metrics[0] || null;
   } catch (error) {
@@ -98,21 +100,23 @@ export async function getArticleMetrics(articleId: string) {
 export async function incrementArticleViews(articleId: string) {
   try {
     const existing = await getArticleMetrics(articleId);
+    const articleIdNumber = Number(articleId);
 
     if (existing) {
       await db
         .update(contentMetrics)
         .set({ views: (existing.views || 0) + 1 })
-        .where(eq(contentMetrics.articleId, articleId));
+        .where(eq(contentMetrics.articleId, articleIdNumber));
     } else {
       await db.insert(contentMetrics).values({
-        articleId,
+        articleId: articleIdNumber,
         views: 1,
-        likes: 0,
-        shares: 0,
-        comments: 0,
+        uniqueVisitors: 0,
+        engagementScore: 0,
+        avgReadDuration: 0,
+        bounceRate: 0,
         createdAt: new Date(),
-        updatedAt: new Date(),
+        lastUpdated: new Date(),
       });
     }
   } catch (error) {
@@ -125,7 +129,7 @@ export async function getRelatedArticles(articleId: number, limit = 4) {
     const related = await db
       .select()
       .from(articles)
-      .orderBy(desc(articles.publishedAt))
+      .orderBy(articleOrder(articles.publishedAt))
       .limit(limit + 1);
 
     return related.filter((a) => a.id !== articleId).slice(0, limit);
@@ -217,7 +221,7 @@ export async function searchArticles(_query: string, limit = 10) {
     const results = await db
       .select()
       .from(articles)
-      .orderBy(desc(articles.publishedAt))
+      .orderBy(articleOrder(articles.publishedAt))
       .limit(limit);
     return results;
   } catch (error) {

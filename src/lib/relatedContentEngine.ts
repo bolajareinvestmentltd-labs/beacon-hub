@@ -13,8 +13,8 @@ export async function getRelatedContentByKeywords(
     const relatedArticles = await db
       .select()
       .from(articles)
-      .where(ne(articles.id, articleId))
-      .orderBy(desc(articles.views))
+      .where(ne(articles.id, Number(articleId)))
+      .orderBy(desc(articles.publishedAt))
       .limit(limit);
 
     return relatedArticles;
@@ -35,7 +35,7 @@ export async function getRelatedContentByCategory(
       .from(articles)
       .where(
         and(
-          ne(articles.id, articleId),
+          ne(articles.id, Number(articleId)),
           eq(articles.category, category)
         )
       )
@@ -56,9 +56,10 @@ export async function createContentRelationship(
 ): Promise<void> {
   try {
     await db.insert(contentRelationships).values({
-      sourceArticleId,
-      relatedArticleId,
-      matchType,
+      sourceArticleId: Number(sourceArticleId),
+      relatedArticleId: Number(relatedArticleId),
+      relationshipType: matchType,
+      relevanceScore: 0,
       createdAt: new Date(),
     });
   } catch (error) {

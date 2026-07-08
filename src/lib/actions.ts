@@ -54,9 +54,12 @@ export async function publishArticle(formData: FormData) {
       slug: validated.slug,
       category: validated.category,
       content: validated.content,
-      excerpt: validated.excerpt,
+      excerpt: validated.excerpt || '',
       coverImage: imageUrl ?? null,
       author: validated.author,
+      source: 'Beacon Hub',
+      publishedAt: new Date(),
+      createdAt: new Date(),
     });
 
     logger.info("Article published", { title, slug: validated.slug });
