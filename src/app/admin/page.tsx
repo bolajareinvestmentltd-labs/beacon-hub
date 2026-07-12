@@ -2,11 +2,18 @@
 
 import { useActionState, useEffect, useState } from "react";
 import { publishArticle, publishDeal } from "@/lib/actions";
-import { ShieldCheck, Database, LineChart } from "lucide-react";
+import { ShieldCheck, Database, LineChart, ClockHour4, ListChecks } from "lucide-react";
 
 type ActionState = {
   success: boolean;
   message: string;
+};
+
+type ArticleHistoryItem = {
+  id: number;
+  title: string;
+  category: string;
+  publishedAt: string;
 };
 
 const initialState: ActionState = {
@@ -16,6 +23,8 @@ const initialState: ActionState = {
 
 export default function AdminPage() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [history, setHistory] = useState<ArticleHistoryItem[]>([]);
+  const [historyError, setHistoryError] = useState<string | null>(null);
 
   const [articleState, articleAction, isArticlePending] = useActionState(
     async (_prevState: ActionState, formData: FormData) => {
@@ -46,6 +55,47 @@ export default function AdminPage() {
       return () => window.clearTimeout(timeout);
     }
   }, [dealState]);
+
+  useEffect(() => {
+    async function loadHistory() {
+      try {
+        const response = await fetch("/api/admin/articles", {
+          credentials: "same-origin",
+        });
+        if (!response.ok) {
+          throw new Error("Could not load article history.");
+        }
+
+        const data = await response.json();
+        setHistory(data.articles || []);
+        setHistoryError(null);
+      } catch (error) {
+        setHistoryError("Unable to load published article history.");
+      }
+    }
+
+    loadHistory();
+  }, []);
+
+  useEffect(() => {
+    if (!articleState.success) return;
+
+    async function refreshHistory() {
+      try {
+        const response = await fetch("/api/admin/articles", {
+          credentials: "same-origin",
+        });
+        if (!response.ok) return;
+
+        const data = await response.json();
+        setHistory(data.articles || []);
+      } catch {
+        // Keep existing history if refresh fails.
+      }
+    }
+
+    refreshHistory();
+  }, [articleState.success]);
 
   return (
     <div className="w-full max-w-7xl mx-auto py-12 px-4 min-h-screen">
