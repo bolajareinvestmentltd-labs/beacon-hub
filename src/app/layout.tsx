@@ -13,6 +13,7 @@ const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfa
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://beacon-hub.vercel.app';
 const socialImage = new URL('/beacon-logo.svg', siteUrl).toString();
+const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID?.trim();
 
 export const metadata: Metadata = {
   title: 'Beacon Hub - Premium News Platform',
@@ -42,13 +43,15 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${playfair.variable} min-h-screen bg-background text-foreground antialiased`}>
-        <Script
-          id="google-adsense-master"
-          async
-          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_PUB_ID}`}
-          crossOrigin="anonymous"
-          strategy="lazyOnload"
-        />
+        {ADSENSE_CLIENT_ID && !ADSENSE_CLIENT_ID.includes('xxxxxxxx') && (
+          <Script
+            id="google-adsense-master"
+            async
+            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
+            crossOrigin="anonymous"
+            strategy="lazyOnload"
+          />
+        )}
 
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <Navbar />

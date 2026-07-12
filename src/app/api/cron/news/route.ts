@@ -32,31 +32,52 @@ async function fetchNewsFromGemini() {
     }
   );
 
-  const data = await response.json();
+  const rawResult = await response.text();
+  let data: any = null;
+
+  try {
+    data = JSON.parse(rawResult);
+  } catch {
+    // Fall back to raw text when Gemini returns non-JSON error details.
+  }
 
   if (!response.ok) {
-    const msg =
-      (data as any)?.error?.message ||
-      (data as any)?.error?.status ||
-      `Gemini request failed with status ${response.status}`;
-    throw new Error(msg);
+    const retryAfter = response.headers.get('retry-after');
+    const message =
+      data?.error?.message || data?.error?.status || `Gemini request failed with status ${response.status}`;
+    const details = retryAfter ? `${message}; retry-after=${retryAfter}` : message;
+
+    if (response.status === 429) {
+      throw new Error(`Gemini rate limit reached: ${details}`);
+    }
+
+    throw new Error(details);
   }
 
   if (data?.error) {
-    throw new Error(data.error.message || "Gemini API error");
+    const errorMessage = data.error.message || data.error.status || "Gemini API error";
+    throw new Error(errorMessage);
   }
 
   const textResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!textResponse) {
-    throw new Error("Empty response from Gemini engine");
+  if (!textResponse || typeof textResponse !== 'string') {
+    throw new Error("Empty or invalid response from Gemini engine");
   }
 
-  return JSON.parse(textResponse);
+  const cleaned = textResponse.trim();
+  try {
+    return JSON.parse(cleaned);
+  } catch (parseError) {
+    throw new Error(`Gemini returned invalid JSON payload; parse error: ${(parseError as Error).message}; body=${cleaned.slice(0, 500)}`);
+  }
 }
 
 export async function GET(req: Request) {
   const authHeader = req.headers.get("authorization");
-  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+  const isVercelCron = req.headers.get('x-vercel-cron') === '1';
+  const isAuthorized = isVercelCron || authHeader === `Bearer ${process.env.CRON_SECRET}`;
+
+  if (!isAuthorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -72,13 +93,17 @@ export async function GET(req: Request) {
     });
   } catch (error) {
     console.error("News sync failed:", error);
+    const message = error instanceof Error ? error.message : "News sync failed";
+    const status = message.includes('rate limit') ? 429 : 500;
+
     return NextResponse.json(
       {
         success: false,
-        error: error instanceof Error ? error.message : "News sync failed",
+        error: message,
       },
-      { status: 200 }
+      { status }
     );
   }
 }
+
 

@@ -32,8 +32,15 @@ export default function AdSense({
   const pathname = usePathname();
   const [adFailed, setAdFailed] = useState(false);
 
-  // Pulls securely from your .env file, falls back to placeholder safely
-  const PUB_ID = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID || 'ca-pub-xxxxxxxxxxxxxxxx';
+  const PUB_ID = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID?.trim();
+  const isValidClientId = Boolean(PUB_ID && !PUB_ID.includes('xxxxxxxx'));
+
+  if (!isValidClientId) {
+    if (typeof window !== 'undefined') {
+      console.warn('[Beacon Hub AdSense] Skipping ad rendering because NEXT_PUBLIC_ADSENSE_PUB_ID is missing or invalid.');
+    }
+    return null;
+  }
 
   useEffect(() => {
     if (typeof window === 'undefined') return;

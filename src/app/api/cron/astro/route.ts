@@ -5,7 +5,15 @@ import { validateHoroscopeReading, validateContentDepth, HoroscopeReadingsBatchS
 
 export const maxDuration = 60;
 
-export async function GET() {
+export async function GET(req: Request) {
+  const authHeader = req.headers.get('authorization');
+  const isVercelCron = req.headers.get('x-vercel-cron') === '1';
+  const isAuthorized = isVercelCron || authHeader === `Bearer ${process.env.CRON_SECRET}`;
+
+  if (!isAuthorized) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
   const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 
   if (!GEMINI_API_KEY) {
@@ -98,12 +106,23 @@ RETURN ONLY VALID JSON ARRAY - NO MARKDOWN, NO BACKTICKS, NO COMMENTARY.`;
     );
 
     if (!res.ok) {
-      const errorData = await res.json();
-      console.error("Gemini API Error:", errorData);
-      return NextResponse.json(
-        { error: "Gemini API error", details: errorData },
-        { status: res.status }
-      );
+      let errorData: any = null;
+      let rawBody: string | undefined = undefined;
+      try {
+        errorData = await res.json();
+      } catch {
+        rawBody = await res.text().catch(() => undefined);
+      }
+
+      console.error("Gemini API Error:", errorData ?? rawBody);
+      const retryAfter = res.headers.get('retry-after');
+      const details = {
+        error: "Gemini API error",
+        status: res.status,
+        retryAfter: retryAfter ?? undefined,
+        details: errorData ?? rawBody,
+      };
+      return NextResponse.json(details, { status: res.status });
     }
 
     const data = await res.json();

@@ -2,23 +2,26 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { eq } from "drizzle-orm";
+import { db } from "@/db";
+import { admins } from "@/db/schema";
 import { checkAuthLimit } from "./rateLimit";
 import { logger } from "./logger";
 import { sanitizeInput } from "./sanitize";
 import { LoginSchema } from "./validation";
+import { verifyPassword, createAdminSessionToken } from "./server-auth";
 
-export const ADMIN_SESSION_COOKIE = "admin_session";
-export const ADMIN_SESSION_VALUE = "secure_jcls_token_active";
+const ADMIN_SESSION_COOKIE = "admin_session";
 
 export async function loginAction(formData: FormData) {
   try {
     const email = (formData.get("email") as string)?.trim() || "";
     const password = (formData.get("password") as string) || "";
     const rememberMe = formData.get("rememberMe") === "on";
-    const ADMIN_PASSPHRASE = process.env.ADMIN_PASSPHRASE;
+    const ADMIN_SESSION_SECRET = process.env.ADMIN_SESSION_SECRET;
 
-    if (!ADMIN_PASSPHRASE) {
-      logger.error("SERVER MISCONFIGURATION: Admin passphrase not set");
+    if (!ADMIN_SESSION_SECRET) {
+      logger.error("SERVER MISCONFIGURATION: Admin session secret not set");
       redirect("/login?error=Server+misconfiguration.+Please+check+environment+settings.");
     }
 
@@ -41,14 +44,26 @@ export async function loginAction(formData: FormData) {
     }
 
     const sanitizedPassword = sanitizeInput(password);
+    const adminRows = await db
+      .select()
+      .from(admins)
+      .where(eq(admins.email, sanitizedEmail))
+      .limit(1);
 
-    if (sanitizedPassword !== ADMIN_PASSPHRASE) {
-      logger.logAuthEvent('failed_login', sanitizedEmail, { reason: 'invalid_password' });
+    const admin = adminRows[0];
+    if (!admin || !verifyPassword(sanitizedPassword, admin.passwordHash)) {
+      logger.logAuthEvent('failed_login', sanitizedEmail, { reason: 'invalid_credentials' });
       redirect("/login?error=Invalid+credentials.");
     }
 
+    const sessionToken = createAdminSessionToken(
+      sanitizedEmail,
+      rememberMe ? 60 * 60 * 24 * 30 : 60 * 60 * 24,
+      ADMIN_SESSION_SECRET
+    );
+
     const cookieStore = await cookies();
-    cookieStore.set(ADMIN_SESSION_COOKIE, ADMIN_SESSION_VALUE, {
+    cookieStore.set(ADMIN_SESSION_COOKIE, sessionToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "strict",
@@ -56,7 +71,7 @@ export async function loginAction(formData: FormData) {
       path: "/",
     });
 
-    logger.logAuthEvent('login', email, { success: true, rememberMe });
+    logger.logAuthEvent('login', sanitizedEmail, { success: true, rememberMe });
     redirect("/admin");
   } catch (error) {
     logger.error("Login action failed", { error });

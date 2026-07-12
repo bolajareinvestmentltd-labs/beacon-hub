@@ -1,11 +1,16 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { ShieldCheck } from "lucide-react";
 import { loginAction } from "@/lib/auth-actions";
-import { cookies } from "next/headers";
 
-export default async function LoginPage({ searchParams }: { searchParams: Promise<{ error?: string }> }) {
-  const resolvedParams = await searchParams;
-  const cookieStore = await cookies();
-  const hasSession = cookieStore.get("admin_session")?.value === "secure_jcls_token_active";
+export default function LoginPage({ searchParams }: { searchParams: { error?: string } }) {
+  const resolvedParams = searchParams;
+  const [hasSession, setHasSession] = useState(false);
+
+  useEffect(() => {
+    setHasSession(document.cookie.includes("admin_session="));
+  }, []);
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
@@ -64,7 +69,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
           </label>
 
           <p className="text-[11px] text-slate-500 dark:text-slate-400">
-            Use the passphrase stored in environment settings. The session is protected by an HTTP-only cookie and stays valid for one day or 30 days when remembered.
+            Use your Beacon Hub admin email and password. The session is protected by an HTTP-only cookie and stays valid for one day or 30 days when remembered.
           </p>
 
           <button
