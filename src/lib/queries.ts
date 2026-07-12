@@ -152,10 +152,15 @@ export async function getEditorialSections() {
   }
 }
 
-export async function getHoroscopeBySign(sign: string) {
+export async function getHoroscopeBySign(sign: string | undefined | null) {
   try {
+    const trimmed = String(sign ?? '').trim();
+    if (!trimmed) {
+      return null;
+    }
+
     const normalized =
-      sign.trim().charAt(0).toUpperCase() + sign.trim().slice(1).toLowerCase();
+      trimmed.charAt(0).toUpperCase() + trimmed.slice(1).toLowerCase();
 
     const reading = await db
       .select()

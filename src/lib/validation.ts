@@ -5,10 +5,10 @@ export const ArticleSchema = z.object({
   title: z.string().min(3, 'Title must be at least 3 characters').max(200, 'Title must be at most 200 characters'),
   slug: z.string().regex(/^[a-z0-9-]+$/, 'Slug must contain only lowercase letters, numbers, and hyphens'),
   content: z.string().min(10, 'Content must be at least 10 characters').max(50000, 'Content too long'),
-  category: z.enum(['Technology', 'Business', 'Science', 'Health', 'Entertainment', 'Politics', 'Sports', 'World']),
+  category: z.string().trim().min(2, 'Category too short').max(100, 'Category too long'),
   author: z.string().min(2, 'Author name too short').max(100, 'Author name too long'),
   excerpt: z.string().max(500, 'Excerpt too long').optional(),
-  coverImage: z.string().url('Invalid image URL').optional(),
+  coverImage: z.string().url('Invalid image URL').nullable().optional(),
 });
 
 // Login validation
@@ -33,8 +33,8 @@ export const DealSchema = z.object({
   vendorName: z.string().min(2, 'Vendor name too short').max(100, 'Vendor name too long'),
   price: z.number().positive('Price must be positive'),
   category: z.string().min(2, 'Category too short').max(100, 'Category too long'),
-  imageUrl: z.string().url('Invalid image URL').optional(),
-  videoUrl: z.string().url('Invalid video URL').optional(),
+  imageUrl: z.string().url('Invalid image URL').nullable().optional(),
+  videoUrl: z.string().url('Invalid video URL').nullable().optional(),
   hasWatermark: z.boolean().default(false),
 });
 

@@ -1,6 +1,6 @@
 import { db } from '@/db';
 import { articles } from '@/db/schema';
-import { desc, ilike } from 'drizzle-orm';
+import { desc } from 'drizzle-orm';
 
 export function sortLatestNews<T extends { publishedAt: string | Date }>(articles: T[]) {
   return [...articles].sort(
@@ -12,23 +12,45 @@ export function latestNews<T extends { publishedAt: string | Date }>(articles: T
   return sortLatestNews(articles).slice(0, limit);
 }
 
-export async function getLiveNews(category?: string) {
+function normalizeCategoryKey(value?: string | null) {
+  return (value ?? '')
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '');
+}
+
+function matchesCategory(articleCategory: string | null | undefined, requestedCategory?: string) {
+  if (!requestedCategory?.trim()) {
+    return true;
+  }
+
+  const requestedKey = normalizeCategoryKey(requestedCategory);
+  const articleKey = normalizeCategoryKey(articleCategory);
+
+  if (!requestedKey || !articleKey) {
+    return false;
+  }
+
+  return articleKey === requestedKey || articleKey.includes(requestedKey) || requestedKey.includes(articleKey);
+}
+
+export async function getLiveNews(category?: string, limit = 12) {
   try {
     const normalizedCategory = category?.trim();
-    const rows = normalizedCategory
-      ? await db
-          .select()
-          .from(articles)
-          .where(ilike(articles.category, `%${normalizedCategory}%`))
-          .orderBy(desc(articles.publishedAt))
-          .limit(12)
-      : await db
-          .select()
-          .from(articles)
-          .orderBy(desc(articles.publishedAt))
-          .limit(12);
+    const baseRows = await db
+      .select()
+      .from(articles)
+      .orderBy(desc(articles.publishedAt))
+      .limit(Math.max(limit * 2, 24));
 
-    return rows.map((article) => ({
+    const filteredRows = normalizedCategory
+      ? baseRows.filter((article) => matchesCategory(article.category, normalizedCategory))
+      : baseRows;
+
+    const rows = filteredRows.length > 0 ? filteredRows : baseRows;
+
+    return rows.slice(0, limit).map((article) => ({
       id: article.id,
       title: article.title,
       description: article.excerpt,

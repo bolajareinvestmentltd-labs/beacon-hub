@@ -1,13 +1,14 @@
 import { getLiveNews } from '@/lib/news';
 
 interface CategoryPageProps {
-  params: {
+  params: Promise<{
     category: string;
-  };
+  }>;
 }
 
 export default async function DynamicCategoryPage({ params }: CategoryPageProps) {
-  const rawCategory = params.category;
+  const resolvedParams = await params;
+  const rawCategory = resolvedParams.category;
   const formattedCategory = decodeURIComponent(rawCategory)
     .replace(/-/g, ' ')
     .toUpperCase();

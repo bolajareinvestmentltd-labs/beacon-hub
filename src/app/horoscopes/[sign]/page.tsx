@@ -9,10 +9,13 @@ export const dynamic = "force-dynamic";
 export default async function HoroscopePage({
   params,
 }: {
-  params: { sign: string };
+  params: Promise<{ sign: string }>;
 }) {
+  const resolvedParams = await params;
+  const requestedSign = resolvedParams.sign ?? "";
+
   // Fetch the live reading from Neon
-  const reading = await getHoroscopeBySign(params.sign);
+  const reading = await getHoroscopeBySign(requestedSign);
 
   if (!reading) {
     return (
@@ -102,7 +105,7 @@ export default async function HoroscopePage({
               key={sign}
               href={`/horoscopes/${sign.toLowerCase()}`}
               className={`flex flex-col items-center justify-center p-4 rounded-lg border transition-all duration-300 ${
-                sign.toLowerCase() === params.sign.toLowerCase()
+                sign.toLowerCase() === requestedSign.toLowerCase()
                   ? "bg-[#E2725B] text-white border-[#E2725B]"
                   : "border-slate-200 dark:border-white/10 hover:border-[#E2725B] hover:shadow-lg"
               }`}

@@ -42,22 +42,20 @@ export default function Footer() {
   }, []);
 
   return (
-    <footer className="border-t border-slate-200/70 bg-white/95 text-slate-700 dark:border-white/10 dark:bg-slate-950/95 dark:text-slate-300">
+    <footer className="border-t border-border/70 bg-surface-elevated/95 text-foreground dark:border-white/10 dark:bg-slate-950/95 dark:text-slate-300">
       <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-12 md:px-6 lg:flex-row lg:justify-between">
         <div className="max-w-md">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#E2725B] text-sm font-black uppercase tracking-[0.3em] text-white">
-              BH
-            </div>
+            <img src="/logo.png" alt="Beacon Hub logo" className="h-10 w-10 rounded-full object-cover" />
             <div>
-              <p className="text-lg font-black text-slate-900 dark:text-white">Beacon Hub</p>
-              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-slate-500 dark:text-slate-400">
+              <p className="text-lg font-black text-foreground dark:text-white">Beacon Hub</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground dark:text-slate-400">
                 Premium News Platform
               </p>
             </div>
           </div>
 
-          <p className="mt-5 text-sm leading-7 text-slate-600 dark:text-slate-400">
+          <p className="mt-5 text-sm leading-7 text-muted-foreground dark:text-slate-400">
             Fast-moving coverage, expert analysis, and clean design for readers who want the latest
             news without the noise.
           </p>
@@ -71,7 +69,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-3 text-sm">
               {QUICK_LINKS.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="transition hover:text-[#E2725B]">
+                  <Link href={link.href} className="transition hover:text-[#2F6FED]">
                     {link.label}
                   </Link>
                 </li>
@@ -86,7 +84,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-3 text-sm">
               {CATEGORY_LINKS.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="transition hover:text-[#E2725B]">
+                  <Link href={link.href} className="transition hover:text-[#2F6FED]">
                     {link.label}
                   </Link>
                 </li>
@@ -105,7 +103,7 @@ export default function Footer() {
                     href={link.href}
                     target="_blank"
                     rel="noreferrer"
-                    className="transition hover:text-[#E2725B]"
+                    className="transition hover:text-primary"
                   >
                     {link.label}
                   </a>
@@ -117,13 +115,13 @@ export default function Footer() {
       </div>
 
       <div className="border-t border-slate-200/70 bg-slate-50/80 px-4 py-4 dark:border-white/10 dark:bg-slate-900/70">
-        <div className="mx-auto flex max-w-7xl flex-col gap-2 text-sm text-slate-500 dark:text-slate-400 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex max-w-7xl flex-col gap-2 text-sm text-muted-foreground dark:text-slate-400 md:flex-row md:items-center md:justify-between">
           <p>© {new Date().getFullYear()} Beacon Hub. All rights reserved.</p>
           <div className="flex gap-4">
-            <Link href="/privacy" className="transition hover:text-[#E2725B]">
+            <Link href="/privacy" className="transition hover:text-primary">
               Privacy
             </Link>
-            <Link href="/terms" className="transition hover:text-[#E2725B]">
+            <Link href="/terms" className="transition hover:text-primary">
               Terms
             </Link>
           </div>
@@ -132,3 +130,4 @@ export default function Footer() {
     </footer>
   );
 }
+

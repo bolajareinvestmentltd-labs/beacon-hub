@@ -10,8 +10,9 @@ import { ChevronLeft } from "lucide-react";
 export const dynamic = "force-dynamic";
 export const revalidate = 600;
 
-export default async function ArticlePage({ params }: { params: { slug: string } }) {
-  const article = await getArticleBySlug(params.slug);
+export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
+  const resolvedParams = await params;
+  const article = await getArticleBySlug(resolvedParams.slug);
 
   if (!article) {
     notFound();
@@ -19,7 +20,7 @@ export default async function ArticlePage({ params }: { params: { slug: string }
 
   const articleData = {
     id: Number(article.id),
-    slug: String(article.slug || params.slug),
+    slug: String(article.slug || resolvedParams.slug),
     title: String(article.title || 'Article'),
     content: String(article.content || ''),
     authorPerspective: article.authorPerspective ? String(article.authorPerspective) : undefined,

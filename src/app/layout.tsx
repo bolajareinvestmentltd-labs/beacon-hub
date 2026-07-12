@@ -5,7 +5,6 @@ import Script from 'next/script';
 import { ThemeProvider } from '@/components/ThemeProvider';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import CategoryBar from '@/components/CategoryBar';
 import MobileDock from '@/components/MobileDock';
 import './globals.css';
 
@@ -20,8 +19,8 @@ export const metadata: Metadata = {
   description: 'World-class news journalism with premium editorial design',
   metadataBase: new URL(siteUrl),
   icons: {
-    icon: '/beacon-logo.svg',
-    apple: '/beacon-logo.svg',
+    icon: '/logo.png',
+    apple: '/logo.png',
   },
   openGraph: {
     title: 'Beacon Hub - Premium News Platform',
@@ -29,13 +28,13 @@ export const metadata: Metadata = {
     url: siteUrl,
     siteName: 'Beacon Hub',
     type: 'website',
-    images: [{ url: socialImage, width: 1200, height: 630, alt: 'Beacon Hub logo' }],
+    images: [{ url: '/logo.png', alt: 'Beacon Hub logo' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Beacon Hub - Premium News Platform',
     description: 'World-class news journalism with premium editorial design',
-    images: [{ url: socialImage, alt: 'Beacon Hub logo' }],
+    images: ['/logo.png'],
   },
 };
 
@@ -51,14 +50,11 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           strategy="lazyOnload"
         />
 
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-          <div className="flex min-h-screen flex-col">
-            <Navbar />
-            <CategoryBar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-            <MobileDock />
-          </div>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <Navbar />
+          <main className="flex-1 pt-[112px]">{children}</main>
+          <Footer />
+          <MobileDock />
         </ThemeProvider>
       </body>
     </html>
