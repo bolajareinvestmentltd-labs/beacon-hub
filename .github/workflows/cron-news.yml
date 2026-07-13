@@ -1,0 +1,22 @@
+name: scheduled-news-sync
+
+on:
+  schedule:
+    - cron: '0 */2 * * *' # every 2 hours
+  workflow_dispatch: {}
+
+jobs:
+  call-news:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Call news cron endpoint
+        env:
+          SITE_URL: ${{ secrets.NEXT_PUBLIC_SITE_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          TARGET=${SITE_URL:-"https://beacon-hub.vercel.app"}
+          echo "Calling $TARGET/api/cron/news"
+          curl -sS -G "$TARGET/api/cron/news" \
+            -H "Authorization: Bearer ${CRON_SECRET}" \
+            --fail
+*** End Patch
