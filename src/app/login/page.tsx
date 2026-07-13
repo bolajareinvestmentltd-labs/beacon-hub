@@ -4,12 +4,19 @@ import { useEffect, useState } from "react";
 import { ShieldCheck } from "lucide-react";
 import { loginAction } from "@/lib/auth-actions";
 
-export default function LoginPage({ searchParams }: { searchParams: { error?: string } }) {
-  const resolvedParams = searchParams;
+export default function LoginPage() {
+  const [resolvedParams, setResolvedParams] = useState<{ error?: string }>({});
   const [hasSession, setHasSession] = useState(false);
 
   useEffect(() => {
     setHasSession(document.cookie.includes("admin_session="));
+    try {
+      const sp = new URLSearchParams(window.location.search);
+      const err = sp.get("error") || undefined;
+      setResolvedParams({ error: err });
+    } catch (e) {
+      // ignore in non-browser environments
+    }
   }, []);
 
   return (

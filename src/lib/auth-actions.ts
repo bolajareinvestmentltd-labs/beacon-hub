@@ -13,6 +13,16 @@ import { verifyPassword, createAdminSessionToken } from "./server-auth";
 
 const ADMIN_SESSION_COOKIE = "admin_session";
 
+function isRedirectError(error: unknown): boolean {
+  return (
+    typeof error === "object" &&
+    error !== null &&
+    "digest" in error &&
+    typeof (error as { digest?: unknown }).digest === "string" &&
+    (error as { digest: string }).digest.startsWith("NEXT_REDIRECT")
+  );
+}
+
 export async function loginAction(formData: FormData) {
   try {
     const email = (formData.get("email") as string)?.trim() || "";
@@ -74,6 +84,10 @@ export async function loginAction(formData: FormData) {
     logger.logAuthEvent('login', sanitizedEmail, { success: true, rememberMe });
     redirect("/admin");
   } catch (error) {
+    if (isRedirectError(error)) {
+      throw error;
+    }
+
     logger.error("Login action failed", { error });
     redirect("/login?error=Unable+to+authenticate+at+this+time.");
   }
