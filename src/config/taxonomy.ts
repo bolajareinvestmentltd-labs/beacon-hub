@@ -2,7 +2,7 @@ export const TAXONOMY = {
   primary: [
     { name: "Top News", href: "/" },
     { name: "Escrow Deals", href: "/deals" },
-    { name: "Elections 2026", href: "/category/elections-2026" },
+    { name: "Elections 2027", href: "/category/elections-2027" },
     { name: "Global News", href: "/category/global-news" },
     { name: "Astrology", href: "/horoscopes" },
     { name: "Tech & Startups", href: "/category/tech-startups" },

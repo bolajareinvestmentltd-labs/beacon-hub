@@ -4,6 +4,7 @@ import { db } from "@/db";
 import { articles } from "@/db/schema";
 import { desc } from "drizzle-orm";
 import { verifyAdminSessionToken } from "@/lib/server-auth";
+import { runDbOperation } from "@/lib/db-utils";
 
 export async function GET() {
   const cookieStore = await cookies();
@@ -15,16 +16,18 @@ export async function GET() {
   }
 
   try {
-    const articleRows = await db
-      .select({
-        id: articles.id,
-        title: articles.title,
-        category: articles.category,
-        publishedAt: articles.publishedAt,
-      })
-      .from(articles)
-      .orderBy(desc(articles.publishedAt))
-      .limit(10);
+    const articleRows = await runDbOperation(() =>
+      db
+        .select({
+          id: articles.id,
+          title: articles.title,
+          category: articles.category,
+          publishedAt: articles.publishedAt,
+        })
+        .from(articles)
+        .orderBy(desc(articles.publishedAt))
+        .limit(10)
+    );
 
     return NextResponse.json({ articles: articleRows });
   } catch (error) {

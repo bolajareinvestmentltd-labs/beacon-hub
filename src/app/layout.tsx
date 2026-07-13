@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import type { ReactNode } from 'react';
 import { Inter, Playfair_Display } from 'next/font/google';
-import Script from 'next/script';
+// Use a raw <script> tag for AdSense to avoid Next.js adding `data-nscript`
 import { ThemeProvider } from '@/components/ThemeProvider';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -44,13 +44,12 @@ export default function RootLayout({ children }: { children: ReactNode }) {
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${playfair.variable} min-h-screen bg-background text-foreground antialiased`}>
         {ADSENSE_CLIENT_ID && !ADSENSE_CLIENT_ID.includes('xxxxxxxx') && (
-          <Script
+          <script
             id="google-adsense-master"
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
             crossOrigin="anonymous"
-            strategy="lazyOnload"
-          />
+          ></script>
         )}
 
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>

@@ -1,32 +1,89 @@
 import { NextResponse } from "next/server";
 import { persistIncomingArticles } from '@/lib/news-sync';
 
-// Allow the Vercel function more time to execute since longer articles take longer to write
 export const maxDuration = 60;
 
+const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
+
+function slugify(value: string) {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/(^-|-$)/g, '')
+    .slice(0, 240);
+}
+
+async function fetchNewsFromGNews() {
+  if (!GNEWS_API_KEY) {
+    return [];
+  }
+
+  const query = encodeURIComponent('Elections 2027 OR Global News OR Tech & Startups');
+  const url = `https://gnews.io/api/v4/search?q=${query}&lang=en&max=10&sortby=publishedAt&token=${GNEWS_API_KEY}`;
+
+  const response = await fetch(url, { method: 'GET' });
+  const text = await response.text();
+
+  let data: any;
+  try {
+    data = JSON.parse(text);
+  } catch (parseError) {
+    throw new Error(`GNews returned invalid JSON: ${(parseError as Error).message}`);
+  }
+
+  if (!response.ok) {
+    const message = data?.message || `GNews request failed with status ${response.status}`;
+    throw new Error(message);
+  }
+
+  if (!Array.isArray(data.articles)) {
+    throw new Error('GNews returned an unexpected response shape.');
+  }
+
+  return data.articles.map((article: any, index: number) => {
+    const title = String(article.title || `News item ${index + 1}`).trim();
+    const category = String(article.source?.name || 'Global News').trim();
+    const description = String(article.description || '').trim();
+    const content = String(article.content || description || title).trim();
+    const slugCandidate = article.url ? slugify(`${article.url}-${title}`) : slugify(title);
+
+    return {
+      title,
+      category,
+      slug: slugCandidate,
+      image_url: article.image || null,
+      excerpt: description || content.slice(0, 220),
+      content: `${content}
+
+Source: ${category}${article.url ? `\nRead more: ${article.url}` : ''}`,
+      author: String(article.author || category || 'GNews').trim(),
+      source: String(article.source?.name || 'GNews').trim(),
+      published_at: article.publishedAt || new Date().toISOString(),
+    };
+  });
+}
+
 async function fetchNewsFromGemini() {
-  const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
   if (!GEMINI_API_KEY) {
     throw new Error("Missing Gemini API Key");
   }
 
+  const prompt = `You are the Senior Editor for a premium news portal named Beacon-Hub. Generate 2 breaking news articles focusing on Global News, Tech & Startups, and Elections 2027. Return strictly in JSON format as an array of objects with the following keys: 'title', 'category', 'slug', 'image_url', 'content', and 'excerpt'. CRITICAL INSTRUCTION: The 'content' key MUST contain a comprehensive, deep-dive editorial consisting of at least 4 to 5 detailed paragraphs. Do not write short summaries. Ensure the tone is objective, analytical, and highly professional.`;
+
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-pro:generateContent?key=${GEMINI_API_KEY}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        contents: [
-          {
-            parts: [
-              {
-                text: "You are the Senior Editor for a premium news portal named Beacon-Hub. Generate 3 breaking news articles focusing on Global News, Tech & Startups, and Elections 2026. Return strictly in JSON format as an array of objects with the following keys: 'title', 'category', 'slug' (a URL-friendly string), 'image_url' (leave empty if no verified image is available, our system has a fallback), 'content', and 'excerpt'. CRITICAL INSTRUCTION: The 'content' key MUST contain a comprehensive, deep-dive editorial consisting of at least 4 to 5 detailed paragraphs. Do not write short summaries. Ensure the tone is objective, analytical, and highly professional.",
-              },
-            ],
-          },
-        ],
+        contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
-          response_mime_type: "application/json",
+          responseMimeType: "application/json",
+          maxOutputTokens: 1024,
+          temperature: 0.4,
+          topP: 0.95,
         },
       }),
     }
@@ -82,14 +139,22 @@ export async function GET(req: Request) {
   }
 
   try {
-    const payload = await fetchNewsFromGemini();
-    const result = await persistIncomingArticles(payload);
+    let articles = await fetchNewsFromGNews();
+    let source = 'GNews';
+
+    if (!articles.length) {
+      articles = await fetchNewsFromGemini();
+      source = 'Gemini';
+    }
+
+    const result = await persistIncomingArticles(articles);
 
     return NextResponse.json({
       success: true,
+      source,
       inserted: result.inserted.length,
       skipped: result.skipped.length,
-      message: "Deep-dive intelligence deployed successfully.",
+      message: `${source} intelligence deployed successfully.`,
     });
   } catch (error) {
     console.error("News sync failed:", error);

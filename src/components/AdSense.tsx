@@ -45,11 +45,23 @@ export default function AdSense({
   useEffect(() => {
     if (typeof window === 'undefined') return;
 
+    let tries = 0;
+
     const pushAd = () => {
       if (!adRef.current) return;
 
-      // CRITICAL NEXT.JS SPA FAILSAFE: 
-      // If Google already injected an iframe into this specific DOM node, abort!
+      const width = adRef.current.offsetWidth || adRef.current.parentElement?.offsetWidth || 0;
+      if (width <= 0) {
+        tries += 1;
+        if (tries < 3) {
+          window.setTimeout(pushAd, 200);
+        } else {
+          console.warn(`[Beacon Hub Ad Engine] Slot ${adSlot} has no width available after retries.`);
+          setAdFailed(true);
+        }
+        return;
+      }
+
       const isFilled = adRef.current.getAttribute('data-adsbygoogle-status');
       if (isFilled === 'done') return;
 
@@ -62,7 +74,6 @@ export default function AdSense({
       }
     };
 
-    // 150ms debounce gives Next.js App Router time to finish its layout paint
     const timer = setTimeout(pushAd, 150);
     return () => clearTimeout(timer);
   }, [pathname, adSlot]);

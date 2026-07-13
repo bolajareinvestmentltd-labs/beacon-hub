@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { articles } from '@/db/schema';
 import { desc } from 'drizzle-orm';
+import { runDbOperation } from '@/lib/db-utils';
 
 export function sortLatestNews<T extends { publishedAt: string | Date }>(articles: T[]) {
   return [...articles].sort(
@@ -38,11 +39,13 @@ function matchesCategory(articleCategory: string | null | undefined, requestedCa
 export async function getLiveNews(category?: string, limit = 12) {
   try {
     const normalizedCategory = category?.trim();
-    const baseRows = await db
-      .select()
-      .from(articles)
-      .orderBy(desc(articles.publishedAt))
-      .limit(Math.max(limit * 2, 24));
+    const baseRows = await runDbOperation(() =>
+      db
+        .select()
+        .from(articles)
+        .orderBy(desc(articles.publishedAt))
+        .limit(Math.max(limit * 2, 24))
+    );
 
     const filteredRows = normalizedCategory
       ? baseRows.filter((article) => matchesCategory(article.category, normalizedCategory))

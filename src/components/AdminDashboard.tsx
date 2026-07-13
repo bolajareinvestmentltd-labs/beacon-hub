@@ -135,7 +135,7 @@ export default function AdminDashboard() {
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Sector</label>
               <select name="category" title="Article category" className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none">
                 <option value="Top News">Top News</option>
-                <option value="Elections 2026">Elections 2026</option>
+                <option value="Elections 2027">Elections 2027</option>
                 <option value="Global News">Global News</option>
                 <option value="Tech & Startups">Tech & Startups</option>
                 <option value="Real Estate">Real Estate</option>
@@ -225,6 +225,77 @@ export default function AdminDashboard() {
             </button>
           </form>
         </div>
+      </div>
+
+      <div className="mt-10 max-w-7xl mx-auto bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
+        <div className="mb-6 flex items-center justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-bold font-playfair text-black dark:text-[#F9F6F0]">Published Article History</h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              Review and edit the most recent published articles from the Beacon-Hub command center.
+            </p>
+          </div>
+          <div>
+            <button
+              type="button"
+              onClick={() => {
+                setHistoryError(null);
+                fetch('/api/admin/articles', { credentials: 'same-origin' })
+                  .then((response) => response.json())
+                  .then((data) => setHistory(data.articles || []))
+                  .catch(() => setHistoryError('Unable to refresh article history.'));
+              }}
+              className="rounded-full border border-[#E2725B] px-4 py-2 text-sm font-semibold text-[#E2725B] transition hover:bg-[#E2725B]/10"
+            >
+              Refresh
+            </button>
+          </div>
+        </div>
+
+        {historyError ? (
+          <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {historyError}
+          </div>
+        ) : history.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-600">
+            No published articles are available yet.
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm text-slate-700 dark:text-slate-200">
+              <thead className="border-b border-slate-200 dark:border-slate-700 text-xs uppercase tracking-[0.16em] text-slate-500 dark:text-slate-400">
+                <tr>
+                  <th className="px-3 py-3">Headline</th>
+                  <th className="px-3 py-3">Category</th>
+                  <th className="px-3 py-3">Published</th>
+                  <th className="px-3 py-3 text-right">Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                {history.map((item) => (
+                  <tr key={item.id} className="border-b border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900 transition-colors">
+                    <td className="px-3 py-4 font-semibold text-slate-900 dark:text-white">{item.title}</td>
+                    <td className="px-3 py-4 text-slate-600 dark:text-slate-300">{item.category}</td>
+                    <td className="px-3 py-4 text-slate-600 dark:text-slate-300">
+                      {new Date(item.publishedAt).toLocaleString('en-US', {
+                        dateStyle: 'medium',
+                        timeStyle: 'short',
+                      })}
+                    </td>
+                    <td className="px-3 py-4 text-right">
+                      <a
+                        href={`/admin/articles/${item.id}/edit`}
+                        className="inline-flex items-center justify-center rounded-full border border-[#E2725B] px-4 py-2 text-xs font-semibold text-[#E2725B] transition hover:bg-[#E2725B]/10"
+                      >
+                        Edit
+                      </a>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
       </div>
     </div>
   );
