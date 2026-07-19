@@ -19,12 +19,13 @@ function authorizeAdmin() {
   return true;
 }
 
-export async function GET(_req: Request, { params }: { params: { id?: string } }) {
+export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!authorizeAdmin()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const articleId = Number(params.id);
+  const { id } = await params;
+  const articleId = Number(id);
   if (!articleId || Number.isNaN(articleId)) {
     return NextResponse.json({ error: "Invalid article identifier." }, { status: 400 });
   }
@@ -50,12 +51,13 @@ export async function GET(_req: Request, { params }: { params: { id?: string } }
   }
 }
 
-export async function PATCH(req: Request, { params }: { params: { id?: string } }) {
+export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
   if (!authorizeAdmin()) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const articleId = Number(params.id);
+  const { id } = await params;
+  const articleId = Number(id);
   if (!articleId || Number.isNaN(articleId)) {
     return NextResponse.json({ error: "Invalid article identifier." }, { status: 400 });
   }
