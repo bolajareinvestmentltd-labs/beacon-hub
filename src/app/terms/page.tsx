@@ -17,7 +17,7 @@ export default function TermsPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">1. Agreement to Terms</h2>
           <p>
-            By accessing and using beacon-hub.vercel.app (the "Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+            By accessing and using www.beacon-hub.com.ng (the "Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
           </p>
         </section>
 
@@ -144,7 +144,7 @@ export default function TermsPage() {
           <p className="mt-4">
             <strong>Email:</strong> support@beacon-hub.com<br />
             <strong>Website:</strong>{" "}
-            <a href="https://beacon-hub.vercel.app/contact" className="text-[#9C4A3A] underline">
+            <a href="https://www.beacon-hub.com.ng/contact" className="text-[#9C4A3A] underline">
               Contact Form
             </a>
           </p>

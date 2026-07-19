@@ -57,7 +57,7 @@ export default function AsymmetricalHeroLayout({
 
   return (
     <div className="w-full">
-      <div className="mb-10 text-center">
+      <div className="mb-6 text-center">
         <div className="mx-auto mb-4 flex items-center justify-center gap-3">
           {logoUrl && (
             <img
@@ -74,7 +74,7 @@ export default function AsymmetricalHeroLayout({
         <h1 className="mt-4 text-4xl sm:text-5xl lg:text-6xl font-black font-serif tracking-tight text-foreground">
           Beacon Hub
         </h1>
-        <p className="mx-auto mt-4 max-w-2xl text-sm sm:text-base text-muted-foreground leading-7">
+        <p className="mx-auto mt-3 max-w-2xl text-sm sm:text-base text-muted-foreground leading-7">
           Fast-moving coverage, clear analysis, and the top stories shaping the day.
         </p>
       </div>
@@ -88,10 +88,10 @@ export default function AsymmetricalHeroLayout({
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 md:gap-12 w-full">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10 w-full">
         <div className="lg:col-span-2">
           {story ? (
-            <article className="rounded-[2rem] border border-border/80 bg-surface p-8 shadow-[0_18px_80px_-48px_rgba(15,23,42,0.3)]">
+            <article className="rounded-[2rem] border border-border/80 bg-surface p-6 md:p-8 shadow-[0_18px_80px_-48px_rgba(15,23,42,0.3)]">
               <div className="flex flex-wrap items-center gap-3 mb-6">
                 <span className="bg-primary text-white text-[10px] font-sans font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-sm">
                   Latest Briefing
@@ -103,7 +103,7 @@ export default function AsymmetricalHeroLayout({
 
               {story.coverImage && (
                 <Link href={`/read/${story.slug || ''}`}>
-                  <div className="w-full h-[300px] md:h-[450px] mb-8 rounded-[1.75rem] overflow-hidden bg-muted relative group shadow-lg">
+                  <div className="w-full h-[300px] md:h-[450px] mb-6 rounded-[1.75rem] overflow-hidden bg-muted relative group shadow-lg">
                     <img
                       src={story.coverImage}
                       alt={story.title || 'Headline Image'}
@@ -114,13 +114,13 @@ export default function AsymmetricalHeroLayout({
               )}
 
               <Link href={`/read/${story.slug || ''}`}>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black font-serif leading-[1.05] mb-6 text-foreground hover:text-primary transition-colors">
+                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black font-serif leading-[1.05] mb-5 text-foreground hover:text-primary transition-colors">
                   {story.title || 'Intelligence Briefing Generating...'}
                 </h2>
               </Link>
 
               {story.excerpt && (
-                <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-8 font-sans max-w-3xl">
+                <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-6 font-sans max-w-3xl">
                   {story.excerpt}
                 </p>
               )}
@@ -134,7 +134,7 @@ export default function AsymmetricalHeroLayout({
           ) : (
             <div className="w-full py-16 border border-border rounded-[2rem] bg-surface animate-pulse">
               <div className="h-4 bg-muted rounded w-32 mb-6" />
-              <div className="w-full h-[350px] bg-muted rounded-[1.75rem] mb-8" />
+              <div className="w-full h-[350px] bg-muted rounded-[1.75rem] mb-6" />
               <div className="h-10 bg-muted rounded w-3/4 mb-4" />
               <div className="h-4 bg-muted rounded w-full mb-2" />
               <div className="h-4 bg-muted rounded w-2/3" />
@@ -143,7 +143,7 @@ export default function AsymmetricalHeroLayout({
         </div>
 
         <div className="lg:col-span-1">
-          <div className="sticky top-24">
+          <div className="sticky top-6 lg:top-24">
             <div className="rounded-[1.75rem] border border-border/70 bg-surface p-6 shadow-sm">
               <h2 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary mb-6">
                 Latest Wire Updates

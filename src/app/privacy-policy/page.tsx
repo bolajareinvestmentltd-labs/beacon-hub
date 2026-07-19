@@ -21,7 +21,7 @@ export default function PrivacyPolicy() {
         {/* Content - Matured, Corporate Tone for AdSense Approval */}
         <div className="font-serif text-base md:text-lg text-slate-800 leading-relaxed space-y-8 whitespace-pre-line">
           <p>
-            At {brandName}, available from https://beacon-hub.vercel.app, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by {brandName} and how we use it.
+            At {brandName}, available from https://www.beacon-hub.com.ng, one of our main priorities is the privacy of our visitors. This Privacy Policy document contains types of information that is collected and recorded by {brandName} and how we use it.
           </p>
 
           <h2 className="text-2xl font-sans font-semibold tracking-tight text-slate-950 mt-12 mb-4">

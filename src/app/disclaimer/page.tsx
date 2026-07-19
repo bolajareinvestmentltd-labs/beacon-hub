@@ -24,7 +24,7 @@ export default function DisclaimerPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">1. General Disclaimer</h2>
           <p>
-            The information provided on beacon-hub.vercel.app is for informational purposes only. While we strive for accuracy, we make no representations or warranties of any kind regarding the completeness, accuracy, reliability, or suitability of the information.
+            The information provided on www.beacon-hub.com.ng is for informational purposes only. While we strive for accuracy, we make no representations or warranties of any kind regarding the completeness, accuracy, reliability, or suitability of the information.
           </p>
           <p className="mt-3">
             Use of the Service is at your own risk. Beacon-Hub assumes no responsibility for errors, omissions, or inaccuracies in the content.
@@ -199,7 +199,7 @@ export default function DisclaimerPage() {
           <p className="mt-4">
             <strong>Email:</strong> support@beacon-hub.com<br />
             <strong>Contact Form:</strong>{" "}
-            <a href="https://beacon-hub.vercel.app/contact" className="text-[#9C4A3A] underline">
+            <a href="https://www.beacon-hub.com.ng/contact" className="text-[#9C4A3A] underline">
               Visit our contact page
             </a>
           </p>

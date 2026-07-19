@@ -17,7 +17,7 @@ export default function PrivacyPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">1. Introduction</h2>
           <p>
-            Beacon-Hub ("we," "us," "our," or "Company") operates the beacon-hub.vercel.app website (the "Service"). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.
+            Beacon-Hub ("we," "us," "our," or "Company") operates the www.beacon-hub.com.ng website (the "Service"). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.
           </p>
           <p>
             Please read this Privacy Policy carefully. If you do not agree with our policies and practices, please do not use our Service.
@@ -166,7 +166,7 @@ export default function PrivacyPage() {
           <p className="mt-4">
             <strong>Email:</strong> support@beacon-hub.com<br />
             <strong>Website:</strong>{" "}
-            <a href="https://beacon-hub.vercel.app/contact" className="text-[#9C4A3A] underline">
+            <a href="https://www.beacon-hub.com.ng/contact" className="text-[#9C4A3A] underline">
               Contact Form
             </a>
           </p>

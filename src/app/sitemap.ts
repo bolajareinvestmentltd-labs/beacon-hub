@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = 'https://beacon-hub.vercel.app';
+  const baseUrl = 'https://www.beacon-hub.com.ng';
   const now = new Date().toISOString().split('T')[0];
 
   // Static routes

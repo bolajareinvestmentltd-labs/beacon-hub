@@ -11,7 +11,7 @@ import './globals.css';
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://beacon-hub.vercel.app';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.beacon-hub.com.ng';
 const socialImage = new URL('/beacon-logo.svg', siteUrl).toString();
 const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID?.trim();
 

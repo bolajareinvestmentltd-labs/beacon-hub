@@ -45,7 +45,7 @@ This document provides instructions for completing Google AdSense and Google Ana
 1. Go to [Google AdSense](https://www.google.com/adsense/)
 2. Sign in with your Google account
 3. Create an AdSense account:
-   - Enter website URL: `https://beacon-hub.vercel.app`
+   - Enter website URL: `https://www.beacon-hub.com.ng`
    - Accept terms and conditions
    - Complete verification
 4. Wait for Google's approval (usually 24-48 hours)
@@ -88,7 +88,7 @@ In Google AdSense dashboard:
 ### Step 4: Google Search Console Setup
 
 1. Go to [Google Search Console](https://search.google.com/search-console)
-2. Add property: `https://beacon-hub.vercel.app`
+2. Add property: `https://www.beacon-hub.com.ng`
 3. Verify ownership using Google-provided meta tag:
    - Copy the verification code
    - Update `src/app/layout.tsx`:
@@ -102,7 +102,7 @@ In Google AdSense dashboard:
 
 4. Submit sitemap:
    - Navigate to Sitemaps in Search Console
-   - Add sitemap: `https://beacon-hub.vercel.app/sitemap.xml`
+   - Add sitemap: `https://www.beacon-hub.com.ng/sitemap.xml`
    - Verify crawl status
 
 ### Step 5: Google Analytics 4 Setup
@@ -110,7 +110,7 @@ In Google AdSense dashboard:
 1. Go to [Google Analytics](https://analytics.google.com/)
 2. Create a new property:
    - Property name: "Beacon-Hub"
-   - Website URL: `https://beacon-hub.vercel.app`
+   - Website URL: `https://www.beacon-hub.com.ng`
    - Timezone: Select your timezone
    - Currency: Select your currency
 
@@ -166,13 +166,13 @@ In Google AdSense dashboard:
 
 ### Test AdSense
 1. Deploy the application
-2. Open https://beacon-hub.vercel.app
+2. Open https://www.beacon-hub.com.ng
 3. Open browser DevTools (F12)
 4. Look for AdSense script loading and ad placeholders
 5. Check for any ad-related errors in console
 
 ### Test Analytics
-1. Visit https://beacon-hub.vercel.app
+1. Visit https://www.beacon-hub.com.ng
 2. Go to Google Analytics dashboard
 3. Navigate to **Real-time** > **Overview**
 4. You should see yourself as an active user

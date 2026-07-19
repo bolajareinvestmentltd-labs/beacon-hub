@@ -123,7 +123,7 @@ export default function AboutPage() {
           <p className="mt-4">
             <strong>Email:</strong> support@beacon-hub.com<br />
             <strong>Contact Form:</strong>{" "}
-            <a href="https://beacon-hub.vercel.app/contact" className="text-[#9C4A3A] underline">
+            <a href="https://www.beacon-hub.com.ng/contact" className="text-[#9C4A3A] underline">
               Visit our contact page
             </a>
           </p>

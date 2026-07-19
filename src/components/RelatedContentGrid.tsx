@@ -27,9 +27,9 @@ export default function RelatedContentGrid({
   const displayArticles = articles.slice(0, limit);
 
   return (
-    <section className="w-full mt-16 pt-12 border-t-2 border-black/10 dark:border-white/10">
+    <section className="w-full mt-10 pt-8 border-t border-black/10 dark:border-white/10">
       {/* Section Header */}
-      <div className="mb-8">
+      <div className="mb-6">
         <h2 className="text-3xl md:text-4xl font-black font-playfair text-black dark:text-[#F9F6F0] mb-2">
           {title}
         </h2>
@@ -37,15 +37,15 @@ export default function RelatedContentGrid({
       </div>
 
       {/* Grid Layout: 3 columns desktop, 2 tablet, 1 mobile */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
         {displayArticles.map((article) => (
           <Link
             key={article.id}
             href={`/read/${article.slug}`}
-            className="group relative flex flex-col overflow-hidden rounded-lg border border-slate-200 dark:border-white/10 hover:border-[#E2725B] hover:shadow-xl transition-all duration-300"
+            className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 dark:border-white/10 hover:border-[#E2725B] hover:shadow-xl transition-all duration-300"
           >
             {/* Card Container with hover effect */}
-            <div className="relative overflow-hidden h-48 md:h-56 bg-slate-200 dark:bg-white/5">
+            <div className="relative overflow-hidden h-44 md:h-52 bg-slate-200 dark:bg-white/5">
               {/* Thumbnail Image */}
               {article.coverImage ? (
                 <img
@@ -68,7 +68,7 @@ export default function RelatedContentGrid({
             </div>
 
             {/* Card Content */}
-            <div className="p-4 md:p-5 flex-1 flex flex-col">
+            <div className="p-4 flex-1 flex flex-col">
               {/* Headline */}
               <h3 className="text-sm md:text-base font-bold text-black dark:text-white group-hover:text-[#E2725B] transition-colors line-clamp-2 mb-3">
                 {article.title}
@@ -117,7 +117,7 @@ export default function RelatedContentGrid({
 
       {/* View All Link */}
       {articles.length > limit && (
-        <div className="mt-10 text-center">
+        <div className="mt-8 text-center">
           <Link
             href="/category/all"
             className="inline-flex items-center gap-2 text-sm font-bold uppercase tracking-wider text-slate-600 dark:text-slate-400 hover:text-[#E2725B] transition-colors"
