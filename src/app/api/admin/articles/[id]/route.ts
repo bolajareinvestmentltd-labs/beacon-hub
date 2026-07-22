@@ -7,8 +7,8 @@ import { verifyAdminSessionToken } from "@/lib/server-auth";
 import { runDbOperation } from "@/lib/db-utils";
 import { sanitizeHTML, sanitizeInput } from "@/lib/sanitize";
 
-function authorizeAdmin() {
-  const cookieStore = cookies();
+async function authorizeAdmin() {
+  const cookieStore = await cookies();
   const session = cookieStore.get("admin_session")?.value;
   const sessionSecret = process.env.ADMIN_SESSION_SECRET;
 
@@ -20,7 +20,7 @@ function authorizeAdmin() {
 }
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!authorizeAdmin()) {
+  if (!(await authorizeAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -52,7 +52,7 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
 }
 
 export async function PATCH(req: Request, { params }: { params: Promise<{ id: string }> }) {
-  if (!authorizeAdmin()) {
+  if (!(await authorizeAdmin())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
