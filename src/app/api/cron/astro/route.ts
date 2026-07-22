@@ -5,6 +5,37 @@ import { validateHoroscopeReading, validateContentDepth, HoroscopeReadingsBatchS
 
 export const maxDuration = 60;
 
+// Retry configuration
+const MAX_RETRIES = 3;
+const BASE_DELAY = 2000; // 2 seconds
+
+// Exponential backoff retry helper
+async function retryWithBackoff<T>(
+  fn: () => Promise<T>,
+  label: string,
+  maxRetries = MAX_RETRIES
+): Promise<T> {
+  let lastError: Error | null = null;
+  
+  for (let attempt = 1; attempt <= maxRetries; attempt++) {
+    try {
+      console.log(`[${label}] Attempt ${attempt}/${maxRetries}`);
+      return await fn();
+    } catch (error) {
+      lastError = error instanceof Error ? error : new Error(String(error));
+      console.warn(`[${label}] Attempt ${attempt} failed: ${lastError.message}`);
+      
+      if (attempt < maxRetries) {
+        const delay = BASE_DELAY * Math.pow(2, attempt - 1);
+        console.log(`[${label}] Waiting ${delay}ms before retry...`);
+        await new Promise(resolve => setTimeout(resolve, delay));
+      }
+    }
+  }
+  
+  throw lastError || new Error(`${label} failed after ${maxRetries} retries`);
+}
+
 export async function GET(req: Request) {
   const authHeader = req.headers.get('authorization');
   const isVercelCron = req.headers.get('x-vercel-cron') === '1';
@@ -55,54 +86,67 @@ ALL 12 SIGNS REQUIRED: Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio
 RETURN ONLY VALID JSON ARRAY - NO MARKDOWN, NO BACKTICKS, NO COMMENTARY.`;
 
   try {
-    // Call Gemini 3.1 Pro with structured output
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-5-pro:generateContent?key=${GEMINI_API_KEY}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          generationConfig: {
-            responseMimeType: "application/json",
-            responseSchema: {
-              type: "ARRAY",
-              items: {
-                type: "OBJECT",
-                properties: {
-                  sign: {
-                    type: "STRING",
-                    enum: [
-                      "Aries",
-                      "Taurus",
-                      "Gemini",
-                      "Cancer",
-                      "Leo",
-                      "Virgo",
-                      "Libra",
-                      "Scorpio",
-                      "Sagittarius",
-                      "Capricorn",
-                      "Aquarius",
-                      "Pisces",
-                    ],
+    // Call Gemini 3.1 Pro with structured output, with retry logic
+    const res = await retryWithBackoff(
+      async () => {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-5-pro:generateContent?key=${GEMINI_API_KEY}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              generationConfig: {
+                responseMimeType: "application/json",
+                responseSchema: {
+                  type: "ARRAY",
+                  items: {
+                    type: "OBJECT",
+                    properties: {
+                      sign: {
+                        type: "STRING",
+                        enum: [
+                          "Aries",
+                          "Taurus",
+                          "Gemini",
+                          "Cancer",
+                          "Leo",
+                          "Virgo",
+                          "Libra",
+                          "Scorpio",
+                          "Sagittarius",
+                          "Capricorn",
+                          "Aquarius",
+                          "Pisces",
+                        ],
+                      },
+                      reading: { type: "STRING" },
+                      lunarPhase: { type: "STRING" },
+                      fortuneLevel: { type: "NUMBER" },
+                      luckyColor: { type: "STRING" },
+                      luckyNumber: { type: "NUMBER" },
+                      compatibleSigns: { type: "ARRAY", items: { type: "STRING" } },
+                      careerForecast: { type: "STRING" },
+                      loveForecast: { type: "STRING" },
+                      financialTip: { type: "STRING" },
+                      powerAffirmation: { type: "STRING" },
+                    },
                   },
-                  reading: { type: "STRING" },
-                  lunarPhase: { type: "STRING" },
-                  fortuneLevel: { type: "NUMBER" },
-                  luckyColor: { type: "STRING" },
-                  luckyNumber: { type: "NUMBER" },
-                  compatibleSigns: { type: "ARRAY", items: { type: "STRING" } },
-                  careerForecast: { type: "STRING" },
-                  loveForecast: { type: "STRING" },
-                  financialTip: { type: "STRING" },
-                  powerAffirmation: { type: "STRING" },
                 },
               },
-            },
-          },
-          contents: [{ parts: [{ text: prompt }] }],
-        }),
-      }
+              contents: [{ parts: [{ text: prompt }] }],
+            }),
+          }
+        );
+        
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Gemini API ${response.status}: ${errorText.substring(0, 200)}`);
+        }
+        
+        return response;
+      },
+      "Gemini Astro API",
+      MAX_RETRIES
     );
 
     if (!res.ok) {
@@ -116,9 +160,11 @@ RETURN ONLY VALID JSON ARRAY - NO MARKDOWN, NO BACKTICKS, NO COMMENTARY.`;
 
       console.error("Gemini API Error:", errorData ?? rawBody);
       const retryAfter = res.headers.get('retry-after');
+      const isRateLimited = res.status === 429;
       const details = {
         error: "Gemini API error",
         status: res.status,
+        retryable: isRateLimited,
         retryAfter: retryAfter ?? undefined,
         details: errorData ?? rawBody,
       };
@@ -226,12 +272,17 @@ RETURN ONLY VALID JSON ARRAY - NO MARKDOWN, NO BACKTICKS, NO COMMENTARY.`;
     });
   } catch (error: any) {
     console.error("ASTRO CRON ERROR:", error);
+    const message = error.message || "Celestial Intelligence handshake failed";
+    const status = message.includes('rate limit') || message.includes('429') ? 429 : 500;
+    
     return NextResponse.json(
       {
         error: "Celestial Intelligence handshake failed",
-        message: error.message,
+        message: message,
+        retryable: status === 429,
+        hint: "Horoscope generation will retry in next scheduled cron window (morning/evening)",
       },
-      { status: 500 }
+      { status }
     );
   }
 }
