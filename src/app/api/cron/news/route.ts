@@ -6,37 +6,6 @@ export const maxDuration = 60;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
 
-// Retry configuration
-const MAX_RETRIES = 3;
-const BASE_DELAY = 2000; // 2 seconds
-
-// Exponential backoff retry helper
-async function retryWithBackoff<T>(
-  fn: () => Promise<T>,
-  label: string,
-  maxRetries = MAX_RETRIES
-): Promise<T> {
-  let lastError: Error | null = null;
-  
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      console.log(`[${label}] Attempt ${attempt}/${maxRetries}`);
-      return await fn();
-    } catch (error) {
-      lastError = error instanceof Error ? error : new Error(String(error));
-      console.warn(`[${label}] Attempt ${attempt} failed: ${lastError.message}`);
-      
-      if (attempt < maxRetries) {
-        const delay = BASE_DELAY * Math.pow(2, attempt - 1);
-        console.log(`[${label}] Waiting ${delay}ms before retry...`);
-        await new Promise(resolve => setTimeout(resolve, delay));
-      }
-    }
-  }
-  
-  throw lastError || new Error(`${label} failed after ${maxRetries} retries`);
-}
-
 function slugify(value: string) {
   return value
     .toLowerCase()
@@ -170,20 +139,11 @@ export async function GET(req: Request) {
   }
 
   try {
-    let articles = await retryWithBackoff(
-      () => fetchNewsFromGNews(),
-      "GNews fetch",
-      MAX_RETRIES
-    );
+    let articles = await fetchNewsFromGNews();
     let source = 'GNews';
 
     if (!articles.length) {
-      console.log('GNews returned no articles, trying Gemini...');
-      articles = await retryWithBackoff(
-        () => fetchNewsFromGemini(),
-        "Gemini fetch",
-        MAX_RETRIES
-      );
+      articles = await fetchNewsFromGemini();
       source = 'Gemini';
     }
 
@@ -205,8 +165,6 @@ export async function GET(req: Request) {
       {
         success: false,
         error: message,
-        retryable: status === 429,
-        message: "Both APIs temporarily unavailable. Retry scheduled for next cron window.",
       },
       { status }
     );
