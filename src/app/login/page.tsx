@@ -9,7 +9,14 @@ export default function LoginPage() {
   const [hasSession, setHasSession] = useState(false);
 
   useEffect(() => {
-    setHasSession(document.cookie.includes("admin_session="));
+    const hasCookie = document.cookie.includes("admin_session=");
+    setHasSession(hasCookie);
+
+    if (hasCookie) {
+      window.location.assign("/admin");
+      return;
+    }
+
     try {
       const sp = new URLSearchParams(window.location.search);
       const err = sp.get("error") || undefined;
