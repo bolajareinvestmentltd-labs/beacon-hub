@@ -6,22 +6,13 @@ import { loginAction } from "@/lib/auth-actions";
 
 export default function LoginPage() {
   const [resolvedParams, setResolvedParams] = useState<{ error?: string }>({});
-  const [hasSession, setHasSession] = useState(false);
 
   useEffect(() => {
-    const hasCookie = document.cookie.includes("admin_session=");
-    setHasSession(hasCookie);
-
-    if (hasCookie) {
-      window.location.assign("/admin");
-      return;
-    }
-
     try {
       const sp = new URLSearchParams(window.location.search);
       const err = sp.get("error") || undefined;
       setResolvedParams({ error: err });
-    } catch (e) {
+    } catch {
       // ignore in non-browser environments
     }
   }, []);
@@ -41,12 +32,6 @@ export default function LoginPage() {
         {resolvedParams.error && (
           <div className="bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 p-3 rounded-md text-xs font-bold text-center mb-6 uppercase tracking-wider">
             {resolvedParams.error}
-          </div>
-        )}
-
-        {hasSession && (
-          <div className="mb-6 rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-center text-xs font-semibold uppercase tracking-wider text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/30 dark:text-emerald-300">
-            Active admin session detected
           </div>
         )}
 
