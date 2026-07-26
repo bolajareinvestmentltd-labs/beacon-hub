@@ -128,7 +128,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
       {/* ARTICLE CONTENT */}
       <div className="max-w-4xl mx-auto px-4 md:px-8 lg:px-12">
-        <div className="content-area">
+        <div className="content-area rounded-3xl border border-slate-200/80 bg-white/80 p-4 shadow-sm backdrop-blur dark:border-white/10 dark:bg-slate-900/60 md:p-8">
           <EditorialColumnComponent
             title={articleData.title}
             content={articleData.content}

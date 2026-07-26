@@ -27,6 +27,7 @@ export default function LoginPage() {
           </div>
           <h1 className="text-3xl font-black font-playfair text-black dark:text-[#F9F6F0]">Restricted Sector</h1>
           <p className="text-slate-500 text-xs mt-2 uppercase tracking-widest font-bold">Beacon-Hub Command Auth</p>
+          <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">Use the seeded admin account to enter the command center.</p>
         </div>
 
         {resolvedParams.error && (
@@ -45,6 +46,7 @@ export default function LoginPage() {
               autoFocus
               className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-black dark:text-white focus:outline-none focus:border-[#E2725B] focus:ring-1 focus:ring-[#E2725B] transition-all"
               placeholder="admin@beacon-hub.local"
+              defaultValue="admin@beacon-hub.local"
               title="Enter an admin email address"
             />
           </div>
@@ -58,6 +60,7 @@ export default function LoginPage() {
               minLength={8}
               className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-black dark:text-white focus:outline-none focus:border-[#E2725B] focus:ring-1 focus:ring-[#E2725B] transition-all"
               placeholder="Enter strong password"
+              defaultValue="Admin123456"
               title="Password must be at least 8 characters"
             />
           </div>

@@ -126,6 +126,9 @@ export default function AdminDashboard() {
           </div>
 
           <form action={articleAction} className="flex flex-col gap-5">
+            <div className="rounded-xl border border-[#E2725B]/15 bg-[#E2725B]/5 px-3 py-2 text-xs text-slate-600 dark:text-slate-300">
+              Publish a fresh editorial brief to the site instantly.
+            </div>
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Headline</label>
               <input type="text" name="title" title="Article headline" placeholder="Enter the headline" required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] focus:ring-1 focus:ring-[#E2725B] outline-none" />
@@ -177,6 +180,9 @@ export default function AdminDashboard() {
           </div>
 
           <form action={dealAction} className="flex flex-col gap-5">
+            <div className="rounded-xl border border-[#3A7B7A]/15 bg-[#3A7B7A]/5 px-3 py-2 text-xs text-slate-600 dark:text-slate-300">
+              List a new asset or offer for the marketplace network.
+            </div>
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Asset Name / Title</label>
               <input type="text" name="title" title="Asset title" placeholder="Enter the asset name" required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />

@@ -56,7 +56,7 @@ const fetchHoroscopes =
         <SectionHeaderComponent
           eyebrow="SELECT YOUR SIGN"
           title="Today's Readings"
-          description="Comprehensive daily guidance for all 12 zodiac signs"
+          description="Comprehensive daily guidance for all 12 zodiac signs, refreshed for the current cosmic cycle."
         />
 
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
@@ -72,7 +72,7 @@ const fetchHoroscopes =
               <Link
                 href={`/horoscopes/${sign.name.toLowerCase()}`}
                 key={sign.name}
-                className="group relative flex flex-col items-center p-6 md:p-8 bg-gradient-to-br from-slate-50 to-white dark:from-white/5 dark:to-white/2 border border-slate-200 dark:border-white/10 rounded-2xl hover:border-[#E2725B] hover:shadow-xl transition-all duration-500 overflow-hidden"
+                className="group relative flex flex-col items-center p-6 md:p-8 bg-gradient-to-br from-slate-50 to-white dark:from-white/5 dark:to-white/2 border border-slate-200 dark:border-white/10 rounded-2xl hover:border-[#E2725B] hover:shadow-xl transition-all duration-500 overflow-hidden min-h-[220px]"
               >
                 <div className="absolute inset-0 bg-gradient-to-b from-[#E2725B]/0 to-[#E2725B]/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
                 <span className="text-[10px] font-bold uppercase tracking-widest text-slate-700 dark:text-slate-300 mb-3 z-10">
