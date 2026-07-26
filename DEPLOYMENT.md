@@ -27,6 +27,8 @@ Recommended schedule:
 - News: 08:00 and 20:00 UTC
 - Horoscope: 07:30 UTC daily
 
+This setup is compatible with both Vercel cron and cron-job.org, so you can keep the same endpoints while switching schedulers if needed.
+
 If you use cron-job.org, add `CRON_SECRET` in Vercel as a production environment variable so the request is authorized.
 
 ## Common Deployment Issues & Fixes
