@@ -111,9 +111,9 @@ export default async function HomePage() {
   const quoteAuthor = latest[0]?.category ? `${latest[0].category} Desk` : 'Beacon-Hub Editorial';
 
   return (
-    <main className="min-h-screen bg-background px-4 py-6 md:px-6 lg:px-8">
+    <main className="min-h-screen bg-background px-3 py-4 sm:px-4 sm:py-6 md:px-6 lg:px-8">
       <div className="mx-auto flex w-full max-w-7xl flex-col">
-        <div className="mt-8 md:mt-10">
+        <div className="mt-4 sm:mt-6 md:mt-8 lg:mt-10">
           <AsymmetricalHeroLayout
             article={heroArticle}
             feedArticles={feedArticles}
@@ -122,7 +122,7 @@ export default async function HomePage() {
           />
         </div>
 
-        <div className="mt-10 md:mt-16">
+        <div className="mt-8 sm:mt-10 md:mt-14 lg:mt-16">
           <SectionHeaderComponent
             eyebrow="EDITORIAL LENS"
             title="Curated Sections"
@@ -147,15 +147,15 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <div className="mt-10 md:mt-16">
+        <div className="mt-8 sm:mt-10 md:mt-14 lg:mt-16">
           <RelatedContentGrid articles={moreStories} title="More Stories" limit={6} />
         </div>
 
-        <div className="mt-10 md:mt-16">
+        <div className="mt-8 sm:mt-10 md:mt-14 lg:mt-16">
           <QuoteCard quote={quoteText} author={quoteAuthor} role="Editorial Briefing" />
         </div>
 
-        <div className="mt-10 md:mt-16">
+        <div className="mt-8 sm:mt-10 md:mt-14 lg:mt-16">
           <RelatedContentGrid articles={trendingNow} title="Trending Now" limit={6} />
         </div>
       </div>

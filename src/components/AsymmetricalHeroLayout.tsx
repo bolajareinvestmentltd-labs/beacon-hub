@@ -57,8 +57,8 @@ export default function AsymmetricalHeroLayout({
 
   return (
     <div className="w-full">
-      <div className="mb-6 text-center">
-        <div className="mx-auto mb-4 flex items-center justify-center gap-3">
+      <div className="mb-5 sm:mb-6 text-center">
+        <div className="mx-auto mb-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
           {logoUrl && (
             <img
               src={logoUrl}
@@ -66,15 +66,15 @@ export default function AsymmetricalHeroLayout({
               className="h-12 w-12 rounded-full border border-border/70 object-cover shadow-sm"
             />
           )}
-          <span className="text-[10px] font-semibold uppercase tracking-[0.45em] text-primary/90">
+          <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.3em] sm:tracking-[0.45em] text-primary/90">
             New & Latest News
           </span>
         </div>
 
-        <h1 className="mt-4 text-4xl sm:text-5xl lg:text-6xl font-black font-serif tracking-tight text-foreground">
+        <h1 className="mt-3 text-3xl sm:text-4xl lg:text-6xl font-black font-serif tracking-tight text-foreground">
           Beacon Hub
         </h1>
-        <p className="mx-auto mt-3 max-w-2xl text-sm sm:text-base text-muted-foreground leading-7">
+        <p className="mx-auto mt-2 sm:mt-3 max-w-2xl text-sm sm:text-base text-muted-foreground leading-6 sm:leading-7">
           Fast-moving coverage, clear analysis, and the top stories shaping the day.
         </p>
       </div>
@@ -88,8 +88,8 @@ export default function AsymmetricalHeroLayout({
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 md:gap-10 w-full">
-        <div className="lg:col-span-2">
+      <div className="grid grid-cols-1 gap-5 md:gap-8 lg:grid-cols-[1.7fr_0.8fr] xl:grid-cols-3 xl:gap-10 w-full">
+        <div className="lg:col-span-1 xl:col-span-2">
           {story ? (
             <article className="rounded-[2rem] border border-border/80 bg-surface p-6 md:p-8 shadow-[0_18px_80px_-48px_rgba(15,23,42,0.3)]">
               <div className="flex flex-wrap items-center gap-3 mb-6">
@@ -142,7 +142,7 @@ export default function AsymmetricalHeroLayout({
           )}
         </div>
 
-        <div className="lg:col-span-1">
+        <div className="lg:col-span-1 xl:col-span-1">
           <div className="sticky top-6 lg:top-24">
             <div className="rounded-[1.75rem] border border-border/70 bg-surface p-6 shadow-sm">
               <h2 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary mb-6">
