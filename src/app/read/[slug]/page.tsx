@@ -143,11 +143,15 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
       {/* MID-STORY INTERSTITIAL AD */}
       <div className="max-w-4xl mx-auto px-4 md:px-8 lg:px-12 my-16">
-        <div className="text-center mb-4">
-          <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">ADVERTISEMENT</p>
+        <div className="mb-4 flex items-center justify-center gap-2 text-center">
+          <div className="h-px flex-1 bg-slate-200 dark:bg-white/10" />
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Sponsored Content</p>
+          <div className="h-px flex-1 bg-slate-200 dark:bg-white/10" />
         </div>
         <div className="flex justify-center">
-          <AdSense adSlot="9999999999" adFormat="rectangle" />
+          <div className="w-full max-w-[720px]">
+            <AdSense adSlot="9999999999" adFormat="rectangle" label="Advertisement" />
+          </div>
         </div>
       </div>
 

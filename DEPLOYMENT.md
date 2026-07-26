@@ -14,6 +14,21 @@ Add these to your Vercel project (Project → Settings → Environment Variables
 - `NEXT_PUBLIC_ADSENSE_PUB_ID` — AdSense publisher id for ad rendering (optional but recommended for production).
 - `NEXT_PUBLIC_SITE_URL` — canonical site URL (optional, used for metadata).
 
+## External cron-job.org setup
+
+You can trigger the same cron endpoints from cron-job.org without relying on Vercel cron.
+
+- News endpoint: https://www.beacon-hub.com.ng/api/cron/news
+- Horoscope endpoint: https://www.beacon-hub.com.ng/api/cron/astro
+- Method: GET
+- Header: Authorization = Bearer YOUR_CRON_SECRET
+
+Recommended schedule:
+- News: 08:00 and 20:00 UTC
+- Horoscope: 07:30 UTC daily
+
+If you use cron-job.org, add `CRON_SECRET` in Vercel as a production environment variable so the request is authorized.
+
 ## Common Deployment Issues & Fixes
 
 - Missing envs causing build or runtime errors

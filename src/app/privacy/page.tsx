@@ -66,7 +66,7 @@ export default function PrivacyPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">4. Advertising and Google AdSense</h2>
           <p>
-            Beacon-Hub uses Google AdSense to display advertisements. Google and its partners may use cookies and other tracking technologies to serve ads based on your prior visits to our site and other websites.
+            Beacon-Hub uses Google AdSense to display advertisements. Google and its partners may use cookies and other tracking technologies to serve ads based on your prior visits to our site and other websites. These technologies help personalize ads and measure campaign performance.
           </p>
           <p className="mt-3">
             You can opt out of Google's advertising personalization by visiting Google's{" "}

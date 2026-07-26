@@ -83,23 +83,25 @@ export default function AdSense({
   const dimensions = AD_DIMENSIONS[adFormat] || AD_DIMENSIONS.auto;
 
   return (
-    <div className={`w-full flex flex-col items-center overflow-hidden my-2 ${className}`}>
+    <div className={`w-full flex flex-col items-center overflow-hidden my-4 ${className}`}>
       {label && (
-        <span className="text-[9px] font-sans font-bold tracking-[0.25em] uppercase text-muted-foreground mb-1.5 block select-none">
-          {label}
-        </span>
+        <div className="mb-2 flex w-full items-center justify-between gap-3 rounded-full border border-border/50 bg-background/70 px-3 py-1.5 text-[9px] font-sans font-semibold uppercase tracking-[0.24em] text-muted-foreground">
+          <span>{label}</span>
+          <span className="rounded-full bg-foreground/5 px-2 py-0.5 text-[8px]">Sponsored</span>
+        </div>
       )}
 
-      <div 
-        className="relative flex items-center justify-center bg-card/40 border border-border/40 rounded-lg overflow-hidden w-full"
-        style={{ ...dimensions, ...style }}
+      <div
+        className="relative flex min-h-[120px] w-full items-center justify-center overflow-hidden rounded-2xl border border-border/50 bg-gradient-to-br from-slate-100/80 via-white to-slate-50/70 shadow-sm backdrop-blur dark:from-slate-900/80 dark:via-slate-950 dark:to-slate-900"
+        style={{ ...dimensions, ...style, maxWidth: fullWidth ? '100%' : '100%' }}
       >
         <ins
           ref={adRef}
           className="adsbygoogle"
           style={{
             display: 'block',
-            width: fullWidth ? '100%' : 'auto',
+            width: fullWidth ? '100%' : '100%',
+            maxWidth: '100%',
           }}
           data-ad-client={PUB_ID}
           data-ad-slot={adSlot}

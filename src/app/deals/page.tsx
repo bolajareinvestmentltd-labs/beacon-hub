@@ -90,7 +90,7 @@ export default function DealsPage() {
                 </div>
 
                 <Link
-                  href="/checkout"
+                  href={`/deals/${deal.id}/checkout`}
                   className="flex items-center justify-center w-full md:w-auto md:inline-flex gap-2 bg-black dark:bg-[#FDFDFB] text-white dark:text-black px-8 py-4 rounded-sm font-mono text-xs font-bold tracking-widest uppercase hover:bg-[#C85A32] dark:hover:bg-[#C85A32] hover:text-white transition-colors"
                 >
                   Initiate Secure Lock <ArrowRight size={14} />

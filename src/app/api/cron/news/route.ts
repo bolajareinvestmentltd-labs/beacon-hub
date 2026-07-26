@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { persistIncomingArticles } from '@/lib/news-sync';
+import { isAuthorizedCronRequest } from '@/lib/cron';
 
 export const maxDuration = 60;
 
@@ -130,9 +131,7 @@ async function fetchNewsFromGemini() {
 }
 
 export async function GET(req: Request) {
-  const authHeader = req.headers.get("authorization");
-  const isVercelCron = req.headers.get('x-vercel-cron') === '1';
-  const isAuthorized = isVercelCron || authHeader === `Bearer ${process.env.CRON_SECRET}`;
+  const isAuthorized = isAuthorizedCronRequest(req);
 
   if (!isAuthorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

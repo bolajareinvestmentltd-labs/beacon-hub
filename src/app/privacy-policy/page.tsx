@@ -67,11 +67,13 @@ export default function PrivacyPolicy() {
             5. Advertising Partners and Cookies
           </h2>
           <p>
-            You may consult this list to find the Privacy Policy for each of the advertising partners of {brandName}.
-            Third-party ad servers or ad networks uses technologies like cookies, JavaScript, or Web Beacons that are used in their respective advertisements and links that appear on {brandName}, which are sent directly to users' browser. They automatically receive your IP address when this occurs. These technologies are used to measure the effectiveness of their advertising campaigns and/or to personalize the advertising content that you see on websites that you visit.
+            Beacon-Hub may display advertising through Google AdSense and other third-party providers. These services use cookies, web beacons, and similar technologies to deliver relevant advertisements, measure performance, and improve the advertising experience on our site.
+          </p>
+          <p>
+            When you visit our website, advertising partners may collect information such as your IP address, browser type, device information, and interaction data. This information is used to personalize ads and to understand campaign effectiveness.
           </p>
           <p className="font-semibold text-slate-950">
-            Note that {brandName} has no access to or control over these cookies that are used by third-party advertisers. We strictly adhere to Google AdSense program policies.
+            Beacon-Hub does not control these third-party cookies or tracking technologies. We comply with Google AdSense program policies and provide transparency about our advertising practices.
           </p>
         </div>
 

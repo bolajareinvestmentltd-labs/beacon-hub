@@ -2,13 +2,12 @@ import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { horoscopes } from "@/db/schema";
 import { validateHoroscopeReading, validateContentDepth, HoroscopeReadingsBatchSchema } from "@/lib/contentValidator";
+import { isAuthorizedCronRequest } from '@/lib/cron';
 
 export const maxDuration = 60;
 
 export async function GET(req: Request) {
-  const authHeader = req.headers.get('authorization');
-  const isVercelCron = req.headers.get('x-vercel-cron') === '1';
-  const isAuthorized = isVercelCron || authHeader === `Bearer ${process.env.CRON_SECRET}`;
+  const isAuthorized = isAuthorizedCronRequest(req);
 
   if (!isAuthorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
