@@ -8,6 +8,7 @@ import { latestNews } from '@/lib/news';
 import * as queries from '@/lib/queries';
 import QuoteCard from '@/components/QuoteCard';
 import RelatedContentGrid from '@/components/RelatedContentGrid';
+import { getEditorialSections } from '@/lib/queries';
 
 type ArticleLike = {
   id?: number;
@@ -61,6 +62,7 @@ export default async function HomePage() {
   }
 
   const latest = sortByNewest(articles).slice(0, 18);
+  const editorialSections = await getEditorialSections();
 
   const heroArticle = latest[0]
     ? {
@@ -118,6 +120,31 @@ export default async function HomePage() {
             logoUrl="/logo.png"
             headerAdLabel="New & Latest News"
           />
+        </div>
+
+        <div className="mt-10 md:mt-16">
+          <SectionHeaderComponent
+            eyebrow="EDITORIAL LENS"
+            title="Curated Sections"
+            description="Browse the newsroom through our premium editorial categories."
+          />
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {editorialSections.slice(0, 6).map((section: { id: number; name: string; description?: string | null; accentColor?: string | null; slug?: string | null }) => (
+              <div
+                key={section.id}
+                className="rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-white/10 dark:bg-slate-900/60"
+              >
+                <div className="mb-3 h-1 w-14 rounded-full" style={{ backgroundColor: section.accentColor || '#E2725B' }} />
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{section.name}</h3>
+                {section.description ? (
+                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{section.description}</p>
+                ) : null}
+                <Link href={`/category/${section.slug || section.name.toLowerCase()}`} className="mt-4 inline-flex text-sm font-semibold text-[#E2725B] hover:underline">
+                  Explore section →
+                </Link>
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="mt-10 md:mt-16">

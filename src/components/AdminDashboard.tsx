@@ -282,13 +282,41 @@ export default function AdminDashboard() {
                         timeStyle: 'short',
                       })}
                     </td>
-                    <td className="px-3 py-4 text-right">
+                    <td className="px-3 py-4 text-right space-x-2">
                       <a
                         href={`/admin/articles/${item.id}/edit`}
                         className="inline-flex items-center justify-center rounded-full border border-[#E2725B] px-4 py-2 text-xs font-semibold text-[#E2725B] transition hover:bg-[#E2725B]/10"
                       >
                         Edit
                       </a>
+                      <button
+                        onClick={async () => {
+                          if (!window.confirm('Are you sure you want to delete this article?')) {
+                            return;
+                          }
+
+                          try {
+                            const response = await fetch(`/api/admin/articles/${item.id}`, {
+                              method: 'DELETE',
+                              credentials: 'same-origin',
+                            });
+
+                            if (!response.ok) {
+                              throw new Error('Failed to delete article');
+                            }
+
+                            setHistory(history.filter(h => h.id !== item.id));
+                            setToastMessage('Article deleted successfully');
+                            setTimeout(() => setToastMessage(null), 4000);
+                          } catch (error) {
+                            setToastMessage('Failed to delete article');
+                            setTimeout(() => setToastMessage(null), 4000);
+                          }
+                        }}
+                        className="inline-flex items-center justify-center rounded-full border border-red-500 px-4 py-2 text-xs font-semibold text-red-500 transition hover:bg-red-50 dark:hover:bg-red-900/20"
+                      >
+                        Delete
+                      </button>
                     </td>
                   </tr>
                 ))}

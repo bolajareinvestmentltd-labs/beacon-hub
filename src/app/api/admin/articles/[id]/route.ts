@@ -95,3 +95,28 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ error: "Unable to update article." }, { status: 500 });
   }
 }
+
+export async function DELETE(_req: Request, { params }: { params: Promise<{ id: string }> }) {
+  if (!(await authorizeAdmin())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const articleId = Number(id);
+  if (!articleId || Number.isNaN(articleId)) {
+    return NextResponse.json({ error: "Invalid article identifier." }, { status: 400 });
+  }
+
+  try {
+    const result = await runDbOperation(() =>
+      db
+        .delete(articles)
+        .where(eq(articles.id, articleId))
+    );
+
+    return NextResponse.json({ success: true, message: "Article deleted successfully.", result });
+  } catch (error) {
+    console.error("Failed to delete article", error);
+    return NextResponse.json({ error: "Unable to delete article." }, { status: 500 });
+  }
+}

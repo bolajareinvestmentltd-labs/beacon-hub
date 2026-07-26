@@ -1,6 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
+import { sanitizeHTML } from '@/lib/sanitize';
 
 interface EditorialColumnComponentProps {
   title: string;
@@ -23,6 +24,8 @@ export default function EditorialColumnComponent({
   children,
   accentColor = '#E2725B',
 }: EditorialColumnComponentProps) {
+  const safeContent = sanitizeHTML(content || '');
+
   return (
     <article className="w-full max-w-4xl mx-auto py-6 md:py-10">
       {/* Premium margins with editorial styling */}
@@ -69,10 +72,16 @@ export default function EditorialColumnComponent({
 
         {/* Content Body - Editorial Column with wide white-space */}
         <div className="prose-editorial max-w-none mb-12">
-          <div
-            className="text-lg md:text-xl text-slate-800 dark:text-slate-200 leading-loose font-serif space-y-8"
-            dangerouslySetInnerHTML={{ __html: content }}
-          />
+          {safeContent ? (
+            <div
+              className="text-lg md:text-xl text-slate-800 dark:text-slate-200 leading-loose font-serif space-y-8"
+              dangerouslySetInnerHTML={{ __html: safeContent }}
+            />
+          ) : (
+            <p className="text-lg md:text-xl text-slate-700 dark:text-slate-300 leading-loose font-serif">
+              {content || 'This story is being prepared for publication.'}
+            </p>
+          )}
         </div>
 
         {/* Pull Quotes or Callouts */}
