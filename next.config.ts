@@ -10,6 +10,8 @@ const nextConfig: NextConfig = {
       {
         source: '/:path*',
         headers: [
+          // Content Security Policy to mitigate XSS and data exfiltration
+          { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https:; frame-ancestors 'none';" },
           // Prevent MIME type sniffing
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           // Prevent clickjacking
@@ -49,8 +51,7 @@ const nextConfig: NextConfig = {
       { protocol: 'https', hostname: '**.nytimes.com' },
       { protocol: 'https', hostname: '**.wsj.com' },
       
-      // Generic wildcard for development flexibility
-      { protocol: 'https', hostname: '*' },
+      // NOTE: wildcard host removed for security. Add specific hosts above if needed.
     ],
   },
 };

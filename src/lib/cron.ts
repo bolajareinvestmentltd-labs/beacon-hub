@@ -1,7 +1,10 @@
 // Shared cron authorization helper for Vercel cron and external schedulers like cron-job.org.
 export function isAuthorizedCronRequest(req: Request, options?: { allowVercelCron?: boolean }) {
   const expectedSecret = process.env.CRON_SECRET?.trim();
-  const allowVercelCron = options?.allowVercelCron ?? true;
+  // For security, do NOT implicitly trust the Vercel cron header by default.
+  // Callers may opt-in by passing { allowVercelCron: true } when running inside
+  // a trusted Vercel environment that guarantees the header authenticity.
+  const allowVercelCron = options?.allowVercelCron ?? false;
 
   const authHeader = req.headers.get('authorization')?.trim();
   const bearerSecret = authHeader?.startsWith('Bearer ') ? authHeader.slice(7).trim() : '';

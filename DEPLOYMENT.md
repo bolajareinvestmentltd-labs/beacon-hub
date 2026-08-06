@@ -7,6 +7,10 @@ Add these to your Vercel project (Project → Settings → Environment Variables
 
 - `DATABASE_URL` — Neon/Postgres connection string used by Drizzle.
 - `ADMIN_SESSION_SECRET` — HMAC secret for admin session cookies.
+  
+Security note:
+- Do NOT commit `.env.local` or any file containing secrets into the repository. If secrets were committed, remove the file and purge history, then rotate all affected secrets immediately (DB credentials, API keys, tokens).
+- Use your platform's secret manager (Vercel, GitHub Actions secrets, AWS Secrets Manager) for production values.
 - `CRON_SECRET` — Bearer secret for cron endpoints (fallback when not Vercel cron).
 - `GEMINI_API_KEY` — API key used by Gemini cron ingestion.
 - `RESEND_API_KEY` — (if using Resend) API key for email sending.
