@@ -23,6 +23,7 @@ export async function publishArticle(formData: FormData) {
     const content = formData.get("content") as string;
     const excerpt = (formData.get("excerpt") as string) || "";
     const imageFile = formData.get("coverImage") as File;
+    const bodyImageFile = formData.get("bodyImage") as File;
 
     const validatedResult = ArticleSchema.safeParse({
       title,
@@ -44,7 +45,7 @@ export async function publishArticle(formData: FormData) {
     const validated = validatedResult.data;
 
     let imageUrl: string | null = null;
-    if (imageFile && imageFile.size > 0) {
+    if (imageFile && imageFile.size > 0 && process.env.BLOB_READ_WRITE_TOKEN) {
       try {
         const blob = await put(`articles/${imageFile.name}`, imageFile, {
           access: "public",
@@ -57,11 +58,29 @@ export async function publishArticle(formData: FormData) {
       }
     }
 
+    let bodyImageUrl: string | null = null;
+    if (bodyImageFile && bodyImageFile.size > 0 && process.env.BLOB_READ_WRITE_TOKEN) {
+      try {
+        const blob = await put(`articles/body-${bodyImageFile.name}`, bodyImageFile, {
+          access: "public",
+          addRandomSuffix: true,
+        });
+        bodyImageUrl = blob.url;
+      } catch (error) {
+        logger.warning("Failed to upload article body image", { error });
+      }
+    }
+
+    const contentWithBodyImage = bodyImageUrl
+      ? `${content}<p><img src="${bodyImageUrl}" alt="${title}" /></p>`
+      : content;
+    const sanitizedContent = sanitizeHTML(contentWithBodyImage);
+
     await db.insert(articles).values({
       title: validated.title,
       slug: validated.slug,
       category: validated.category,
-      content: validated.content,
+      content: sanitizedContent,
       excerpt: validated.excerpt || '',
       coverImage: imageUrl ?? null,
       author: validated.author,
@@ -71,8 +90,12 @@ export async function publishArticle(formData: FormData) {
     });
 
     logger.info("Article published", { title, slug: validated.slug });
-    revalidatePath("/");
-    revalidatePath("/admin");
+    try {
+      revalidatePath("/");
+      revalidatePath("/admin");
+    } catch (error) {
+      logger.warning("Article published, but cache revalidation failed", { error });
+    }
 
     return {
       success: true,
@@ -120,7 +143,7 @@ export async function publishDeal(formData: FormData) {
     const validated = validatedResult.data;
 
     let imageUrl: string | null = null;
-    if (imageFile && imageFile.size > 0) {
+    if (imageFile && imageFile.size > 0 && process.env.BLOB_READ_WRITE_TOKEN) {
       try {
         const blob = await put(`deals/${imageFile.name}`, imageFile, {
           access: "public",
@@ -143,8 +166,12 @@ export async function publishDeal(formData: FormData) {
     });
 
     logger.info("Deal published", { title, vendorName });
-    revalidatePath("/deals");
-    revalidatePath("/admin");
+    try {
+      revalidatePath("/deals");
+      revalidatePath("/admin");
+    } catch (error) {
+      logger.warning("Deal published, but cache revalidation failed", { error });
+    }
 
     return {
       success: true,

@@ -2,12 +2,22 @@ import { Ratelimit } from '@upstash/ratelimit';
 import { Redis } from '@upstash/redis';
 import { logger } from './logger';
 
-if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+const redisUrl = process.env.UPSTASH_REDIS_REST_URL;
+const redisToken = process.env.UPSTASH_REDIS_REST_TOKEN;
+const hasValidRedisConfig = Boolean(
+  redisUrl &&
+  redisToken &&
+  redisUrl.startsWith('https://') &&
+  !redisUrl.includes('your_upstash_') &&
+  !redisToken.includes('your_upstash_')
+);
+
+if (!hasValidRedisConfig) {
   console.warn('Rate limiting disabled: Missing Upstash credentials');
 }
 
-const redis = process.env.UPSTASH_REDIS_REST_URL
-  ? Redis.fromEnv()
+const redis = hasValidRedisConfig
+  ? new Redis({ url: redisUrl, token: redisToken })
   : null;
 
 /**

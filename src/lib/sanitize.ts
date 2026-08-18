@@ -9,8 +9,8 @@ export function sanitizeHTML(html: string): string {
   if (!html || typeof html !== 'string') return '';
   
   return DOMPurify.sanitize(html, {
-    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6'],
-    ALLOWED_ATTR: ['href', 'title'],
+    ALLOWED_TAGS: ['b', 'i', 'em', 'strong', 'a', 'p', 'br', 'ul', 'ol', 'li', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'img'],
+    ALLOWED_ATTR: ['href', 'title', 'src', 'alt'],
   });
 }
 
