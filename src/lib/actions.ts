@@ -71,8 +71,12 @@ export async function publishArticle(formData: FormData) {
     });
 
     logger.info("Article published", { title, slug: validated.slug });
-    revalidatePath("/");
-    revalidatePath("/admin");
+    try {
+      revalidatePath("/");
+      revalidatePath("/admin");
+    } catch (error) {
+      logger.warning("Article published, but cache revalidation failed", { error });
+    }
 
     return {
       success: true,
@@ -143,8 +147,12 @@ export async function publishDeal(formData: FormData) {
     });
 
     logger.info("Deal published", { title, vendorName });
-    revalidatePath("/deals");
-    revalidatePath("/admin");
+    try {
+      revalidatePath("/deals");
+      revalidatePath("/admin");
+    } catch (error) {
+      logger.warning("Deal published, but cache revalidation failed", { error });
+    }
 
     return {
       success: true,
