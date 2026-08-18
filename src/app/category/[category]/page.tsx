@@ -1,4 +1,5 @@
-import { getLiveNews } from '@/lib/news';
+import Link from 'next/link';
+import { getArticlesByCategory } from '@/lib/queries';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -13,7 +14,7 @@ export default async function DynamicCategoryPage({ params }: CategoryPageProps)
     .replace(/-/g, ' ')
     .toUpperCase();
 
-  const articles = await getLiveNews(rawCategory);
+  const articles = await getArticlesByCategory(rawCategory);
 
   return (
     // Note the heavy pt-36 padding here to clear the fixed navbar height cleanly!
@@ -32,36 +33,34 @@ export default async function DynamicCategoryPage({ params }: CategoryPageProps)
           <div className="border-2 border-dashed border-[#1A1A1A]/20 rounded-sm p-12 text-center bg-[#1A1A1A]/5">
             <h3 className="text-lg font-serif font-bold uppercase text-[#1A1A1A]">No Live Feed Available</h3>
             <p className="mt-2 text-sm text-[#1A1A1A]/60 max-w-sm mx-auto">
-              We couldn't retrieve records for this sector right now. Verify your GNEWS_API_KEY environment configuration.
+              No published articles have been assigned to this sector yet.
             </p>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {articles.map((article, index) => (
-              <a 
-                href={article.url} 
-                target="_blank" 
-                rel="noopener noreferrer" 
-                key={index}
+              <Link
+                href={`/read/${article.slug}`}
+                key={article.id || index}
                 className="group block border border-[#1A1A1A]/10 bg-white/40 p-6 rounded-sm hover:border-[#9C4A3A]/40 transition-all duration-300"
               >
-                {article.image && (
+                {article.coverImage && (
                   <img 
-                    src={article.image} 
+                    src={article.coverImage} 
                     alt={article.title}
                     className="w-full h-48 object-cover grayscale group-hover:grayscale-0 transition-all duration-500 mb-4 rounded-sm"
                   />
                 )}
                 <span className="text-xs font-mono text-[#9C4A3A] font-bold block mb-2">
-                  {article.source.name}
+                  {article.category}
                 </span>
                 <h3 className="text-lg font-serif font-bold tracking-tight text-[#1A1A1A] group-hover:text-[#9C4A3A] transition-colors duration-200 line-clamp-2">
                   {article.title}
                 </h3>
                 <p className="mt-2 text-sm text-[#1A1A1A]/70 font-sans line-clamp-3 leading-relaxed">
-                  {article.description}
+                  {article.excerpt}
                 </p>
-              </a>
+              </Link>
             ))}
           </div>
         )}

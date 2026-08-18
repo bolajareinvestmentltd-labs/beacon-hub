@@ -78,6 +78,27 @@ export async function getArticles(limit = 12) {
   }
 }
 
+export async function getArticlesByCategory(category: string, limit = 24) {
+  const normalizedCategory = category.trim().toLowerCase().replace(/[-_]+/g, ' ');
+
+  try {
+    const allArticles = await runDbOperation(() =>
+      db
+        .select()
+        .from(articles)
+        .orderBy(articleOrder(articles.publishedAt))
+        .limit(limit)
+    );
+
+    return allArticles.filter((article) =>
+      String(article.category || '').trim().toLowerCase() === normalizedCategory
+    );
+  } catch (error) {
+    console.error('Error fetching articles by category:', error);
+    return [];
+  }
+}
+
 export async function getArticleBySlug(slug: string) {
   try {
     const article = await runDbOperation(() =>

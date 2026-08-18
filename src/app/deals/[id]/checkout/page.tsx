@@ -1,15 +1,18 @@
 "use server";
 
 import React from "react";
+import { db } from "@/db";
+import { deals } from "@/db/schema";
+import { eq } from "drizzle-orm";
+import { notFound } from "next/navigation";
 
-export default async function CheckoutPage() {
-  // Mock data for pure frontend layout representation
-  const mockDeal = {
-    title: "Premium Minimalist UI Kit & Design System Token",
-    vendor: "JCLS• Labs",
-    price: 25000,
-    platformFee: 50,
-  };
+export default async function CheckoutPage({ params }: { params: Promise<{ id: string }> }) {
+  const dealId = Number((await params).id);
+  if (!Number.isFinite(dealId)) notFound();
+
+  const rows = await db.select().from(deals).where(eq(deals.id, dealId)).limit(1);
+  const deal = rows[0];
+  if (!deal) notFound();
 
   return (
     <main className="min-h-screen bg-[#FDFBF7] text-[#1C1C1C] antialiased selection:bg-[#C85A32] selection:text-white font-sans">
@@ -42,14 +45,14 @@ export default async function CheckoutPage() {
               </h2>
               <div className="border border-[#1C1C1C]/10 bg-white/50 backdrop-blur p-6 rounded-sm space-y-4">
                 <div className="flex justify-between items-start gap-4">
-                  <h3 className="font-serif text-lg leading-snug">{mockDeal.title}</h3>
+                  <h3 className="font-serif text-lg leading-snug">{deal.title}</h3>
                   <span className="font-mono font-bold text-base whitespace-nowrap">
-                    ₦{mockDeal.price.toLocaleString()}
+                    ₦{deal.price.toLocaleString()}
                   </span>
                 </div>
                 <div className="flex justify-between items-center text-xs text-slate-500 pt-4 border-t border-[#1C1C1C]/5">
                   <span>Vendor Sign-off</span>
-                  <span className="font-mono font-medium text-[#1C1C1C]">{mockDeal.vendor}</span>
+                  <span className="font-mono font-medium text-[#1C1C1C]">{deal.vendorName}</span>
                 </div>
               </div>
             </div>
@@ -61,17 +64,17 @@ export default async function CheckoutPage() {
               <div className="space-y-3 font-mono text-sm border-b border-[#1C1C1C]/10 pb-6">
                 <div className="flex justify-between text-slate-600">
                   <span>Principal Asset Price</span>
-                  <span>₦{mockDeal.price.toLocaleString()}.00</span>
+                  <span>₦{deal.price.toLocaleString()}.00</span>
                 </div>
                 <div className="flex justify-between text-[#C85A32] font-medium">
                   <span>Flat Platform Relay Lock</span>
-                  <span>+ ₦{mockDeal.platformFee}.00</span>
+                  <span>+ ₦{deal.platformFee}.00</span>
                 </div>
               </div>
               <div className="flex justify-between items-end pt-4">
                 <span className="font-serif text-base font-medium">Total Committal</span>
                 <span className="text-2xl md:text-3xl font-mono font-bold tracking-tight">
-                  ₦{(mockDeal.price + mockDeal.platformFee).toLocaleString()}.00
+                  ₦{(deal.price + deal.platformFee).toLocaleString()}.00
                 </span>
               </div>
             </div>
