@@ -52,7 +52,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const readingTime = getReadingTimeString(articleData.content);
 
   return (
-    <div className="w-full bg-gradient-to-b from-white via-slate-50 to-white dark:from-slate-950 dark:via-black dark:to-slate-950">
+    <div className="w-full min-w-0 overflow-x-hidden bg-gradient-to-b from-white via-slate-50 to-white dark:from-slate-950 dark:via-black dark:to-slate-950 pb-24 md:pb-0">
       {/* Navigation Bar */}
       <div className="sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-lg border-b border-slate-200 dark:border-white/10 z-40">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
@@ -75,14 +75,14 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       </div>
 
       {/* EDITORIAL HEADER */}
-      <div className="max-w-4xl mx-auto px-4 md:px-8 lg:px-12 py-12 md:py-16">
+      <div className="mx-auto w-full max-w-4xl px-5 py-8 sm:px-6 md:px-8 md:py-16">
         {/* Category Badge */}
         <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#3A7B7A] dark:text-[#4A9B9A] inline-block mb-6">
           {articleData.category}
         </span>
 
         {/* Premium Title */}
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-black font-playfair leading-[1.1] text-black dark:text-[#F9F6F0] mb-6">
+        <h1 className="break-words text-[2.35rem] leading-[1.08] sm:text-5xl md:text-6xl lg:text-7xl font-black font-playfair text-black dark:text-[#F9F6F0] mb-6">
           {articleData.title}
         </h1>
 
@@ -127,15 +127,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       </div>
 
       {/* ARTICLE CONTENT */}
-      <div className="max-w-4xl mx-auto px-4 md:px-8 lg:px-12">
-        <div className="content-area rounded-3xl border border-slate-200/80 bg-white/80 p-4 shadow-sm backdrop-blur dark:border-white/10 dark:bg-slate-900/60 md:p-8">
+      <div className="mx-auto w-full max-w-4xl px-5 sm:px-6 md:px-8">
+        <div className="content-area min-w-0 rounded-2xl border border-slate-200/80 bg-white/80 p-4 shadow-sm backdrop-blur dark:border-white/10 dark:bg-slate-900/60 sm:p-6 md:rounded-3xl md:p-8">
           <EditorialColumnComponent
             title={articleData.title}
             content={articleData.content}
-            author={articleData.authorPerspective || articleData.author || 'Editorial Board'}
-            publishDate={articleData.publishedAt}
-            excerpt={articleData.excerpt || articleData.metaDescription || ''}
-            coverImage={articleData.coverImage}
             accentColor="#E2725B"
           />
         </div>

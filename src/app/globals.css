@@ -38,6 +38,7 @@
   body {
     background-color: var(--background);
     color: var(--foreground);
+    overflow-x: hidden;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
   }
@@ -64,6 +65,10 @@
     height: auto;
     margin: 2rem auto;
     border-radius: 0.75rem;
+  }
+
+  .prose-editorial p {
+    overflow-wrap: anywhere;
   }
 }
 
