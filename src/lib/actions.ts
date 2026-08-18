@@ -23,6 +23,7 @@ export async function publishArticle(formData: FormData) {
     const content = formData.get("content") as string;
     const excerpt = (formData.get("excerpt") as string) || "";
     const imageFile = formData.get("coverImage") as File;
+    const bodyImageFile = formData.get("bodyImage") as File;
 
     const validatedResult = ArticleSchema.safeParse({
       title,
@@ -57,11 +58,29 @@ export async function publishArticle(formData: FormData) {
       }
     }
 
+    let bodyImageUrl: string | null = null;
+    if (bodyImageFile && bodyImageFile.size > 0 && process.env.BLOB_READ_WRITE_TOKEN) {
+      try {
+        const blob = await put(`articles/body-${bodyImageFile.name}`, bodyImageFile, {
+          access: "public",
+          addRandomSuffix: true,
+        });
+        bodyImageUrl = blob.url;
+      } catch (error) {
+        logger.warning("Failed to upload article body image", { error });
+      }
+    }
+
+    const contentWithBodyImage = bodyImageUrl
+      ? `${content}<p><img src="${bodyImageUrl}" alt="${title}" /></p>`
+      : content;
+    const sanitizedContent = sanitizeHTML(contentWithBodyImage);
+
     await db.insert(articles).values({
       title: validated.title,
       slug: validated.slug,
       category: validated.category,
-      content: validated.content,
+      content: sanitizedContent,
       excerpt: validated.excerpt || '',
       coverImage: imageUrl ?? null,
       author: validated.author,

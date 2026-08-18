@@ -154,6 +154,11 @@ export default function AdminDashboard() {
             </div>
 
             <div>
+              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Briefing Image</label>
+              <input type="file" name="bodyImage" title="Briefing body image" accept="image/*" className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#E2725B]/10 file:text-[#E2725B] hover:file:bg-[#E2725B]/20 transition-all cursor-pointer" />
+            </div>
+
+            <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Brief Excerpt</label>
               <textarea name="excerpt" title="Article excerpt" rows={2} required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
             </div>
