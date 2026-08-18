@@ -25,6 +25,7 @@ export default function AdminDashboard() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [history, setHistory] = useState<ArticleHistoryItem[]>([]);
   const [historyError, setHistoryError] = useState<string | null>(null);
+  const [articleFormError, setArticleFormError] = useState<string | null>(null);
 
   const [articleState, articleAction, isArticlePending] = useActionState(
     async (_prevState: ActionState, formData: FormData) => {
@@ -125,7 +126,12 @@ export default function AdminDashboard() {
             <h2 className="text-lg font-bold font-playfair text-black dark:text-[#F9F6F0]">Manual Intel Override</h2>
           </div>
 
-          <form action={articleAction} className="flex flex-col gap-5">
+          <form
+            action={articleAction}
+            onSubmit={() => setArticleFormError(null)}
+            onInvalid={() => setArticleFormError("Headline, excerpt, and full briefing are required.")}
+            className="flex flex-col gap-5"
+          >
             <div className="rounded-xl border border-[#E2725B]/15 bg-[#E2725B]/5 px-3 py-2 text-xs text-slate-600 dark:text-slate-300">
               Publish a fresh editorial brief to the site instantly.
             </div>
@@ -170,6 +176,9 @@ export default function AdminDashboard() {
 
             {articleState.message && !articleState.success && (
               <p className="text-sm text-red-600 dark:text-red-400">{articleState.message}</p>
+            )}
+            {articleFormError && (
+              <p className="text-sm text-red-600 dark:text-red-400">{articleFormError}</p>
             )}
 
             <button type="submit" disabled={isArticlePending} className="mt-2 bg-black dark:bg-[#F9F6F0] hover:bg-[#E2725B] dark:hover:bg-[#E2725B] text-white dark:text-black hover:text-white font-black py-4 rounded-md transition-colors duration-300 w-full uppercase tracking-[0.2em] text-[10px] disabled:cursor-not-allowed disabled:opacity-70">
