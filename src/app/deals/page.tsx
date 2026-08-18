@@ -1,31 +1,17 @@
 import Link from "next/link";
 import { ShieldCheck, ArrowRight, Image as ImageIcon } from "lucide-react";
+import { db } from "@/db";
+import { deals } from "@/db/schema";
+import { desc, eq } from "drizzle-orm";
 
 export const dynamic = "force-dynamic";
 
-export default function DealsPage() {
-  // Build-safe merged version: mock-only (no DB dependencies here).
-  // Keeps UI intact and avoids runtime/build breaks from missing imports or DB schema drift.
-  const deals = [
-    {
-      id: "tx-ay-001",
-      title: "Prime Real Estate Plot",
-      vendor: "AY SMART INVESTMENT LTD",
-      price: 2500000,
-      image_url:
-        "https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=1000&auto=format&fit=crop",
-      status: "AVAILABLE",
-    },
-    {
-      id: "tx-hk-002",
-      title: "Premium Vendor Placement",
-      vendor: "HENNAHBYKAWTHAR EVENTS",
-      price: 5000,
-      image_url:
-        "https://images.unsplash.com/photo-1519741497674-611481863552?q=80&w=1000&auto=format&fit=crop",
-      status: "AVAILABLE",
-    },
-  ];
+export default async function DealsPage() {
+  const listedDeals = await db
+    .select()
+    .from(deals)
+    .where(eq(deals.isActive, true))
+    .orderBy(desc(deals.createdAt));
 
   return (
     <main className="min-h-screen bg-white dark:bg-[#0B0B0B] pt-24 pb-32">
@@ -45,15 +31,15 @@ export default function DealsPage() {
         </div>
 
         <div className="space-y-12">
-          {deals.map((deal) => (
+          {listedDeals.map((deal) => (
             <div
               key={deal.id}
               className="group flex flex-col bg-slate-50 dark:bg-[#121214] border border-black/5 dark:border-white/5 rounded-sm overflow-hidden shadow-sm hover:shadow-md transition-shadow"
             >
               <div className="w-full aspect-[4/3] md:aspect-[16/9] bg-slate-200 dark:bg-[#1C1C1E] relative overflow-hidden">
-                {deal.image_url ? (
+                {deal.imageUrl ? (
                   <img
-                    src={deal.image_url}
+                    src={deal.imageUrl}
                     alt={deal.title}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   />
@@ -64,7 +50,7 @@ export default function DealsPage() {
                 )}
 
                 <div className="absolute top-4 right-4 bg-black/80 backdrop-blur-sm text-white text-[10px] font-mono font-bold px-3 py-1 rounded-sm uppercase tracking-widest border border-white/10">
-                  {deal.status}
+                  AVAILABLE
                 </div>
               </div>
 
@@ -72,7 +58,7 @@ export default function DealsPage() {
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-4">
                   <div className="space-y-2">
                     <p className="text-[10px] font-mono text-slate-500 uppercase tracking-[0.2em] font-bold">
-                      VENDOR: {deal.vendor}
+                      VENDOR: {deal.vendorName}
                     </p>
                     <h3 className="text-2xl font-serif font-bold text-black dark:text-white leading-tight">
                       {deal.title}

@@ -16,6 +16,15 @@ type ArticleHistoryItem = {
   publishedAt: string;
 };
 
+type DealHistoryItem = {
+  id: number;
+  title: string;
+  vendorName: string;
+  category: string;
+  price: number;
+  createdAt: string;
+};
+
 const initialState: ActionState = {
   success: false,
   message: "",
@@ -25,6 +34,8 @@ export default function AdminDashboard() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
   const [history, setHistory] = useState<ArticleHistoryItem[]>([]);
   const [historyError, setHistoryError] = useState<string | null>(null);
+  const [dealHistory, setDealHistory] = useState<DealHistoryItem[]>([]);
+  const [dealHistoryError, setDealHistoryError] = useState<string | null>(null);
   const [articleFormError, setArticleFormError] = useState<string | null>(null);
 
   const [articleState, articleAction, isArticlePending] = useActionState(
@@ -77,6 +88,13 @@ export default function AdminDashboard() {
 
     loadHistory();
   }, []);
+
+  useEffect(() => {
+    fetch("/api/admin/deals", { credentials: "same-origin" })
+      .then((response) => response.ok ? response.json() : Promise.reject())
+      .then((data) => setDealHistory(data.deals || []))
+      .catch(() => setDealHistoryError("Unable to load escrow asset history."));
+  }, [dealState.success]);
 
   useEffect(() => {
     if (!articleState.success) return;
@@ -346,6 +364,35 @@ export default function AdminDashboard() {
                   </tr>
                 ))}
               </tbody>
+            </table>
+          </div>
+        )}
+      </div>
+
+      <div className="mt-10 max-w-7xl mx-auto bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
+        <div className="mb-6">
+          <h2 className="text-xl font-bold font-playfair text-black dark:text-[#F9F6F0]">Escrow Asset History</h2>
+          <p className="text-sm text-slate-500 dark:text-slate-400">Manage marketplace listings separately from editorial articles.</p>
+        </div>
+        {dealHistoryError ? (
+          <p className="text-sm text-red-600">{dealHistoryError}</p>
+        ) : dealHistory.length === 0 ? (
+          <p className="rounded-xl border border-dashed border-slate-300 p-8 text-center text-sm text-slate-600">No escrow assets have been listed yet.</p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="min-w-full text-left text-sm text-slate-700 dark:text-slate-200">
+              <thead className="border-b border-slate-200 text-xs uppercase tracking-widest text-slate-500"><tr><th className="px-3 py-3">Asset</th><th className="px-3 py-3">Vendor</th><th className="px-3 py-3">Price</th><th className="px-3 py-3 text-right">Action</th></tr></thead>
+              <tbody>{dealHistory.map((deal) => (
+                <tr key={deal.id} className="border-b border-slate-100 dark:border-slate-800">
+                  <td className="px-3 py-4 font-semibold">{deal.title}</td>
+                  <td className="px-3 py-4">{deal.vendorName}</td>
+                  <td className="px-3 py-4">₦{deal.price.toLocaleString()}</td>
+                  <td className="space-x-2 px-3 py-4 text-right">
+                    <a href={`/admin/deals/${deal.id}/edit`} className="inline-flex rounded-full border border-[#E2725B] px-4 py-2 text-xs font-semibold text-[#E2725B]">Edit</a>
+                    <button type="button" onClick={async () => { if (!window.confirm("Delete this escrow asset?")) return; const response = await fetch(`/api/admin/deals/${deal.id}`, { method: "DELETE", credentials: "same-origin" }); if (response.ok) setDealHistory((items) => items.filter((item) => item.id !== deal.id)); }} className="inline-flex rounded-full border border-red-500 px-4 py-2 text-xs font-semibold text-red-500">Delete</button>
+                  </td>
+                </tr>
+              ))}</tbody>
             </table>
           </div>
         )}
