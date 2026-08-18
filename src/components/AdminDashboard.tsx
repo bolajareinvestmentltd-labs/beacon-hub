@@ -101,7 +101,7 @@ export default function AdminDashboard() {
   return (
     <div className="w-full max-w-7xl mx-auto py-12 px-4 min-h-screen">
       {toastMessage && (
-        <div className="fixed top-4 right-4 z-50 rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 shadow-lg dark:border-emerald-900/40 dark:bg-emerald-950/80 dark:text-emerald-300">
+        <div role="status" aria-live="polite" className="fixed top-24 right-4 z-[100] max-w-[calc(100vw-2rem)] rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 shadow-lg dark:border-emerald-900/40 dark:bg-emerald-950/80 dark:text-emerald-300">
           {toastMessage}
         </div>
       )}
@@ -238,6 +238,11 @@ export default function AdminDashboard() {
 
             {dealState.message && !dealState.success && (
               <p className="text-sm text-red-600 dark:text-red-400">{dealState.message}</p>
+            )}
+            {dealState.success && dealState.message && (
+              <p role="status" aria-live="polite" className="rounded-md border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm font-semibold text-emerald-700 dark:border-emerald-900/40 dark:bg-emerald-950/40 dark:text-emerald-300">
+                {dealState.message}
+              </p>
             )}
 
             <button type="submit" disabled={isDealPending} className="mt-2 bg-[#E2725B] hover:bg-[#c95b46] text-white font-black py-4 rounded-md transition-colors duration-300 w-full uppercase tracking-[0.2em] text-[10px] disabled:cursor-not-allowed disabled:opacity-70">
