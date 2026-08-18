@@ -6,6 +6,7 @@ export const maxDuration = 60;
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
 
 function slugify(value: string) {
   return value
@@ -14,6 +15,20 @@ function slugify(value: string) {
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/(^-|-$)/g, '')
     .slice(0, 240);
+}
+
+function classifyNews(title: string, description: string) {
+  const searchableText = `${title} ${description}`.toLowerCase();
+
+  if (/election|politic|government|senate|president|governor|party/.test(searchableText)) {
+    return 'Elections 2027';
+  }
+
+  if (/tech|startup|software|artificial intelligence|digital|cyber|innovation/.test(searchableText)) {
+    return 'Tech & Startups';
+  }
+
+  return 'Global News';
 }
 
 async function fetchNewsFromGNews() {
@@ -45,9 +60,9 @@ async function fetchNewsFromGNews() {
 
   return data.articles.map((article: any, index: number) => {
     const title = String(article.title || `News item ${index + 1}`).trim();
-    const category = String(article.source?.name || 'Global News').trim();
     const description = String(article.description || '').trim();
     const content = String(article.content || description || title).trim();
+    const category = classifyNews(title, description);
     const slugCandidate = article.url ? slugify(`${article.url}-${title}`) : slugify(title);
 
     return {
@@ -74,7 +89,7 @@ async function fetchNewsFromGemini() {
   const prompt = `You are the Senior Editor for a premium news portal named Beacon-Hub. Generate 2 breaking news articles focusing on Global News, Tech & Startups, and Elections 2027. Return strictly in JSON format as an array of objects with the following keys: 'title', 'category', 'slug', 'image_url', 'content', and 'excerpt'. CRITICAL INSTRUCTION: The 'content' key MUST contain a comprehensive, deep-dive editorial consisting of at least 4 to 5 detailed paragraphs. Do not write short summaries. Ensure the tone is objective, analytical, and highly professional.`;
 
   const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-pro:generateContent?key=${GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
     {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -82,7 +97,7 @@ async function fetchNewsFromGemini() {
         contents: [{ parts: [{ text: prompt }] }],
         generationConfig: {
           responseMimeType: "application/json",
-          maxOutputTokens: 1024,
+          maxOutputTokens: 4096,
           temperature: 0.4,
           topP: 0.95,
         },
@@ -131,7 +146,7 @@ async function fetchNewsFromGemini() {
 }
 
 export async function GET(req: Request) {
-  const isAuthorized = isAuthorizedCronRequest(req);
+  const isAuthorized = isAuthorizedCronRequest(req, { allowVercelCron: true });
 
   if (!isAuthorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });

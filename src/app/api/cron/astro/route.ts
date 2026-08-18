@@ -7,7 +7,7 @@ import { isAuthorizedCronRequest } from '@/lib/cron';
 export const maxDuration = 60;
 
 export async function GET(req: Request) {
-  const isAuthorized = isAuthorizedCronRequest(req);
+  const isAuthorized = isAuthorizedCronRequest(req, { allowVercelCron: true });
 
   if (!isAuthorized) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -54,9 +54,10 @@ ALL 12 SIGNS REQUIRED: Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio
 RETURN ONLY VALID JSON ARRAY - NO MARKDOWN, NO BACKTICKS, NO COMMENTARY.`;
 
   try {
-    // Call Gemini 3.1 Pro with structured output
+    const geminiModel = process.env.GEMINI_MODEL || "gemini-2.0-flash";
+
     const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-5-pro:generateContent?key=${GEMINI_API_KEY}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/${geminiModel}:generateContent?key=${GEMINI_API_KEY}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
