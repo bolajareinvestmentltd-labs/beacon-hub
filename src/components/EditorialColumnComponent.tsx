@@ -1,7 +1,7 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { sanitizeHTML } from '@/lib/sanitize';
+import { formatEditorialContent } from '@/lib/sanitize';
 
 interface EditorialColumnComponentProps {
   title: string;
@@ -24,7 +24,7 @@ export default function EditorialColumnComponent({
   children,
   accentColor = '#E2725B',
 }: EditorialColumnComponentProps) {
-  const safeContent = sanitizeHTML(content || '');
+  const safeContent = formatEditorialContent(content || '');
 
   return (
     <article className="w-full max-w-4xl mx-auto py-6 md:py-10">

@@ -49,5 +49,21 @@
   .font-mono {
     @apply text-xs tracking-widest uppercase;
   }
+
+  .prose-editorial p {
+    margin: 0 0 1.75rem;
+  }
+
+  .prose-editorial p:last-child {
+    margin-bottom: 0;
+  }
+
+  .prose-editorial img {
+    display: block;
+    width: 100%;
+    height: auto;
+    margin: 2rem auto;
+    border-radius: 0.75rem;
+  }
 }
 

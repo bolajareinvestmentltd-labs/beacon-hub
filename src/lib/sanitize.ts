@@ -14,6 +14,30 @@ export function sanitizeHTML(html: string): string {
   });
 }
 
+function escapeHTML(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+/** Preserve paragraph structure when editorial copy is pasted as plain text. */
+export function formatEditorialContent(content: string): string {
+  if (!content || typeof content !== 'string') return '';
+
+  if (/<(?:p|br|img|strong|em|b|i|h[1-6]|ul|ol|li)\b/i.test(content)) {
+    return sanitizeHTML(content);
+  }
+
+  return content
+    .trim()
+    .split(/\r?\n\s*\r?\n/)
+    .map((paragraph) => `<p>${paragraph.split(/\r?\n/).map(escapeHTML).join('<br />')}</p>`)
+    .join('');
+}
+
 /**
  * Sanitize plain text input (remove HTML tags, trim whitespace)
  * @param input - Text to sanitize
