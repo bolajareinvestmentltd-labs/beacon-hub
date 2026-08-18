@@ -1,5 +1,6 @@
 import type { NextConfig } from "next";
 
+const isDevelopment = process.env.NODE_ENV !== "production";
 const nextConfig: NextConfig = {
   // Allow your local phone IP to connect to the dev server
   allowedDevOrigins: ['192.168.43.104'],
@@ -11,7 +12,7 @@ const nextConfig: NextConfig = {
         source: '/:path*',
         headers: [
           // Content Security Policy to mitigate XSS and data exfiltration
-          { key: 'Content-Security-Policy', value: "default-src 'self'; script-src 'self' https://www.googletagmanager.com https://www.google-analytics.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https:; frame-ancestors 'none';" },
+          { key: 'Content-Security-Policy', value: `default-src 'self'; script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com https://www.google-analytics.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https:; frame-ancestors 'none';` },
           // Prevent MIME type sniffing
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           // Prevent clickjacking

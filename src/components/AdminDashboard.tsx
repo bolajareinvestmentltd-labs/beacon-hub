@@ -133,7 +133,7 @@ export default function AdminDashboard() {
             className="flex flex-col gap-5"
           >
             <div className="rounded-xl border border-[#E2725B]/15 bg-[#E2725B]/5 px-3 py-2 text-xs text-slate-600 dark:text-slate-300">
-              Publish a fresh editorial brief to the site instantly.
+              Publish a fresh editorial brief to the site instantly. Headline, Brief Excerpt, and Full Briefing are required before deployment.
             </div>
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Headline</label>
