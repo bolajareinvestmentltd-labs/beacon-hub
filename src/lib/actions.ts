@@ -44,7 +44,7 @@ export async function publishArticle(formData: FormData) {
     const validated = validatedResult.data;
 
     let imageUrl: string | null = null;
-    if (imageFile && imageFile.size > 0) {
+    if (imageFile && imageFile.size > 0 && process.env.BLOB_READ_WRITE_TOKEN) {
       try {
         const blob = await put(`articles/${imageFile.name}`, imageFile, {
           access: "public",
@@ -124,7 +124,7 @@ export async function publishDeal(formData: FormData) {
     const validated = validatedResult.data;
 
     let imageUrl: string | null = null;
-    if (imageFile && imageFile.size > 0) {
+    if (imageFile && imageFile.size > 0 && process.env.BLOB_READ_WRITE_TOKEN) {
       try {
         const blob = await put(`deals/${imageFile.name}`, imageFile, {
           access: "public",
