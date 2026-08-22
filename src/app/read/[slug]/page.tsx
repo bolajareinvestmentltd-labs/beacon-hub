@@ -7,6 +7,7 @@ import AdSense from "@/components/AdSense";
 import { getReadingTimeString } from "@/lib/readingTime";
 import { ChevronLeft } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 
 const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 const siteUrl = configuredSiteUrl?.startsWith("https://")
@@ -128,7 +129,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     console.warn("Failed to track view:", error);
   }
 
-  let relatedArticles = [] as any[];
+  let relatedArticles: Awaited<ReturnType<typeof getRelatedArticles>> = [];
   try {
     relatedArticles = await getRelatedArticles(articleData.id, 6);
   } catch (error) {
@@ -204,9 +205,12 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         {/* Featured Image */}
         {articleData.coverImage && (
           <div className="my-12 md:my-16">
-            <img
+            <Image
               src={articleData.coverImage}
               alt={articleData.title}
+              width={1200}
+              height={630}
+              unoptimized
               className="w-full h-auto max-h-96 md:max-h-[500px] object-cover rounded-2xl shadow-2xl"
             />
           </div>

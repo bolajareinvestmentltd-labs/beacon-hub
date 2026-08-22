@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { ReactNode } from 'react';
 
 interface HeroArticle {
@@ -64,9 +65,12 @@ export default function AsymmetricalHeroLayout({
       <div className="mb-5 sm:mb-6 text-center">
         <div className="mx-auto mb-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
           {logoUrl && (
-            <img
+            <Image
               src={logoUrl}
               alt={logoAlt}
+              width={48}
+              height={48}
+              unoptimized
               className="h-12 w-12 rounded-full border border-border/70 object-cover shadow-sm"
             />
           )}
@@ -110,9 +114,11 @@ export default function AsymmetricalHeroLayout({
                   {item.coverImage && (
                     <Link href={`/read/${item.slug || ''}`}>
                       <div className="relative mb-5 aspect-video max-h-64 w-full overflow-hidden rounded-[1.5rem] bg-muted shadow-lg sm:max-h-80 md:mb-6 md:aspect-[21/9] md:max-h-96">
-                        <img
+                        <Image
                           src={item.coverImage}
                           alt={item.title || 'Headline Image'}
+                          fill
+                          unoptimized
                           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
                         />
                       </div>
