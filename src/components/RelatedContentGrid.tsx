@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface RelatedArticle {
   id: number;
@@ -8,9 +9,9 @@ interface RelatedArticle {
   title: string;
   excerpt: string;
   category: string;
-  coverImage?: string;
+  coverImage?: string | null;
   publishedAt: Date;
-  authorPerspective?: string;
+  authorPerspective?: string | null;
 }
 
 interface RelatedContentGridProps {
@@ -48,9 +49,11 @@ export default function RelatedContentGrid({
             <div className="relative overflow-hidden h-44 md:h-52 bg-slate-200 dark:bg-white/5">
               {/* Thumbnail Image */}
               {article.coverImage ? (
-                <img
+                <Image
                   src={article.coverImage}
                   alt={article.title}
+                  fill
+                  unoptimized
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               ) : (
