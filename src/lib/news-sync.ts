@@ -18,6 +18,8 @@ export type NewsArticleInput = {
   publishedAt?: string | Date | null;
   author?: string | null;
   source?: string | null;
+  metaDescription?: string | null;
+  seoKeywords?: string[] | null;
 };
 
 function slugify(value: string) {
@@ -59,6 +61,8 @@ export function normalizeIncomingArticle(article: NewsArticleInput) {
     publishedAt: article.published_at || article.publishedAt || new Date(),
     author: article.author?.trim() || 'Beacon-Hub Intelligence',
     source: article.source?.trim() || 'Beacon Hub',
+    metaDescription: toExcerpt(article.metaDescription, excerpt),
+    seoKeywords: Array.isArray(article.seoKeywords) ? article.seoKeywords.slice(0, 8) : [],
   };
 }
 
@@ -91,6 +95,8 @@ export async function persistIncomingArticles(inputArticles: NewsArticleInput[])
         coverImage: normalized.coverImage,
         isBreaking: normalized.isBreaking,
         isSponsored: normalized.isSponsored,
+        metaDescription: normalized.metaDescription,
+        seoKeywords: normalized.seoKeywords,
         publishedAt: normalized.publishedAt as Date,
         createdAt: new Date(),
       });

@@ -10,6 +10,7 @@ interface HeroArticle {
   excerpt: string;
   category: string;
   coverImage?: string;
+  isSponsored?: boolean;
   publishedAt: Date;
 }
 
@@ -18,6 +19,9 @@ interface FeedArticle {
   slug: string;
   title: string;
   category: string;
+  excerpt?: string;
+  coverImage?: string;
+  isSponsored?: boolean;
   publishedAt: Date;
 }
 
@@ -91,46 +95,48 @@ export default function AsymmetricalHeroLayout({
       <div className="grid grid-cols-1 gap-5 md:gap-8 lg:grid-cols-[1.7fr_0.8fr] xl:grid-cols-3 xl:gap-10 w-full">
         <div className="lg:col-span-1 xl:col-span-2">
           {story ? (
-            <article className="rounded-[2rem] border border-border/80 bg-surface p-6 md:p-8 shadow-[0_18px_80px_-48px_rgba(15,23,42,0.3)]">
-              <div className="flex flex-wrap items-center gap-3 mb-6">
-                <span className="bg-primary text-white text-[10px] font-sans font-bold uppercase tracking-widest px-3 py-1 rounded-full shadow-sm">
-                  Latest Briefing
-                </span>
-                <span className="text-[10px] font-sans font-bold text-muted-foreground uppercase tracking-wider">
-                  {story.category || 'Top Story'}
-                </span>
-              </div>
-
-              {story.coverImage && (
-                <Link href={`/read/${story.slug || ''}`}>
-                  <div className="w-full h-[300px] md:h-[450px] mb-6 rounded-[1.75rem] overflow-hidden bg-muted relative group shadow-lg">
-                    <img
-                      src={story.coverImage}
-                      alt={story.title || 'Headline Image'}
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                    />
+            <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Featured stories">
+              {[story, ...feedArticles].map((item, index) => (
+                <article key={`${item.id}-${item.slug}`} className="w-full min-w-full snap-start rounded-[2rem] border border-border/80 bg-surface p-4 shadow-[0_18px_80px_-48px_rgba(15,23,42,0.3)] sm:p-6 md:p-8">
+                  <div className="mb-4 flex flex-wrap items-center gap-3 sm:mb-6">
+                    <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-widest text-white shadow-sm">
+                      {item.isSponsored ? 'Sponsored' : index === 0 ? 'Latest Briefing' : 'Featured Story'}
+                    </span>
+                    <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-muted-foreground">
+                      {item.category || 'Top Story'}
+                    </span>
                   </div>
-                </Link>
-              )}
 
-              <Link href={`/read/${story.slug || ''}`}>
-                <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black font-serif leading-[1.05] mb-5 text-foreground hover:text-primary transition-colors">
-                  {story.title || 'Intelligence Briefing Generating...'}
-                </h2>
-              </Link>
+                  {item.coverImage && (
+                    <Link href={`/read/${item.slug || ''}`}>
+                      <div className="relative mb-5 aspect-video max-h-64 w-full overflow-hidden rounded-[1.5rem] bg-muted shadow-lg sm:max-h-80 md:mb-6 md:aspect-[21/9] md:max-h-96">
+                        <img
+                          src={item.coverImage}
+                          alt={item.title || 'Headline Image'}
+                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      </div>
+                    </Link>
+                  )}
 
-              {story.excerpt && (
-                <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-6 font-sans max-w-3xl">
-                  {story.excerpt}
-                </p>
-              )}
+                  <Link href={`/read/${item.slug || ''}`}>
+                    <h2 className="mb-4 text-lg font-bold leading-tight text-foreground transition-colors hover:text-primary sm:text-3xl md:text-4xl lg:text-5xl">
+                      {item.title || 'Intelligence Briefing Generating...'}
+                    </h2>
+                  </Link>
 
-              {story.publishedAt && (
-                <div className="text-[11px] font-mono font-medium uppercase tracking-widest text-muted-foreground">
-                  {timeAgo(story.publishedAt)}
-                </div>
-              )}
-            </article>
+                  {item.excerpt && (
+                    <p className="mb-5 max-w-3xl font-sans text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg">
+                      {item.excerpt}
+                    </p>
+                  )}
+
+                  <div className="text-[11px] font-mono font-medium uppercase tracking-widest text-muted-foreground">
+                    {timeAgo(item.publishedAt)}
+                  </div>
+                </article>
+              ))}
+            </div>
           ) : (
             <div className="w-full py-16 border border-border rounded-[2rem] bg-surface animate-pulse">
               <div className="h-4 bg-muted rounded w-32 mb-6" />

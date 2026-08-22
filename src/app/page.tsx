@@ -1,10 +1,6 @@
 ﻿import Link from 'next/link';
-import { getArticles, getFeaturedArticles, getBreakingNews } from '@/lib/queries';
 import AsymmetricalHeroLayout from '@/components/AsymmetricalHeroLayout';
 import SectionHeaderComponent from '@/components/SectionHeaderComponent';
-import AdPlacementManager from '@/components/AdPlacementManager';
-import { premiumClasses } from '@/lib/premiumStyles';
-import { latestNews } from '@/lib/news';
 import * as queries from '@/lib/queries';
 import QuoteCard from '@/components/QuoteCard';
 import RelatedContentGrid from '@/components/RelatedContentGrid';
@@ -18,6 +14,7 @@ type ArticleLike = {
   description?: string;
   category?: string;
   coverImage?: string;
+  isSponsored?: boolean;
   publishedAt?: string | Date | null;
 };
 
@@ -72,6 +69,7 @@ export default async function HomePage() {
         excerpt: latest[0].excerpt ?? latest[0].description ?? '',
         category: latest[0].category ?? 'Top News',
         coverImage: latest[0].coverImage ?? '',
+        isSponsored: latest[0].isSponsored,
         publishedAt: latest[0].publishedAt ? new Date(latest[0].publishedAt) : new Date(),
       }
     : undefined;
@@ -81,6 +79,9 @@ export default async function HomePage() {
     slug: article.slug ?? `article-${index + 2}`,
     title: article.title ?? 'Latest news',
     category: article.category ?? 'Top News',
+    excerpt: article.excerpt ?? article.description ?? '',
+    coverImage: article.coverImage ?? '',
+    isSponsored: article.isSponsored,
     publishedAt: article.publishedAt ? new Date(article.publishedAt) : new Date(),
   }));
 
@@ -111,9 +112,9 @@ export default async function HomePage() {
   const quoteAuthor = latest[0]?.category ? `${latest[0].category} Desk` : 'Beacon-Hub Editorial';
 
   return (
-    <main className="min-h-screen bg-background px-3 py-4 sm:px-4 sm:py-6 md:px-6 lg:px-8">
-      <div className="mx-auto flex w-full max-w-7xl flex-col">
-        <div className="mt-4 sm:mt-6 md:mt-8 lg:mt-10">
+    <div className="min-h-screen w-full bg-background py-4 sm:py-6">
+      <div className="flex w-full flex-col">
+        <div className="mt-2 sm:mt-4 md:mt-6">
           <AsymmetricalHeroLayout
             article={heroArticle}
             feedArticles={feedArticles}
@@ -122,7 +123,7 @@ export default async function HomePage() {
           />
         </div>
 
-        <div className="mt-8 sm:mt-10 md:mt-14 lg:mt-16">
+        <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-14">
           <SectionHeaderComponent
             eyebrow="EDITORIAL LENS"
             title="Curated Sections"
@@ -147,18 +148,18 @@ export default async function HomePage() {
           </div>
         </div>
 
-        <div className="mt-8 sm:mt-10 md:mt-14 lg:mt-16">
+        <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-14">
           <RelatedContentGrid articles={moreStories} title="More Stories" limit={6} />
         </div>
 
-        <div className="mt-8 sm:mt-10 md:mt-14 lg:mt-16">
+        <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-14">
           <QuoteCard quote={quoteText} author={quoteAuthor} role="Editorial Briefing" />
         </div>
 
-        <div className="mt-8 sm:mt-10 md:mt-14 lg:mt-16">
+        <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-14">
           <RelatedContentGrid articles={trendingNow} title="Trending Now" limit={6} />
         </div>
       </div>
-    </main>
+    </div>
   );
 }

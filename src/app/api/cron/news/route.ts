@@ -7,6 +7,18 @@ export const maxDuration = 60;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
+const NEWS_CATEGORIES = ['Global News', 'Tech & Startups', 'Elections 2027'] as const;
+
+type GNewsArticle = {
+  title?: unknown;
+  description?: unknown;
+  content?: unknown;
+  image?: unknown;
+  url?: unknown;
+  author?: unknown;
+  source?: { name?: unknown };
+  publishedAt?: unknown;
+};
 
 function slugify(value: string) {
   return value
@@ -42,7 +54,7 @@ async function fetchNewsFromGNews() {
   const response = await fetch(url, { method: 'GET' });
   const text = await response.text();
 
-  let data: any;
+  let data: { articles?: GNewsArticle[]; message?: string };
   try {
     data = JSON.parse(text);
   } catch (parseError) {
@@ -58,25 +70,26 @@ async function fetchNewsFromGNews() {
     throw new Error('GNews returned an unexpected response shape.');
   }
 
-  return data.articles.map((article: any, index: number) => {
+  return data.articles.map((article, index: number) => {
     const title = String(article.title || `News item ${index + 1}`).trim();
     const description = String(article.description || '').trim();
     const content = String(article.content || description || title).trim();
     const category = classifyNews(title, description);
-    const slugCandidate = article.url ? slugify(`${article.url}-${title}`) : slugify(title);
+    const articleUrl = typeof article.url === 'string' ? article.url : '';
+    const slugCandidate = articleUrl ? slugify(`${articleUrl}-${title}`) : slugify(title);
 
     return {
       title,
       category,
       slug: slugCandidate,
-      image_url: article.image || null,
+      image_url: typeof article.image === 'string' ? article.image : null,
       excerpt: description || content.slice(0, 220),
       content: `${content}
 
-Source: ${category}${article.url ? `\nRead more: ${article.url}` : ''}`,
-      author: String(article.author || category || 'GNews').trim(),
-      source: String(article.source?.name || 'GNews').trim(),
-      published_at: article.publishedAt || new Date().toISOString(),
+    Source: ${category}${articleUrl ? `\nRead more: ${articleUrl}` : ''}`,
+      author: typeof article.author === 'string' ? article.author.trim() : category,
+      source: typeof article.source?.name === 'string' ? article.source.name.trim() : 'GNews',
+      published_at: typeof article.publishedAt === 'string' ? article.publishedAt : new Date().toISOString(),
     };
   });
 }
@@ -86,7 +99,7 @@ async function fetchNewsFromGemini() {
     throw new Error("Missing Gemini API Key");
   }
 
-  const prompt = `You are the Senior Editor for a premium news portal named Beacon-Hub. Generate 2 breaking news articles focusing on Global News, Tech & Startups, and Elections 2027. Return strictly in JSON format as an array of objects with the following keys: 'title', 'category', 'slug', 'image_url', 'content', and 'excerpt'. CRITICAL INSTRUCTION: The 'content' key MUST contain a comprehensive, deep-dive editorial consisting of at least 4 to 5 detailed paragraphs. Do not write short summaries. Ensure the tone is objective, analytical, and highly professional.`;
+  const prompt = `You are the Senior Editor for Beacon Hub. Generate 2 original editorial news articles across these categories only: ${NEWS_CATEGORIES.join(', ')}. Return strictly as a JSON array with the keys title, category, slug, image_url, content, excerpt, metaDescription, author, and source. Use null for image_url unless you can provide a real, publicly accessible HTTPS JPEG or PNG URL. The content must contain at least 4 detailed paragraphs, and metaDescription must be 50-160 characters. Keep the tone objective and analytical.`;
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
@@ -106,7 +119,7 @@ async function fetchNewsFromGemini() {
   );
 
   const rawResult = await response.text();
-  let data: any = null;
+  let data: { candidates?: Array<{ content?: { parts?: Array<{ text?: unknown }> } }>; error?: { message?: string; status?: string } } | null = null;
 
   try {
     data = JSON.parse(rawResult);
@@ -139,7 +152,11 @@ async function fetchNewsFromGemini() {
 
   const cleaned = textResponse.trim();
   try {
-    return JSON.parse(cleaned);
+    const parsed: unknown = JSON.parse(cleaned);
+    if (!Array.isArray(parsed)) {
+      throw new Error('Gemini response must be an array of articles');
+    }
+    return parsed;
   } catch (parseError) {
     throw new Error(`Gemini returned invalid JSON payload; parse error: ${(parseError as Error).message}; body=${cleaned.slice(0, 500)}`);
   }

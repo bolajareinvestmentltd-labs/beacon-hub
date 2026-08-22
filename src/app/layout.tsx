@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import type { Viewport } from 'next';
 import type { ReactNode } from 'react';
 import { Inter, Playfair_Display } from 'next/font/google';
 // Use a raw <script> tag for AdSense to avoid Next.js adding `data-nscript`
@@ -12,13 +13,26 @@ const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 const playfair = Playfair_Display({ subsets: ['latin'], variable: '--font-playfair' });
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://www.beacon-hub.com.ng';
-const socialImage = new URL('/beacon-logo.svg', siteUrl).toString();
 const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID?.trim();
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#0B0B0B',
+};
 
 export const metadata: Metadata = {
   title: 'Beacon Hub - Premium News Platform',
   description: 'World-class news journalism with premium editorial design',
   metadataBase: new URL(siteUrl),
+  manifest: '/manifest.webmanifest',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'Beacon Hub',
+  },
   icons: {
     icon: '/logo.png',
     apple: '/logo.png',
@@ -54,7 +68,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
           <Navbar />
-          <main className="flex-1 pt-[112px]">{children}</main>
+          <main className="w-full max-w-screen-xl mx-auto flex-1 overflow-x-hidden px-4 pt-[112px] sm:px-6 lg:px-8">{children}</main>
           <Footer />
           <MobileDock />
         </ThemeProvider>
