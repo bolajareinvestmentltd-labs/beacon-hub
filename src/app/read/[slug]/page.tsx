@@ -6,6 +6,93 @@ import RelatedContentGrid from "@/components/RelatedContentGrid";
 import AdSense from "@/components/AdSense";
 import { getReadingTimeString } from "@/lib/readingTime";
 import { ChevronLeft } from "lucide-react";
+import type { Metadata } from "next";
+
+const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
+const siteUrl = configuredSiteUrl?.startsWith("https://")
+  ? configuredSiteUrl
+  : "https://www.beacon-hub.com.ng";
+const siteName = "Beacon Hub";
+const fallbackImageUrl = new URL("/logo.png", siteUrl).toString();
+
+function toAbsoluteUrl(value: string | undefined, fallback: string) {
+  if (!value) return fallback;
+
+  try {
+    const url = new URL(value, siteUrl);
+    return url.protocol === "http:" || url.protocol === "https:" ? url.toString() : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function truncateDescription(value: string) {
+  const description = value.replace(/\s+/g, " ").trim();
+  return description.length > 160 ? `${description.slice(0, 157).trimEnd()}...` : description;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const article = await getArticleBySlug(slug);
+  const articleUrl = new URL(`/read/${encodeURIComponent(slug)}`, siteUrl).toString();
+
+  if (!article) {
+    return {
+      title: siteName,
+      description: "World-class news journalism with premium editorial design",
+      alternates: { canonical: articleUrl },
+      openGraph: {
+        title: siteName,
+        description: "World-class news journalism with premium editorial design",
+        url: articleUrl,
+        siteName,
+        type: "article",
+        images: [{ url: fallbackImageUrl, width: 1200, height: 630, alt: `${siteName} logo` }],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title: siteName,
+        description: "World-class news journalism with premium editorial design",
+        images: [fallbackImageUrl],
+      },
+    };
+  }
+
+  const title = String(article.title || siteName);
+  const description = truncateDescription(
+    String(article.metaDescription || article.excerpt || "Read the latest story from Beacon Hub.")
+  );
+  const imageUrl = toAbsoluteUrl(article.coverImage ? String(article.coverImage) : undefined, fallbackImageUrl);
+  const author = article.author ? String(article.author) : "Beacon Hub Editorial Board";
+
+  // Keep shared preview images under 300 KB; JPEG and PNG are the most reliable formats for WhatsApp.
+  return {
+    title,
+    description,
+    authors: [{ name: author }],
+    alternates: { canonical: articleUrl },
+    openGraph: {
+      title,
+      description,
+      url: articleUrl,
+      siteName,
+      type: "article",
+      publishedTime: article.publishedAt?.toISOString(),
+      authors: [author],
+      images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [imageUrl],
+    },
+  };
+}
 
 export const dynamic = "force-dynamic";
 export const revalidate = 600;
