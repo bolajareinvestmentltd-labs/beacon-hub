@@ -6,6 +6,9 @@ import { logger } from "./logger";
 import { checkContactLimit } from "./rateLimit";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
+const fromEmail = process.env.RESEND_FROM_EMAIL || "Beacon Hub <support@beacon-hub.com.ng>";
+const adminEmail = process.env.RESEND_ADMIN_EMAIL || "support@beacon-hub.com.ng";
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.beacon-hub.com.ng";
 
 /**
  * Map form subject values to proper category names
@@ -28,8 +31,8 @@ export async function subscribeToNetwork(formData: FormData) {
   try {
     // The internal alert system to the JCLs Admin
     await resend.emails.send({
-      from: "onboarding@resend.dev",
-      to: "YOUR_PERSONAL_EMAIL_HERE@gmail.com", // 🚨 REPLACE THIS WITH YOUR RESEND LOGIN EMAIL
+      from: fromEmail,
+      to: adminEmail,
       subject: "JCLs Network: New Subscriber 📡",
       html: `
         <div style="font-family: sans-serif; padding: 20px; color: #0A1128;">
@@ -80,7 +83,7 @@ export async function sendContactEmail(formData: FormData) {
 
     // Send confirmation email to user
     const userEmailResult = await resend.emails.send({
-      from: "support@beacon-hub.com",
+      from: fromEmail,
       to: email,
       subject: `We received your message: ${validated.subject}`,
       html: `
@@ -100,7 +103,7 @@ export async function sendContactEmail(formData: FormData) {
           
           <p style="margin-top: 30px; font-size: 12px; color: #999;">
             Beacon-Hub Support Team<br/>
-            <a href="https://beacon-hub.com" style="color: #9C4A3A;">Visit our website</a>
+            <a href="${siteUrl}" style="color: #9C4A3A;">Visit our website</a>
           </p>
         </div>
       `,
@@ -112,8 +115,8 @@ export async function sendContactEmail(formData: FormData) {
 
     // Send notification to admin
     const adminEmailResult = await resend.emails.send({
-      from: "support@beacon-hub.com",
-      to: "support@beacon-hub.com",
+      from: fromEmail,
+      to: adminEmail,
       subject: `New Contact Form: ${validated.subject}`,
       html: `
         <div style="font-family: sans-serif; padding: 20px; color: #1A1A1A;">

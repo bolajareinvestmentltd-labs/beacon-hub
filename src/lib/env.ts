@@ -13,6 +13,8 @@ const EnvSchema = z.object({
   
   // Email
   RESEND_API_KEY: z.string().min(1, 'RESEND_API_KEY is required'),
+  RESEND_FROM_EMAIL: z.string().optional(),
+  RESEND_ADMIN_EMAIL: z.string().email().optional(),
   
   // Error tracking (optional)
   NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),
@@ -31,6 +33,7 @@ const EnvSchema = z.object({
   
   // Environment
   NODE_ENV: z.enum(['development', 'production']).optional(),
+  NEXT_PUBLIC_SITE_URL: z.string().url().optional(),
 });
 
 /**

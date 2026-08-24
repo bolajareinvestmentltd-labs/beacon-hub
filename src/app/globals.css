@@ -3,30 +3,35 @@
 @layer base {
   :root {
     /* --- JCLS Alabaster (Light Mode - Default) --- */
-    --background: #FDFDFB;
-    --foreground: #0B0B0B;
-    --card: #FFFFFF;
-    --border: #E5E7EB;
+    --background: #F7F4EF;
+    --foreground: #111318;
+    --card: #FFFDF9;
+    --border: #D9D4CB;
 
     /* Brand Accent */
-    --accent: #C85A32;
+    --accent: #E16D52;
     --accent-foreground: #FFFFFF;
+    --accent-secondary: #287C7B;
+    --highlight: #F2B66D;
 
     /* Subtle utility colors */
-    --muted: #F3F4F6;
-    --muted-foreground: #6B7280;
+    --muted: #EEEAE2;
+    --muted-foreground: #626A70;
   }
 
   .dark {
     /* --- JCLS Executive Charcoal (Dark Mode Override) --- */
-    --background: #0B0B0B;
-    --foreground: #FDFDFB;
-    --card: #101010;
-    --border: #1F2937;
+    --background: #0D1117;
+    --foreground: #F8F4ED;
+    --card: #151B22;
+    --border: #344049;
 
     /* Muted colors adapt for dark background */
-    --muted: #111827;
-    --muted-foreground: #9CA3AF;
+    --muted: #202A31;
+    --muted-foreground: #AEB8BC;
+    --accent: #EF8065;
+    --accent-secondary: #5FC1B5;
+    --highlight: #F4C879;
   }
 }
 
@@ -38,6 +43,7 @@
 
   body {
     background-color: var(--background);
+    background-image: linear-gradient(120deg, color-mix(in srgb, var(--accent-secondary) 5%, transparent), transparent 38%), linear-gradient(300deg, color-mix(in srgb, var(--accent) 5%, transparent), transparent 42%);
     color: var(--foreground);
     overflow-x: hidden;
     min-height: 100dvh;

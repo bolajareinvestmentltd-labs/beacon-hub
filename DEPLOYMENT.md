@@ -17,6 +17,20 @@ Security note:
 - `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` — for rate-limiting and caching (if used).
 - `NEXT_PUBLIC_ADSENSE_PUB_ID` — AdSense publisher id for ad rendering (optional but recommended for production).
 - `NEXT_PUBLIC_SITE_URL` — canonical site URL (optional, used for metadata).
+- `RESEND_FROM_EMAIL` — verified Resend sender, for example `Beacon Hub <support@beacon-hub.com.ng>`.
+- `RESEND_ADMIN_EMAIL` — verified destination for contact and newsletter notifications.
+
+## Custom domain checklist
+
+If the Vercel URL works but the custom domain does not, check these in order:
+
+1. Confirm the domain is assigned to this exact Vercel project and the latest production deployment.
+2. Confirm the domain is not expired or suspended at the registrar.
+3. Confirm the registrar DNS records match the current values shown by Vercel. Remove stale A, CNAME, parking, or URL-forwarding records.
+4. Confirm Vercel shows the SSL certificate as valid and the domain status as `Valid Configuration`.
+5. Set `NEXT_PUBLIC_SITE_URL` to the final HTTPS domain and redeploy.
+
+When a domain stops resolving while the `*.vercel.app` URL still returns `200`, start with the registrar DNS and domain expiry. A past-due Vercel account can suspend deployments or domains, but it must be confirmed in Vercel Billing and Project settings rather than inferred from the application.
 
 ## External cron-job.org setup
 

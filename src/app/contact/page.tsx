@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { sendContactEmail } from "@/lib/email-actions";
 import ContactForm from "@/components/ContactForm";
 
 export const metadata: Metadata = {

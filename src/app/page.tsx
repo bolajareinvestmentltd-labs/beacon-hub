@@ -4,6 +4,7 @@ import SectionHeaderComponent from '@/components/SectionHeaderComponent';
 import * as queries from '@/lib/queries';
 import QuoteCard from '@/components/QuoteCard';
 import RelatedContentGrid from '@/components/RelatedContentGrid';
+import LiveClock from '@/components/LiveClock';
 import { getEditorialSections } from '@/lib/queries';
 
 type ArticleLike = {
@@ -112,23 +113,32 @@ export default async function HomePage() {
   const quoteAuthor = latest[0]?.category ? `${latest[0].category} Desk` : 'Beacon-Hub Editorial';
 
   return (
-    <div className="min-h-screen w-full bg-background py-4 sm:py-6">
+    <div className="min-h-screen w-full bg-background py-4 sm:py-8">
       <div className="flex w-full flex-col">
+        <div className="mb-6 flex flex-col gap-4 border-y border-border/70 py-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
+          <div>
+            <p className="font-mono text-[10px] text-[#E2725B]">Beacon Hub / Daily Signal</p>
+            <h1 className="mt-2 max-w-2xl text-3xl font-black leading-none text-foreground sm:text-5xl">
+              The world, edited with intent.
+            </h1>
+          </div>
+          <div className="flex items-center gap-3 text-muted-foreground">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-[#E2725B]" aria-hidden="true" />
+            <span className="font-mono text-[10px]">LIVE / LAGOS</span>
+            <LiveClock />
+          </div>
+        </div>
         <div className="mt-2 sm:mt-4 md:mt-6">
           <AsymmetricalHeroLayout
             article={heroArticle}
             feedArticles={feedArticles}
             logoUrl="/logo.png"
-            headerAdLabel="New & Latest News"
+            headerAdLabel="Latest Signal"
           />
         </div>
 
         <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-14">
-          <SectionHeaderComponent
-            eyebrow="EDITORIAL LENS"
-            title="Curated Sections"
-            description="Browse the newsroom through our premium editorial categories."
-          />
+          <SectionHeaderComponent eyebrow="THE DESKS" title="Choose your signal" description="Move through the newsroom by subject, perspective, and pace." />
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
             {editorialSections.slice(0, 6).map((section: { id: number; name: string; description?: string | null; accentColor?: string | null; slug?: string | null }) => (
               <div
