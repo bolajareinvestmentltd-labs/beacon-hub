@@ -33,14 +33,29 @@
 @layer base {
   * {
     border-color: var(--border);
+    -webkit-tap-highlight-color: transparent;
   }
 
   body {
     background-color: var(--background);
     color: var(--foreground);
     overflow-x: hidden;
+    min-height: 100dvh;
+    overscroll-behavior-y: none;
     font-feature-settings: "rlig" 1, "calt" 1;
     -webkit-font-smoothing: antialiased;
+    touch-action: manipulation;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  }
+
+  html {
+    color-scheme: dark light;
+  }
+
+  @media (display-mode: standalone) {
+    body {
+      padding-bottom: max(1.25rem, env(safe-area-inset-bottom));
+    }
   }
 
   h1, h2, h3, h4 {

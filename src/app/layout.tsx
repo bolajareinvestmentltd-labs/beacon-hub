@@ -4,6 +4,7 @@ import type { ReactNode } from 'react';
 import { Inter, Playfair_Display } from 'next/font/google';
 // Use a raw <script> tag for AdSense to avoid Next.js adding `data-nscript`
 import { ThemeProvider } from '@/components/ThemeProvider';
+import PwaInstallPrompt from '@/components/PwaInstallPrompt';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MobileDock from '@/components/MobileDock';
@@ -21,6 +22,7 @@ export const viewport: Viewport = {
   maximumScale: 1,
   userScalable: false,
   themeColor: '#0B0B0B',
+  viewportFit: 'cover',
 };
 
 export const metadata: Metadata = {
@@ -30,7 +32,7 @@ export const metadata: Metadata = {
   manifest: '/manifest.webmanifest',
   appleWebApp: {
     capable: true,
-    statusBarStyle: 'default',
+    statusBarStyle: 'black-translucent',
     title: 'Beacon Hub',
   },
   icons: {
@@ -71,6 +73,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <main className="w-full max-w-screen-xl mx-auto flex-1 overflow-x-hidden px-4 pt-[112px] sm:px-6 lg:px-8">{children}</main>
           <Footer />
           <MobileDock />
+          <PwaInstallPrompt />
         </ThemeProvider>
       </body>
     </html>
