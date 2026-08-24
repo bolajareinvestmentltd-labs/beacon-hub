@@ -5,6 +5,7 @@ import { Inter, Playfair_Display } from 'next/font/google';
 // Use a raw <script> tag for AdSense to avoid Next.js adding `data-nscript`
 import { ThemeProvider } from '@/components/ThemeProvider';
 import PwaInstallPrompt from '@/components/PwaInstallPrompt';
+import BrandSplash from '@/components/BrandSplash';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MobileDock from '@/components/MobileDock';
@@ -69,6 +70,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         )}
 
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+          <BrandSplash />
           <Navbar />
           <main className="w-full max-w-screen-xl mx-auto flex-1 overflow-x-hidden px-4 pt-[112px] sm:px-6 lg:px-8">{children}</main>
           <Footer />

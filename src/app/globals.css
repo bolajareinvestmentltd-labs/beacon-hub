@@ -13,6 +13,9 @@
     --accent-foreground: #FFFFFF;
     --accent-secondary: #287C7B;
     --highlight: #F2B66D;
+    --deep-ink: #102A43;
+    --brand-gradient: linear-gradient(120deg, #FF5A4F 0%, #00A7A7 100%);
+    --cool-gradient: linear-gradient(120deg, #00A7A7 0%, #B9E769 100%);
 
     /* Subtle utility colors */
     --muted: #EEEAE2;
@@ -32,6 +35,9 @@
     --accent: #EF8065;
     --accent-secondary: #5FC1B5;
     --highlight: #F4C879;
+    --deep-ink: #102A43;
+    --brand-gradient: linear-gradient(120deg, #FF745F 0%, #3CD6C8 100%);
+    --cool-gradient: linear-gradient(120deg, #3CD6C8 0%, #D1F36B 100%);
   }
 }
 
@@ -70,6 +76,54 @@
 
   .font-mono {
     @apply text-xs tracking-widest uppercase;
+  }
+
+  .app-gradient {
+    background-image: var(--brand-gradient);
+  }
+
+  .app-gradient-cool {
+    background-image: var(--cool-gradient);
+  }
+
+  .app-gradient-text {
+    background-image: var(--brand-gradient);
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Keep older page utilities visually aligned with the new token system. */
+  [class*="text-[#E2725B]"], [class*="text-[#C85A32]"], [class*="text-[#9C4A3A]"] {
+    color: var(--accent) !important;
+  }
+
+  [class*="bg-[#E2725B]"], [class*="bg-[#C85A32]"], [class*="bg-[#9C4A3A]"] {
+    background-color: var(--accent) !important;
+  }
+
+  [class*="border-[#E2725B]"], [class*="border-[#C85A32]"], [class*="border-[#9C4A3A]"] {
+    border-color: var(--accent) !important;
+  }
+
+  .brand-splash {
+    animation: splash-out 700ms ease 900ms forwards;
+  }
+
+  .brand-splash[data-skip="true"] {
+    display: none;
+  }
+
+  .brand-splash-mark {
+    animation: splash-mark-in 700ms cubic-bezier(.2,.8,.2,1) both;
+  }
+
+  @keyframes splash-mark-in {
+    from { opacity: 0; transform: scale(.86) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
+  }
+
+  @keyframes splash-out {
+    to { opacity: 0; pointer-events: none; visibility: hidden; }
   }
 
   .prose-editorial p {

@@ -23,7 +23,7 @@ export default function LiveClock() {
   }, []);
 
   return (
-    <time dateTime={new Date().toISOString()} aria-label={`Current time in Lagos: ${time}`} className="font-mono text-sm font-bold tabular-nums text-foreground">
+    <time aria-label={`Current time in Lagos: ${time}`} className="font-mono text-sm font-bold tabular-nums text-foreground">
       {time} <span className="text-muted-foreground">WAT</span>
     </time>
   );
