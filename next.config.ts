@@ -7,12 +7,25 @@ const nextConfig: NextConfig = {
   
   // Security headers
   async headers() {
+    const contentSecurityPolicy = [
+      "default-src 'self'",
+      `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""} https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.googletagmanager.com https://www.google-analytics.com`,
+      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+      "img-src 'self' data: blob: https:",
+      "font-src 'self' data: https://fonts.googleapis.com https://fonts.gstatic.com https://www.gstatic.com",
+      "connect-src 'self' https: wss:",
+      "frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
+      "frame-ancestors 'none'",
+      "base-uri 'self'",
+      "object-src 'none'",
+    ].join('; ');
+
     return [
       {
         source: '/:path*',
         headers: [
           // Content Security Policy to mitigate XSS and data exfiltration
-          { key: 'Content-Security-Policy', value: `default-src 'self'; script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""} https://www.googletagmanager.com https://www.google-analytics.com; img-src 'self' data: https:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https:; frame-ancestors 'none';` },
+          { key: 'Content-Security-Policy', value: contentSecurityPolicy },
           // Prevent MIME type sniffing
           { key: 'X-Content-Type-Options', value: 'nosniff' },
           // Prevent clickjacking

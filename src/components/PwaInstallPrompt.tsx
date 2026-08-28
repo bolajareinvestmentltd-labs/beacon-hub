@@ -13,8 +13,8 @@ export default function PwaInstallPrompt() {
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (event: Event) => {
-      event.preventDefault();
-      setDeferredPrompt(event as BeforeInstallPromptEvent);
+      const promptEvent = event as BeforeInstallPromptEvent;
+      setDeferredPrompt(promptEvent);
       setShowPrompt(true);
     };
 
@@ -34,11 +34,16 @@ export default function PwaInstallPrompt() {
 
   const handleInstall = async () => {
     if (!deferredPrompt) {
+      setShowPrompt(false);
       return;
     }
 
-    deferredPrompt.prompt();
-    await deferredPrompt.userChoice;
+    try {
+      await deferredPrompt.prompt();
+      await deferredPrompt.userChoice;
+    } catch (error) {
+      console.warn('Install prompt could not be shown:', error);
+    }
 
     setDeferredPrompt(null);
     setShowPrompt(false);
