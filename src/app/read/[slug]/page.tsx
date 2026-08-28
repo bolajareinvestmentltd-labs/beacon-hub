@@ -1,4 +1,5 @@
 import { getArticleBySlug, getRelatedArticles, incrementArticleViews } from "@/lib/queries";
+import { normalizeArticleSlug, slugToArticleTitle, getArticleSlugCandidates } from "@/lib/metadata";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import EditorialColumnComponent from "@/components/EditorialColumnComponent";
@@ -38,32 +39,37 @@ export async function generateMetadata({
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const { slug } = await params;
-  const article = await getArticleBySlug(slug);
-  const articleUrl = new URL(`/read/${encodeURIComponent(slug)}`, siteUrl).toString();
+  const normalizedSlug = normalizeArticleSlug(slug);
+  const candidates = getArticleSlugCandidates(slug);
+  const article = await getArticleBySlug(normalizedSlug);
+  const articleUrl = new URL(`/read/${encodeURIComponent(normalizedSlug || slug)}`, siteUrl).toString();
 
   if (!article) {
+    const fallbackTitle = slugToArticleTitle(slug);
+    const fallbackDescription = "Read the latest story from Beacon Hub.";
+
     return {
-      title: siteName,
-      description: "World-class news journalism with premium editorial design",
+      title: fallbackTitle,
+      description: fallbackDescription,
       alternates: { canonical: articleUrl },
       openGraph: {
-        title: siteName,
-        description: "World-class news journalism with premium editorial design",
+        title: fallbackTitle,
+        description: fallbackDescription,
         url: articleUrl,
         siteName,
         type: "article",
-        images: [{ url: fallbackImageUrl, width: 1200, height: 630, alt: `${siteName} logo` }],
+        images: [{ url: fallbackImageUrl, width: 1200, height: 630, alt: fallbackTitle }],
       },
       twitter: {
         card: "summary_large_image",
-        title: siteName,
-        description: "World-class news journalism with premium editorial design",
+        title: fallbackTitle,
+        description: fallbackDescription,
         images: [fallbackImageUrl],
       },
     };
   }
 
-  const title = String(article.title || siteName);
+  const title = String(article.title || slugToArticleTitle(slug) || siteName);
   const description = truncateDescription(
     String(article.metaDescription || article.excerpt || "Read the latest story from Beacon Hub.")
   );
@@ -100,7 +106,8 @@ export const revalidate = 600;
 
 export default async function ArticlePage({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  const article = await getArticleBySlug(resolvedParams.slug);
+  const normalizedSlug = normalizeArticleSlug(resolvedParams.slug);
+  const article = await getArticleBySlug(normalizedSlug || resolvedParams.slug);
 
   if (!article) {
     notFound();

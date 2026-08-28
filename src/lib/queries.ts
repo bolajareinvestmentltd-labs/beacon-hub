@@ -100,15 +100,28 @@ export async function getArticlesByCategory(category: string, limit = 24) {
 }
 
 export async function getArticleBySlug(slug: string) {
+  const candidates = Array.from(
+    new Set(
+      [slug, slug?.trim(), slug?.toLowerCase(), slug?.replace(/[%_\s]+/g, '-'), slug?.replace(/-/g, ' ')].filter(Boolean)
+    )
+  ).map((candidate) => candidate.trim());
+
   try {
-    const article = await runDbOperation(() =>
-      db
-        .select()
-        .from(articles)
-        .where(eq(articles.slug, slug))
-        .limit(1)
-    );
-    return article[0] || null;
+    for (const candidate of candidates) {
+      const article = await runDbOperation(() =>
+        db
+          .select()
+          .from(articles)
+          .where(eq(articles.slug, candidate))
+          .limit(1)
+      );
+
+      if (article[0]) {
+        return article[0];
+      }
+    }
+
+    return null;
   } catch (error) {
     console.error('Error fetching article by slug:', error);
     return null;
