@@ -10,7 +10,13 @@ import { logger } from "./logger";
 import { checkSubscribeLimit } from "./rateLimit";
 
 const generateSlug = (title: string) => {
-  return title.toLowerCase().replace(/[^a-z0-9]+/g, "-") + `-${Date.now().toString().slice(-4)}`;
+  const slug = title
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
+  return `${slug || 'article'}-${Date.now().toString().slice(-4)}`;
 };
 
 // ========================================================

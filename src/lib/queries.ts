@@ -100,11 +100,17 @@ export async function getArticlesByCategory(category: string, limit = 24) {
 }
 
 export async function getArticleBySlug(slug: string) {
-  const candidates = Array.from(
-    new Set(
-      [slug, slug?.trim(), slug?.toLowerCase(), slug?.replace(/[%_\s]+/g, '-'), slug?.replace(/-/g, ' ')].filter(Boolean)
-    )
-  ).map((candidate) => candidate.trim());
+  const values = [
+    slug,
+    slug?.trim(),
+    slug?.toLowerCase(),
+    slug?.replace(/[%_\s]+/g, '-'),
+    slug?.replace(/-/g, ' '),
+    slug?.replace(/^-+|-+$/g, ''),
+    slug?.replace(/[%_\s]+/g, '-').replace(/^-+|-+$/g, ''),
+  ].filter((value): value is string => Boolean(value));
+
+  const candidates = Array.from(new Set(values.map((candidate) => candidate.trim())));
 
   try {
     for (const candidate of candidates) {
@@ -118,6 +124,21 @@ export async function getArticleBySlug(slug: string) {
 
       if (article[0]) {
         return article[0];
+      }
+
+      const unprefixed = candidate.replace(/^-+/, '');
+      if (unprefixed !== candidate) {
+        const alternate = await runDbOperation(() =>
+          db
+            .select()
+            .from(articles)
+            .where(eq(articles.slug, unprefixed))
+            .limit(1)
+        );
+
+        if (alternate[0]) {
+          return alternate[0];
+        }
       }
     }
 
