@@ -5,7 +5,8 @@ import { articles, deals, subscribers } from "@/db/schema";
 import { revalidatePath } from "next/cache";
 import { put } from "@vercel/blob";
 import { ArticleSchema, DealSchema, SubscribeSchema } from "./validation";
-import { sanitizeHTML, sanitizeEmail } from "./sanitize";
+import { sanitizeEmail } from "./sanitize";
+import { sanitizeServerHTML } from "./server-sanitize";
 import { logger } from "./logger";
 import { checkSubscribeLimit } from "./rateLimit";
 
@@ -35,7 +36,7 @@ export async function publishArticle(formData: FormData) {
       title,
       slug: generateSlug(title),
       category,
-      content: sanitizeHTML(content),
+      content: sanitizeServerHTML(content),
       author: "JCLs Intelligence",
       excerpt,
       coverImage: null,
@@ -80,7 +81,7 @@ export async function publishArticle(formData: FormData) {
     const contentWithBodyImage = bodyImageUrl
       ? `${content}<p><img src="${bodyImageUrl}" alt="${title}" /></p>`
       : content;
-    const sanitizedContent = sanitizeHTML(contentWithBodyImage);
+    const sanitizedContent = sanitizeServerHTML(contentWithBodyImage);
 
     await db.insert(articles).values({
       title: validated.title,
@@ -134,7 +135,7 @@ export async function publishDeal(formData: FormData) {
       vendorName,
       price,
       category,
-      description: sanitizeHTML(description),
+      description: sanitizeServerHTML(description),
       imageUrl: null,
       videoUrl: null,
     });
