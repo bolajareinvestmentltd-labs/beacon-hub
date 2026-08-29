@@ -147,22 +147,22 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
   const readingTime = getReadingTimeString(articleData.content);
 
   return (
-    <div className="w-full min-w-0 overflow-x-hidden bg-gradient-to-b from-white via-slate-50 to-white dark:from-slate-950 dark:via-black dark:to-slate-950 pb-24 md:pb-0">
+    <div className="w-full min-w-0 overflow-x-hidden bg-gradient-to-b from-background via-muted to-background pb-24 text-foreground md:pb-0">
       {/* Navigation Bar */}
-      <div className="sticky top-0 bg-white/80 dark:bg-black/80 backdrop-blur-lg border-b border-slate-200 dark:border-white/10 z-40">
+      <div className="sticky top-0 z-40 border-b border-border/70 bg-card/80 backdrop-blur-lg">
         <div className="max-w-4xl mx-auto px-4 py-4 flex items-center justify-between">
           <Link
             href="/"
-            className="inline-flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-[#E2725B] transition-colors font-bold text-sm uppercase tracking-wider"
+            className="inline-flex items-center gap-2 text-muted-foreground transition-colors hover:text-primary font-bold text-sm uppercase tracking-wider"
           >
             <ChevronLeft size={16} />
             Back to Hub
           </Link>
 
-          <div className="flex items-center gap-3 text-xs text-slate-500 dark:text-slate-400">
+          <div className="flex items-center gap-3 text-xs text-muted-foreground">
             <span className="hidden sm:inline">{readingTime}</span>
             <span className="hidden sm:inline">•</span>
-            <span className="text-[9px] font-bold uppercase tracking-widest bg-slate-100 dark:bg-white/5 px-2 py-1 rounded">
+            <span className="rounded bg-muted px-2 py-1 text-[9px] font-bold uppercase tracking-widest">
               {articleData.category}
             </span>
           </div>
@@ -172,25 +172,25 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       {/* EDITORIAL HEADER */}
       <div className="mx-auto w-full max-w-4xl px-5 py-8 sm:px-6 md:px-8 md:py-16">
         {/* Category Badge */}
-        <span className="text-[10px] font-bold uppercase tracking-[0.15em] text-[#3A7B7A] dark:text-[#4A9B9A] inline-block mb-6">
+        <span className="mb-6 inline-block text-[10px] font-bold uppercase tracking-[0.15em] text-accent-secondary">
           {articleData.category}
         </span>
 
         {/* Premium Title */}
-        <h1 className="break-words text-[2.35rem] leading-[1.08] sm:text-5xl md:text-6xl lg:text-7xl font-black font-playfair text-black dark:text-[#F9F6F0] mb-6">
+        <h1 className="mb-6 break-words text-[2.35rem] leading-[1.08] font-black font-playfair text-foreground sm:text-5xl md:text-6xl lg:text-7xl">
           {articleData.title}
         </h1>
 
         {/* Byline & Metadata */}
-        <div className="flex flex-col md:flex-row md:items-center md:gap-6 pb-8 border-b-2 border-slate-300 dark:border-white/10">
+        <div className="flex flex-col border-b-2 border-border pb-8 md:flex-row md:items-center md:gap-6">
           <div>
-            <p className="text-sm font-serif text-slate-600 dark:text-slate-400">
+            <p className="text-sm font-serif text-muted-foreground">
               By{' '}
-              <span className="font-bold text-black dark:text-white">
+              <span className="font-bold text-foreground">
                 {articleData.authorPerspective || articleData.author || "Editorial Board"}
               </span>
             </p>
-            <p className="text-xs text-slate-500 dark:text-slate-500 mt-1">
+            <p className="mt-1 text-xs text-muted-foreground">
               {articleData.publishedAt.toLocaleDateString("en-US", {
                 month: "long",
                 day: "numeric",
@@ -200,10 +200,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           </div>
 
           <div className="mt-4 md:mt-0 md:ml-auto flex items-center gap-4">
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
               {readingTime}
             </span>
-            <span className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            <span className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
               {articleData.wordCount?.toLocaleString() || "Unknown"} words
             </span>
           </div>
@@ -226,11 +226,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
       {/* ARTICLE CONTENT */}
       <div className="mx-auto w-full max-w-4xl px-5 sm:px-6 md:px-8">
-        <div className="content-area min-w-0 rounded-2xl border border-slate-200/80 bg-white/80 p-4 shadow-sm backdrop-blur dark:border-white/10 dark:bg-slate-900/60 sm:p-6 md:rounded-3xl md:p-8">
+        <div className="content-area min-w-0 rounded-2xl border border-border/80 bg-card/70 p-4 shadow-sm backdrop-blur sm:p-6 md:rounded-3xl md:p-8">
           <EditorialColumnComponent
             title={articleData.title}
             content={articleData.content}
-            accentColor="#E2725B"
+            accentColor="var(--accent)"
           />
         </div>
       </div>
@@ -238,9 +238,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       {/* MID-STORY INTERSTITIAL AD */}
       <div className="max-w-4xl mx-auto px-4 md:px-8 lg:px-12 my-16">
         <div className="mb-4 flex items-center justify-center gap-2 text-center">
-          <div className="h-px flex-1 bg-slate-200 dark:bg-white/10" />
-          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Sponsored Content</p>
-          <div className="h-px flex-1 bg-slate-200 dark:bg-white/10" />
+          <div className="h-px flex-1 bg-border" />
+          <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-muted-foreground">Sponsored Content</p>
+          <div className="h-px flex-1 bg-border" />
         </div>
         <div className="flex justify-center">
           <div className="w-full max-w-[720px]">

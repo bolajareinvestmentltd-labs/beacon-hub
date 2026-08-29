@@ -18,21 +18,21 @@ export default async function DynamicCategoryPage({ params }: CategoryPageProps)
 
   return (
     // Note the heavy pt-36 padding here to clear the fixed navbar height cleanly!
-    <main className="min-h-screen bg-[#F4EFEA] text-[#1A1A1A] px-6 pt-36 pb-16">
-      <div className="max-w-6xl mx-auto border-b border-[#1A1A1A]/10 pb-6 mb-12">
-        <span className="text-[10px] font-mono text-[#9C4A3A] uppercase tracking-widest font-bold">
+    <main className="min-h-screen bg-background px-6 pt-36 pb-16 text-foreground">
+      <div className="mx-auto mb-12 max-w-6xl border-b border-border pb-6">
+        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-accent">
           LIVE INTELLIGENCE SECTOR // {rawCategory.toUpperCase()}
         </span>
-        <h1 className="text-4xl md:text-6xl font-serif font-black tracking-tight text-[#1A1A1A] mt-2">
+        <h1 className="mt-2 text-4xl font-serif font-black tracking-tight text-foreground md:text-6xl">
           {formattedCategory}
         </h1>
       </div>
 
       <div className="max-w-6xl mx-auto">
         {articles.length === 0 ? (
-          <div className="border-2 border-dashed border-[#1A1A1A]/20 rounded-sm p-12 text-center bg-[#1A1A1A]/5">
-            <h3 className="text-lg font-serif font-bold uppercase text-[#1A1A1A]">No Live Feed Available</h3>
-            <p className="mt-2 text-sm text-[#1A1A1A]/60 max-w-sm mx-auto">
+          <div className="rounded-sm border-2 border-dashed border-border p-12 text-center bg-muted/60">
+            <h3 className="text-lg font-serif font-bold uppercase text-foreground">No Live Feed Available</h3>
+            <p className="mx-auto mt-2 max-w-sm text-sm text-muted-foreground">
               No published articles have been assigned to this sector yet.
             </p>
           </div>
@@ -42,7 +42,7 @@ export default async function DynamicCategoryPage({ params }: CategoryPageProps)
               <Link
                 href={`/read/${article.slug}`}
                 key={article.id || index}
-                className="group block border border-[#1A1A1A]/10 bg-white/40 p-6 rounded-sm hover:border-[#9C4A3A]/40 transition-all duration-300"
+                className="group block rounded-sm border border-border/80 bg-card/55 p-6 transition-all duration-300 hover:border-accent/60 hover:bg-card/80"
               >
                 {article.coverImage && (
                   <img 
@@ -51,13 +51,13 @@ export default async function DynamicCategoryPage({ params }: CategoryPageProps)
                     className="w-full h-48 object-cover grayscale group-hover:grayscale-0 transition-all duration-500 mb-4 rounded-sm"
                   />
                 )}
-                <span className="text-xs font-mono text-[#9C4A3A] font-bold block mb-2">
+                <span className="mb-2 block text-xs font-mono font-bold text-accent">
                   {article.category}
                 </span>
-                <h3 className="text-lg font-serif font-bold tracking-tight text-[#1A1A1A] group-hover:text-[#9C4A3A] transition-colors duration-200 line-clamp-2">
+                <h3 className="line-clamp-2 text-lg font-serif font-bold tracking-tight text-foreground transition-colors duration-200 group-hover:text-accent">
                   {article.title}
                 </h3>
-                <p className="mt-2 text-sm text-[#1A1A1A]/70 font-sans line-clamp-3 leading-relaxed">
+                <p className="mt-2 line-clamp-3 font-sans text-sm leading-relaxed text-muted-foreground">
                   {article.excerpt}
                 </p>
               </Link>
