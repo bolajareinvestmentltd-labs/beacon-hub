@@ -9,11 +9,11 @@ const nextConfig: NextConfig = {
   async headers() {
     const contentSecurityPolicy = [
       "default-src 'self'",
-      `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""} https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://www.googletagmanager.com https://www.google-analytics.com`,
+      `script-src 'self' 'unsafe-inline'${isDevelopment ? " 'unsafe-eval'" : ""} https://pagead2.googlesyndication.com https://googleads.g.doubleclick.net https://ep2.adtrafficquality.google https://www.googletagmanager.com https://www.google-analytics.com`,
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
       "img-src 'self' data: blob: https:",
       "font-src 'self' data: https://fonts.googleapis.com https://fonts.gstatic.com https://www.gstatic.com",
-      "connect-src 'self' https: wss:",
+      "connect-src 'self' https: wss: https://ep2.adtrafficquality.google",
       "frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",
