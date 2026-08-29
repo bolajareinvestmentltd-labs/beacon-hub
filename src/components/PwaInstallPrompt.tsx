@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { X } from 'lucide-react';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt: () => Promise<void>;
@@ -49,12 +50,26 @@ export default function PwaInstallPrompt() {
     setShowPrompt(false);
   };
 
+  const handleDismiss = () => {
+    setDeferredPrompt(null);
+    setShowPrompt(false);
+  };
+
   if (!showPrompt) {
     return null;
   }
 
   return (
     <div className="fixed bottom-24 right-4 z-50 flex items-center gap-3 rounded-2xl border border-white/20 bg-[#07151C]/95 px-4 py-3 text-sm text-white shadow-2xl backdrop-blur-md md:bottom-8">
+      <button
+        type="button"
+        onClick={handleDismiss}
+        aria-label="Dismiss install prompt"
+        title="Dismiss install prompt"
+        className="order-last self-start rounded-full p-1 text-slate-300 transition hover:bg-white/10 hover:text-white"
+      >
+        <X size={16} aria-hidden="true" />
+      </button>
       <div>
         <p className="text-[10px] font-bold uppercase tracking-[0.26em] text-[#F4C8BA]">Install App</p>
         <p className="mt-1 text-xs text-slate-200">Use Beacon Hub like a native app.</p>

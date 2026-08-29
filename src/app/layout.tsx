@@ -9,6 +9,7 @@ import BrandSplash from '@/components/BrandSplash';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MobileDock from '@/components/MobileDock';
+import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
@@ -76,6 +77,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Footer />
           <MobileDock />
           <PwaInstallPrompt />
+          <ServiceWorkerRegistration />
         </ThemeProvider>
       </body>
     </html>
