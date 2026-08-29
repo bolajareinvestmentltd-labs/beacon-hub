@@ -16,12 +16,13 @@ async function main() {
   }
 
   const existing = await db.select().from(admins).where(eq(admins.email, email)).limit(1);
+  const passwordHash = hashPassword(password);
   if (existing.length > 0) {
-    console.log(`Admin already exists for ${email}`);
+    await db.update(admins).set({ passwordHash, role: 'admin' }).where(eq(admins.email, email));
+    console.log(`Admin password updated successfully for ${email}`);
     process.exit(0);
   }
 
-  const passwordHash = hashPassword(password);
   await db.insert(admins).values({ email, passwordHash, role: 'admin' });
   console.log(`Admin created successfully for ${email}`);
 }
