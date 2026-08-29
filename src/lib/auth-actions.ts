@@ -7,7 +7,7 @@ import { db } from "@/db";
 import { admins } from "@/db/schema";
 import { checkAuthLimit } from "./rateLimit";
 import { logger } from "./logger";
-import { sanitizeInput } from "./sanitize";
+import { sanitizeInput } from "./input-sanitize";
 import { LoginSchema } from "./validation";
 import { verifyPassword, createAdminSessionToken } from "./server-auth";
 
