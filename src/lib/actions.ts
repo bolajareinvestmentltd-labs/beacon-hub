@@ -21,6 +21,16 @@ const generateSlug = (title: string) => {
   return `${slug || 'article'}-${Date.now().toString().slice(-4)}`;
 };
 
+const getFileFromFormData = (formData: FormData, fieldName: string): File | null => {
+  const value = formData.get(fieldName);
+  return value instanceof File && value.size > 0 ? value : null;
+};
+
+const isValidImageFile = (file: File | null) => {
+  if (!file) return false;
+  return file.type.startsWith('image/') && file.size > 0 && file.size <= 8 * 1024 * 1024;
+};
+
 // ========================================================
 // 1. INTELLIGENCE ENGINE (News Override)
 // ========================================================
@@ -33,8 +43,8 @@ export async function publishArticle(formData: FormData) {
     const category = formData.get("category") as string;
     const content = formData.get("content") as string;
     const excerpt = (formData.get("excerpt") as string) || "";
-    const imageFile = formData.get("coverImage") as File;
-    const bodyImageFile = formData.get("bodyImage") as File;
+    const imageFile = getFileFromFormData(formData, "coverImage");
+    const bodyImageFile = getFileFromFormData(formData, "bodyImage");
 
     const validatedResult = ArticleSchema.safeParse({
       title,
@@ -55,24 +65,39 @@ export async function publishArticle(formData: FormData) {
 
     const validated = validatedResult.data;
 
+    if (imageFile && !isValidImageFile(imageFile)) {
+      return {
+        success: false,
+        message: "Cover image must be a valid image file under 8MB.",
+      };
+    }
+
+    if (bodyImageFile && !isValidImageFile(bodyImageFile)) {
+      return {
+        success: false,
+        message: "Brief image must be a valid image file under 8MB.",
+      };
+    }
+
     let imageUrl: string | null = null;
-    if (imageFile && imageFile.size > 0 && process.env.BLOB_READ_WRITE_TOKEN) {
+    if (imageFile && isValidImageFile(imageFile) && process.env.BLOB_READ_WRITE_TOKEN) {
       try {
-        const blob = await put(`articles/${imageFile.name}`, imageFile, {
+        const safeFileName = imageFile.name.replace(/\s+/g, '-');
+        const blob = await put(`articles/${Date.now()}-${safeFileName}`, imageFile, {
           access: "public",
           addRandomSuffix: true,
         });
         imageUrl = blob.url;
       } catch (error) {
         logger.warning("Failed to upload article image", { error });
-        // Continue without image
       }
     }
 
     let bodyImageUrl: string | null = null;
-    if (bodyImageFile && bodyImageFile.size > 0 && process.env.BLOB_READ_WRITE_TOKEN) {
+    if (bodyImageFile && isValidImageFile(bodyImageFile) && process.env.BLOB_READ_WRITE_TOKEN) {
       try {
-        const blob = await put(`articles/body-${bodyImageFile.name}`, bodyImageFile, {
+        const safeFileName = bodyImageFile.name.replace(/\s+/g, '-');
+        const blob = await put(`articles/body-${Date.now()}-${safeFileName}`, bodyImageFile, {
           access: "public",
           addRandomSuffix: true,
         });

@@ -146,6 +146,8 @@ export default function AdminDashboard() {
 
           <form
             action={articleAction}
+            method="POST"
+            encType="multipart/form-data"
             onSubmit={() => setArticleFormError(null)}
             onInvalid={() => setArticleFormError("Headline, excerpt, and full briefing are required.")}
             className="flex flex-col gap-5"
