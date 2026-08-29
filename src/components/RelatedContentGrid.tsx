@@ -28,13 +28,13 @@ export default function RelatedContentGrid({
   const displayArticles = articles.slice(0, limit);
 
   return (
-    <section className="w-full mt-10 pt-8 border-t border-black/10 dark:border-white/10">
+    <section className="mt-10 w-full border-t border-border pt-8">
       {/* Section Header */}
       <div className="mb-6">
-        <h2 className="text-3xl md:text-4xl font-black font-playfair text-black dark:text-[#F9F6F0] mb-2">
+        <h2 className="mb-2 text-3xl font-black font-playfair text-foreground md:text-4xl">
           {title}
         </h2>
-        <div className="h-1 w-16 bg-[#E2725B]" />
+        <div className="h-1 w-16 bg-primary" />
       </div>
 
       {/* Grid Layout: 3 columns desktop, 2 tablet, 1 mobile */}
@@ -43,10 +43,10 @@ export default function RelatedContentGrid({
           <Link
             key={article.id}
             href={`/read/${article.slug}`}
-            className="group relative flex flex-col overflow-hidden rounded-xl border border-slate-200 dark:border-white/10 hover:border-[#E2725B] hover:shadow-xl transition-all duration-300"
+            className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card/55 transition-all duration-300 hover:border-primary hover:bg-card/85 hover:shadow-xl"
           >
             {/* Card Container with hover effect */}
-            <div className="relative overflow-hidden h-44 md:h-52 bg-slate-200 dark:bg-white/5">
+            <div className="relative h-44 overflow-hidden bg-muted md:h-52">
               {/* Thumbnail Image */}
               {article.coverImage ? (
                 <Image
@@ -57,14 +57,14 @@ export default function RelatedContentGrid({
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               ) : (
-                <div className="w-full h-full bg-gradient-to-br from-slate-300 to-slate-400 dark:from-slate-700 dark:to-slate-800 flex items-center justify-center">
-                  <span className="text-slate-500 dark:text-slate-400 text-sm font-medium">No Image</span>
+                <div className="app-gradient-cool flex h-full w-full items-center justify-center">
+                  <span className="text-sm font-medium text-foreground/70">No Image</span>
                 </div>
               )}
 
               {/* Category Badge Overlay */}
               <div className="absolute top-3 left-3">
-                <span className="inline-block bg-[#E2725B] text-white text-[9px] font-bold uppercase tracking-widest px-2 py-1 rounded-sm">
+                <span className="inline-block rounded-sm bg-primary px-2 py-1 text-[9px] font-bold uppercase tracking-widest text-primary-foreground">
                   {article.category}
                 </span>
               </div>
@@ -73,19 +73,19 @@ export default function RelatedContentGrid({
             {/* Card Content */}
             <div className="p-4 flex-1 flex flex-col">
               {/* Headline */}
-              <h3 className="text-sm md:text-base font-bold text-black dark:text-white group-hover:text-[#E2725B] transition-colors line-clamp-2 mb-3">
+              <h3 className="mb-3 line-clamp-2 text-sm font-bold text-foreground transition-colors group-hover:text-primary md:text-base">
                 {article.title}
               </h3>
 
               {/* Excerpt */}
               {article.excerpt && (
-                <p className="text-xs md:text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-4 flex-1">
+                <p className="mb-4 line-clamp-2 flex-1 text-xs text-muted-foreground md:text-sm">
                   {article.excerpt}
                 </p>
               )}
 
               {/* Footer: Author + Date */}
-              <div className="flex items-center justify-between gap-2 text-[11px] md:text-xs font-medium text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-white/5 pt-3">
+              <div className="flex items-center justify-between gap-2 border-t border-border pt-3 text-[11px] font-medium text-muted-foreground md:text-xs">
                 <span className="truncate">
                   {article.authorPerspective || 'Editorial Board'}
                 </span>
@@ -101,7 +101,7 @@ export default function RelatedContentGrid({
             {/* Hover Arrow */}
             <div className="absolute bottom-4 right-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <svg
-                className="w-5 h-5 text-[#E2725B]"
+                className="h-5 w-5 text-primary"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"

@@ -17,7 +17,7 @@ export default function CategoryBar() {
   const pathname = usePathname() ?? '/';
 
   return (
-    <div className="sticky top-0 z-40 border-b border-slate-200/70 bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/80 dark:border-white/10 dark:bg-slate-950/95">
+    <div className="sticky top-0 z-40 border-b border-border/70 bg-card/90 backdrop-blur supports-[backdrop-filter]:bg-card/80">
       <div className="mx-auto flex max-w-7xl items-center gap-2 overflow-x-auto px-4 py-3">
         {CATEGORIES.map((category) => {
           const isActive =
@@ -30,8 +30,8 @@ export default function CategoryBar() {
               aria-current={isActive ? 'page' : undefined}
               className={`whitespace-nowrap rounded-full border px-4 py-2 text-[11px] font-semibold uppercase tracking-[0.24em] transition-colors ${
                 isActive
-                  ? 'border-[#E2725B] bg-[#E2725B] text-white shadow-sm'
-                  : 'border-slate-200/90 bg-slate-50 text-slate-800 hover:border-[#E2725B] hover:bg-[#E2725B]/10 dark:border-white/10 dark:bg-white/5 dark:text-slate-100 dark:hover:bg-[#E2725B]/10'
+                  ? 'border-primary bg-primary text-primary-foreground shadow-sm'
+                  : 'border-border/90 bg-muted/70 text-foreground hover:border-primary hover:bg-primary/10'
               }`}
             >
               {category.label}

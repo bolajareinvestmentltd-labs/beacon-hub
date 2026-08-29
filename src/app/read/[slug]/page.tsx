@@ -251,20 +251,20 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
       {/* META INFO & SEO */}
       {articleData.metaDescription && (
-        <div className="max-w-4xl mx-auto px-4 md:px-8 lg:px-12 my-12 p-6 bg-slate-100 dark:bg-white/5 rounded-lg border border-slate-200 dark:border-white/10">
-          <p className="text-sm text-slate-700 dark:text-slate-300 italic">{articleData.metaDescription}</p>
+        <div className="mx-auto my-12 max-w-4xl rounded-lg border border-border bg-muted/70 p-6 px-4 md:px-8 lg:px-12">
+          <p className="text-sm italic text-muted-foreground">{articleData.metaDescription}</p>
         </div>
       )}
 
       {/* KEYWORDS */}
       {articleData.seoKeywords.length > 0 && (
-        <div className="max-w-4xl mx-auto px-4 md:px-8 lg:px-12 my-12 pt-12 border-t border-slate-200 dark:border-white/10">
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4">Related Keywords</p>
+        <div className="mx-auto my-12 max-w-4xl border-t border-border px-4 pt-12 md:px-8 lg:px-12">
+          <p className="mb-4 text-xs font-bold uppercase tracking-widest text-muted-foreground">Related Keywords</p>
           <div className="flex flex-wrap gap-2">
             {articleData.seoKeywords.slice(0, 8).map((keyword: string, i: number) => (
               <span
                 key={i}
-                className="text-xs bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 px-3 py-1 rounded-full border border-slate-200 dark:border-white/10"
+                className="rounded-full border border-border bg-muted px-3 py-1 text-xs text-muted-foreground"
               >
                 {keyword}
               </span>
@@ -274,10 +274,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       )}
 
       {/* RELATED CONTENT GRID */}
-      <div className="max-w-4xl mx-auto px-4 md:px-8 lg:px-12 my-16 pt-12 border-t-2 border-slate-200 dark:border-white/10">
+      <div className="mx-auto my-16 max-w-4xl border-t-2 border-border px-4 pt-12 md:px-8 lg:px-12">
         <div className="mb-8">
-          <p className="text-xs font-bold uppercase tracking-[0.15em] text-[#E2725B] mb-2">DISCOVER MORE</p>
-          <h2 className="text-3xl md:text-4xl font-black font-playfair text-black dark:text-[#F9F6F0]">Related Stories</h2>
+          <p className="mb-2 text-xs font-bold uppercase tracking-[0.15em] text-primary">DISCOVER MORE</p>
+          <h2 className="text-3xl font-black font-playfair text-foreground md:text-4xl">Related Stories</h2>
         </div>
 
         {relatedArticles.length > 0 ? (

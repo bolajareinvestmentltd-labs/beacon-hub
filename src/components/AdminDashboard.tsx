@@ -149,9 +149,9 @@ export default function AdminDashboard() {
           <ShieldCheck size={28} />
         </div>
         <div>
-          <h1 className="text-3xl font-black font-playfair text-black dark:text-[#F9F6F0]">Command Center</h1>
-          <p className="text-slate-500 text-xs mt-1 uppercase tracking-widest font-bold flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse"></span>
+          <h1 className="text-3xl font-black font-playfair text-foreground">Command Center</h1>
+          <p className="mt-1 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            <span className="h-2 w-2 animate-pulse rounded-full bg-accent-secondary"></span>
             Encrypted JCLs Connection
           </p>
         </div>
@@ -161,7 +161,7 @@ export default function AdminDashboard() {
         <div className="admin-panel bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
           <div className="admin-section-heading flex items-center gap-2 text-[#E2725B] mb-6 border-b border-black/5 dark:border-white/5 pb-4">
             <Database size={18} />
-            <h2 className="text-lg font-bold font-playfair text-black dark:text-[#F9F6F0]">Manual Intel Override</h2>
+            <h2 className="text-lg font-bold font-playfair text-foreground">Manual Intel Override</h2>
           </div>
 
           <form
@@ -257,7 +257,7 @@ export default function AdminDashboard() {
         <div className="admin-panel bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
           <div className="admin-section-heading flex items-center gap-2 text-[#E2725B] mb-6 border-b border-black/5 dark:border-white/5 pb-4">
             <LineChart size={18} />
-            <h2 className="text-lg font-bold font-playfair text-black dark:text-[#F9F6F0]">Escrow Asset Deployment</h2>
+            <h2 className="text-lg font-bold font-playfair text-foreground">Escrow Asset Deployment</h2>
           </div>
 
           <form action={dealAction} className="flex flex-col gap-5">
@@ -322,8 +322,8 @@ export default function AdminDashboard() {
       <div className="admin-panel mt-10 max-w-7xl mx-auto bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
         <div className="mb-6 flex items-center justify-between gap-4">
           <div>
-            <h2 className="text-xl font-bold font-playfair text-black dark:text-[#F9F6F0]">Published Article History</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400">
+            <h2 className="text-xl font-bold font-playfair text-foreground">Published Article History</h2>
+            <p className="text-sm text-muted-foreground">
               Review and edit the most recent published articles from the Beacon-Hub command center.
             </p>
           </div>
@@ -420,8 +420,8 @@ export default function AdminDashboard() {
 
       <div className="admin-panel mt-10 max-w-7xl mx-auto bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
         <div className="mb-6">
-          <h2 className="text-xl font-bold font-playfair text-black dark:text-[#F9F6F0]">Escrow Asset History</h2>
-          <p className="text-sm text-slate-500 dark:text-slate-400">Manage marketplace listings separately from editorial articles.</p>
+            <h2 className="text-xl font-bold font-playfair text-foreground">Escrow Asset History</h2>
+          <p className="text-sm text-muted-foreground">Manage marketplace listings separately from editorial articles.</p>
         </div>
         {dealHistoryError ? (
           <p className="text-sm text-red-600">{dealHistoryError}</p>
