@@ -74,25 +74,38 @@ export async function POST(request: Request) {
     const category = String(formData.get("category") || "Top News").trim();
     const content = String(formData.get("content") || "").trim();
     const excerpt = String(formData.get("excerpt") || "").trim();
+    const sanitizedContent = sanitizeServerHTML(content);
     const coverImage = getFileFromFormData(formData, "coverImage");
     const bodyImageFile = getFileFromFormData(formData, "bodyImage");
 
     if (!title || !content || !excerpt) {
-      return NextResponse.json({ error: "Please complete all required fields before publishing." }, { status: 400 });
+      const missingField = !title ? "Headline" : !excerpt ? "Brief Excerpt" : "Full Briefing";
+      return NextResponse.json({ error: `${missingField} is required before publishing.` }, { status: 400 });
     }
 
     const validatedResult = ArticleSchema.safeParse({
       title,
       slug: generateSlug(title),
       category,
-      content: sanitizeServerHTML(content),
+      content: sanitizedContent,
       author: "JCLs Intelligence",
       excerpt,
       coverImage: null,
     });
 
     if (!validatedResult.success) {
-      return NextResponse.json({ error: "Please complete all required fields before publishing." }, { status: 400 });
+      const issue = validatedResult.error.issues[0];
+      const field = issue?.path[0] ? String(issue.path[0]) : "article";
+      const fieldLabels: Record<string, string> = {
+        title: "Headline",
+        content: "Full Briefing",
+        category: "Sector",
+        author: "Author",
+        excerpt: "Brief Excerpt",
+      };
+      return NextResponse.json({
+        error: `${fieldLabels[field] || "Article"}: ${issue?.message || "Invalid value."}`,
+      }, { status: 400 });
     }
 
     if (coverImage && !isValidImageFile(coverImage)) {
@@ -129,7 +142,7 @@ export async function POST(request: Request) {
       }
     }
 
-    const finalContent = bodyImageUrl ? `${sanitizeServerHTML(content)}<p><img src="${bodyImageUrl}" alt="${title}" /></p>` : sanitizeServerHTML(content);
+    const finalContent = bodyImageUrl ? `${sanitizedContent}<p><img src="${bodyImageUrl}" alt="${title}" /></p>` : sanitizedContent;
 
     await runDbOperation(() =>
       db.insert(articles).values({

@@ -39,6 +39,7 @@ export default function AdminDashboard() {
   const [articleFormError, setArticleFormError] = useState<string | null>(null);
   const [selectedCoverName, setSelectedCoverName] = useState<string>("");
   const [selectedBodyName, setSelectedBodyName] = useState<string>("");
+  const [excerptLength, setExcerptLength] = useState(0);
   const [isArticleSubmitting, setIsArticleSubmitting] = useState(false);
   const articleFormRef = useRef<HTMLFormElement | null>(null);
 
@@ -119,6 +120,7 @@ export default function AdminDashboard() {
       form.reset();
       setSelectedCoverName("");
       setSelectedBodyName("");
+      setExcerptLength(0);
 
       const historyResponse = await fetch("/api/admin/articles", {
         credentials: "same-origin",
@@ -222,8 +224,19 @@ export default function AdminDashboard() {
             </div>
 
             <div>
-              <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Brief Excerpt</label>
-              <textarea name="excerpt" title="Article excerpt" rows={2} required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
+              <div className="mb-2 flex items-center justify-between gap-3">
+                <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest block">Brief Excerpt</label>
+                <span className="text-[10px] font-semibold text-slate-500">{excerptLength}/1000</span>
+              </div>
+              <textarea
+                name="excerpt"
+                title="Article excerpt"
+                rows={3}
+                required
+                maxLength={1000}
+                onChange={(event) => setExcerptLength(event.target.value.length)}
+                className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none"
+              />
             </div>
 
             <div>

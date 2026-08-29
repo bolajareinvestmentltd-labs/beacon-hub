@@ -7,7 +7,7 @@ export const ArticleSchema = z.object({
   content: z.string().min(10, 'Content must be at least 10 characters').max(50000, 'Content too long'),
   category: z.string().trim().min(2, 'Category too short').max(100, 'Category too long'),
   author: z.string().min(2, 'Author name too short').max(100, 'Author name too long'),
-  excerpt: z.string().max(500, 'Excerpt too long').optional(),
+  excerpt: z.string().max(1000, 'Excerpt too long').optional(),
   coverImage: z.string().url('Invalid image URL').nullable().optional(),
 });
 
