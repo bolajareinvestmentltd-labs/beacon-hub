@@ -2,42 +2,42 @@
 
 @layer base {
   :root {
-    /* --- JCLS Alabaster (Light Mode - Default) --- */
-    --background: #F7F4EF;
-    --foreground: #111318;
-    --card: #FFFDF9;
-    --border: #D9D4CB;
+    /* --- Beacon Citrus Glass (Light Mode - Default) --- */
+    --background: #F2F7F3;
+    --foreground: #10252B;
+    --card: #FBFEFC;
+    --border: #C8D8D2;
 
     /* Brand Accent */
-    --accent: #E16D52;
+    --accent: #F05D4E;
     --accent-foreground: #FFFFFF;
-    --accent-secondary: #287C7B;
-    --highlight: #F2B66D;
-    --deep-ink: #102A43;
-    --brand-gradient: linear-gradient(120deg, #FF5A4F 0%, #00A7A7 100%);
-    --cool-gradient: linear-gradient(120deg, #00A7A7 0%, #B9E769 100%);
+    --accent-secondary: #007F82;
+    --highlight: #E9B949;
+    --deep-ink: #10252B;
+    --brand-gradient: linear-gradient(118deg, #F05D4E 0%, #E9B949 48%, #007F82 100%);
+    --cool-gradient: linear-gradient(118deg, #007F82 0%, #58B89D 52%, #E9B949 100%);
 
     /* Subtle utility colors */
-    --muted: #EEEAE2;
-    --muted-foreground: #626A70;
+    --muted: #E4EFEB;
+    --muted-foreground: #52696D;
   }
 
   .dark {
-    /* --- JCLS Executive Charcoal (Dark Mode Override) --- */
-    --background: #0D1117;
-    --foreground: #F8F4ED;
-    --card: #151B22;
-    --border: #344049;
+    /* --- Beacon Citrus Glass (Dark Mode Override) --- */
+    --background: #08151A;
+    --foreground: #F8FAEF;
+    --card: #10252B;
+    --border: #2A4A4D;
 
     /* Muted colors adapt for dark background */
-    --muted: #202A31;
-    --muted-foreground: #AEB8BC;
-    --accent: #EF8065;
-    --accent-secondary: #5FC1B5;
-    --highlight: #F4C879;
-    --deep-ink: #102A43;
-    --brand-gradient: linear-gradient(120deg, #FF745F 0%, #3CD6C8 100%);
-    --cool-gradient: linear-gradient(120deg, #3CD6C8 0%, #D1F36B 100%);
+    --muted: #173238;
+    --muted-foreground: #A5C1BF;
+    --accent: #FF755F;
+    --accent-secondary: #63D2C3;
+    --highlight: #FFD166;
+    --deep-ink: #08151A;
+    --brand-gradient: linear-gradient(118deg, #FF755F 0%, #FFD166 48%, #63D2C3 100%);
+    --cool-gradient: linear-gradient(118deg, #63D2C3 0%, #53B7A0 52%, #FFD166 100%);
   }
 }
 
@@ -147,15 +147,34 @@
   }
 
   .admin-command-center {
-    --admin-ink: #fdf7ed;
-    --admin-muted: #aebbc0;
-    --admin-panel: #18232a;
-    --admin-field: #0e171e;
-    --admin-line: rgba(255, 255, 255, .12);
-    --admin-warm: #ff8a65;
-    --admin-gold: #f6c85f;
-    --admin-cool: #61d0c4;
+    --admin-ink: #10252B;
+    --admin-muted: #52696D;
+    --admin-panel: rgba(251, 254, 252, .72);
+    --admin-field: rgba(255, 255, 255, .72);
+    --admin-line: rgba(16, 37, 43, .16);
+    --admin-warm: #E64F43;
+    --admin-gold: #A66D00;
+    --admin-cool: #007F82;
+    --admin-warm-text: #9B3F35;
+    --admin-warm-line: rgba(230, 79, 67, .36);
+    --admin-cool-text: #00696C;
+    --admin-cool-line: rgba(0, 127, 130, .36);
     color: var(--admin-ink);
+  }
+
+  .dark .admin-command-center {
+    --admin-ink: #F8FAEF;
+    --admin-muted: #A5C1BF;
+    --admin-panel: rgba(16, 37, 43, .78);
+    --admin-field: rgba(5, 17, 22, .68);
+    --admin-line: rgba(214, 246, 232, .16);
+    --admin-warm: #FF755F;
+    --admin-gold: #FFD166;
+    --admin-cool: #63D2C3;
+    --admin-warm-text: #F8C2B7;
+    --admin-warm-line: rgba(255, 117, 95, .38);
+    --admin-cool-text: #B9EEE7;
+    --admin-cool-line: rgba(99, 210, 195, .38);
   }
 
   .admin-command-center .admin-page-header {
@@ -168,7 +187,7 @@
   }
 
   .admin-command-center .admin-panel {
-    background: linear-gradient(145deg, rgba(24, 35, 42, .98), rgba(17, 26, 33, .98)) !important;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--admin-panel) 88%, var(--admin-warm)), color-mix(in srgb, var(--admin-panel) 92%, var(--admin-cool))) !important;
     border: 1px solid var(--admin-line) !important;
     box-shadow: 0 20px 50px rgba(0, 0, 0, .2) !important;
   }
@@ -182,16 +201,21 @@
     color: var(--admin-ink) !important;
   }
 
+  .admin-command-center .admin-page-header h1,
+  .admin-command-center .admin-panel h2 {
+    color: var(--admin-ink) !important;
+  }
+
   .admin-command-center .admin-callout {
-    color: #f5d6b8 !important;
-    background: rgba(255, 138, 101, .1) !important;
-    border-color: rgba(255, 138, 101, .28) !important;
+    color: var(--admin-warm-text) !important;
+    background: rgba(230, 79, 67, .1) !important;
+    border-color: var(--admin-warm-line) !important;
   }
 
   .admin-command-center .admin-callout-cool {
-    color: #b9eee7 !important;
-    background: rgba(97, 208, 196, .1) !important;
-    border-color: rgba(97, 208, 196, .28) !important;
+    color: var(--admin-cool-text) !important;
+    background: rgba(0, 127, 130, .1) !important;
+    border-color: var(--admin-cool-line) !important;
   }
 
   .admin-command-center label {
@@ -223,8 +247,8 @@
 
   .admin-command-center input[type="file"] {
     color: var(--admin-muted);
-    background: rgba(97, 208, 196, .07);
-    border: 1px dashed rgba(97, 208, 196, .35);
+    background: rgba(0, 127, 130, .08);
+    border: 1px dashed var(--admin-cool-line);
     padding: .6rem;
   }
 
