@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
-import { publishArticle, publishDeal } from "@/lib/actions";
+import { useActionState, useEffect, useRef, useState } from "react";
+import { publishDeal } from "@/lib/actions";
 import { ShieldCheck, Database, LineChart } from "lucide-react";
 
 type ActionState = {
@@ -37,13 +37,10 @@ export default function AdminDashboard() {
   const [dealHistory, setDealHistory] = useState<DealHistoryItem[]>([]);
   const [dealHistoryError, setDealHistoryError] = useState<string | null>(null);
   const [articleFormError, setArticleFormError] = useState<string | null>(null);
-
-  const [articleState, articleAction, isArticlePending] = useActionState(
-    async (_prevState: ActionState, formData: FormData) => {
-      return await publishArticle(formData);
-    },
-    initialState
-  );
+  const [selectedCoverName, setSelectedCoverName] = useState<string>("");
+  const [selectedBodyName, setSelectedBodyName] = useState<string>("");
+  const [isArticleSubmitting, setIsArticleSubmitting] = useState(false);
+  const articleFormRef = useRef<HTMLFormElement | null>(null);
 
   const [dealState, dealAction, isDealPending] = useActionState(
     async (_prevState: ActionState, formData: FormData) => {
@@ -51,14 +48,6 @@ export default function AdminDashboard() {
     },
     initialState
   );
-
-  useEffect(() => {
-    if (articleState.success && articleState.message) {
-      setToastMessage(articleState.message);
-      const timeout = window.setTimeout(() => setToastMessage(null), 4000);
-      return () => window.clearTimeout(timeout);
-    }
-  }, [articleState]);
 
   useEffect(() => {
     if (dealState.success && dealState.message) {
@@ -96,25 +85,54 @@ export default function AdminDashboard() {
       .catch(() => setDealHistoryError("Unable to load escrow asset history."));
   }, [dealState.success]);
 
-  useEffect(() => {
-    if (!articleState.success) return;
+  async function handleArticleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-    async function refreshHistory() {
-      try {
-        const response = await fetch("/api/admin/articles", {
-          credentials: "same-origin",
-        });
-        if (!response.ok) return;
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+    const title = String(formData.get("title") || "").trim();
+    const excerpt = String(formData.get("excerpt") || "").trim();
+    const content = String(formData.get("content") || "").trim();
 
-        const data = await response.json();
-        setHistory(data.articles || []);
-      } catch {
-        // Keep existing history if refresh fails.
-      }
+    if (!title || !excerpt || !content) {
+      setArticleFormError("Please complete all required fields before publishing.");
+      return;
     }
 
-    refreshHistory();
-  }, [articleState.success]);
+    setArticleFormError(null);
+    setIsArticleSubmitting(true);
+
+    try {
+      const response = await fetch("/api/admin/articles", {
+        method: "POST",
+        body: formData,
+        credentials: "same-origin",
+      });
+
+      const payload = await response.json().catch(() => ({}));
+
+      if (!response.ok) {
+        throw new Error(payload?.error || payload?.message || "Please complete all required fields before publishing.");
+      }
+
+      setToastMessage(payload?.message || "Article published successfully.");
+      form.reset();
+      setSelectedCoverName("");
+      setSelectedBodyName("");
+
+      const historyResponse = await fetch("/api/admin/articles", {
+        credentials: "same-origin",
+      });
+      if (historyResponse.ok) {
+        const data = await historyResponse.json();
+        setHistory(data.articles || []);
+      }
+    } catch (error) {
+      setArticleFormError(error instanceof Error ? error.message : "Please complete all required fields before publishing.");
+    } finally {
+      setIsArticleSubmitting(false);
+    }
+  }
 
   return (
     <div className="w-full max-w-7xl mx-auto py-12 px-4 min-h-screen">
@@ -145,11 +163,10 @@ export default function AdminDashboard() {
           </div>
 
           <form
-            action={articleAction}
+            ref={articleFormRef}
             method="POST"
             encType="multipart/form-data"
-            onSubmit={() => setArticleFormError(null)}
-            onInvalid={() => setArticleFormError("Headline, excerpt, and full briefing are required.")}
+            onSubmit={handleArticleSubmit}
             className="flex flex-col gap-5"
           >
             <div className="rounded-xl border border-[#E2725B]/15 bg-[#E2725B]/5 px-3 py-2 text-xs text-slate-600 dark:text-slate-300">
@@ -176,12 +193,32 @@ export default function AdminDashboard() {
 
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Cover Image</label>
-              <input type="file" name="coverImage" title="Article cover image" accept="image/*" className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#E2725B]/10 file:text-[#E2725B] hover:file:bg-[#E2725B]/20 transition-all cursor-pointer" />
+              <input
+                type="file"
+                name="coverImage"
+                title="Article cover image"
+                accept="image/*"
+                onChange={(event) => setSelectedCoverName(event.target.files?.[0]?.name || "")}
+                className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#E2725B]/10 file:text-[#E2725B] hover:file:bg-[#E2725B]/20 transition-all cursor-pointer"
+              />
+              {selectedCoverName && (
+                <p className="mt-2 text-[11px] text-slate-400">Selected: {selectedCoverName}</p>
+              )}
             </div>
 
             <div>
               <label className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-2 block">Briefing Image</label>
-              <input type="file" name="bodyImage" title="Briefing body image" accept="image/*" className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#E2725B]/10 file:text-[#E2725B] hover:file:bg-[#E2725B]/20 transition-all cursor-pointer" />
+              <input
+                type="file"
+                name="bodyImage"
+                title="Briefing body image"
+                accept="image/*"
+                onChange={(event) => setSelectedBodyName(event.target.files?.[0]?.name || "")}
+                className="w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#E2725B]/10 file:text-[#E2725B] hover:file:bg-[#E2725B]/20 transition-all cursor-pointer"
+              />
+              {selectedBodyName && (
+                <p className="mt-2 text-[11px] text-slate-400">Selected: {selectedBodyName}</p>
+              )}
             </div>
 
             <div>
@@ -194,15 +231,12 @@ export default function AdminDashboard() {
               <textarea name="content" title="Article content" rows={5} required className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-sm focus:border-[#E2725B] outline-none" />
             </div>
 
-            {articleState.message && !articleState.success && (
-              <p className="text-sm text-red-600 dark:text-red-400">{articleState.message}</p>
-            )}
             {articleFormError && (
               <p className="text-sm text-red-600 dark:text-red-400">{articleFormError}</p>
             )}
 
-            <button type="submit" disabled={isArticlePending} className="mt-2 bg-black dark:bg-[#F9F6F0] hover:bg-[#E2725B] dark:hover:bg-[#E2725B] text-white dark:text-black hover:text-white font-black py-4 rounded-md transition-colors duration-300 w-full uppercase tracking-[0.2em] text-[10px] disabled:cursor-not-allowed disabled:opacity-70">
-              {isArticlePending ? "Publishing..." : "Deploy Intelligence"}
+            <button type="submit" disabled={isArticleSubmitting} className="mt-2 bg-black dark:bg-[#F9F6F0] hover:bg-[#E2725B] dark:hover:bg-[#E2725B] text-white dark:text-black hover:text-white font-black py-4 rounded-md transition-colors duration-300 w-full uppercase tracking-[0.2em] text-[10px] disabled:cursor-not-allowed disabled:opacity-70">
+              {isArticleSubmitting ? "Publishing..." : "Deploy Intelligence"}
             </button>
           </form>
         </div>
