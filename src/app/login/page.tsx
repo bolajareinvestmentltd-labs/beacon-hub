@@ -45,8 +45,8 @@ export default function LoginPage() {
               required
               autoFocus
               className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-black dark:text-white focus:outline-none focus:border-[#E2725B] focus:ring-1 focus:ring-[#E2725B] transition-all"
-              placeholder="admin@beacon-hub.local"
-              defaultValue="admin@beacon-hub.local"
+              placeholder={process.env.NODE_ENV === "development" ? "admin@beacon-hub.local" : "Enter admin email"}
+              defaultValue={process.env.NODE_ENV === "development" ? "admin@beacon-hub.local" : ""}
               title="Enter an admin email address"
             />
           </div>
@@ -59,8 +59,8 @@ export default function LoginPage() {
               required
               minLength={8}
               className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-black dark:text-white focus:outline-none focus:border-[#E2725B] focus:ring-1 focus:ring-[#E2725B] transition-all"
-              placeholder="Enter strong password"
-              defaultValue="Admin123456"
+              placeholder="Enter your admin password"
+              defaultValue=""
               title="Password must be at least 8 characters"
             />
           </div>
