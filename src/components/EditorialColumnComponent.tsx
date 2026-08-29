@@ -23,11 +23,11 @@ export default function EditorialColumnComponent({
       <div className="prose-editorial min-w-0 max-w-none mb-8">
           {safeContent ? (
             <div
-              className="text-[1.08rem] sm:text-lg md:text-xl text-slate-800 dark:text-slate-200 leading-[1.85] font-serif"
+              className="text-[1.08rem] leading-[1.85] font-serif text-foreground sm:text-lg md:text-xl"
               dangerouslySetInnerHTML={{ __html: safeContent }}
             />
           ) : (
-            <p className="text-[1.08rem] sm:text-lg md:text-xl text-slate-700 dark:text-slate-300 leading-[1.85] font-serif">
+            <p className="text-[1.08rem] leading-[1.85] font-serif text-foreground sm:text-lg md:text-xl">
               {content || 'This story is being prepared for publication.'}
             </p>
           )}
