@@ -14,7 +14,7 @@ const nextConfig: NextConfig = {
       "img-src 'self' data: blob: https:",
       "font-src 'self' data: https://fonts.googleapis.com https://fonts.gstatic.com https://www.gstatic.com",
       "connect-src 'self' https: wss: https://ep2.adtrafficquality.google",
-      "frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com",
+      "frame-src 'self' https://googleads.g.doubleclick.net https://tpc.googlesyndication.com https://ep2.adtrafficquality.google https://www.google.com",
       "frame-ancestors 'none'",
       "base-uri 'self'",
       "object-src 'none'",
