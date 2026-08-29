@@ -9,6 +9,7 @@ import { sanitizeEmail } from "./sanitize";
 import { sanitizeServerHTML } from "./server-sanitize";
 import { logger } from "./logger";
 import { checkSubscribeLimit } from "./rateLimit";
+import { getRequiredRuntimeValue } from "./runtime-config";
 
 const generateSlug = (title: string) => {
   const slug = title
@@ -25,6 +26,9 @@ const generateSlug = (title: string) => {
 // ========================================================
 export async function publishArticle(formData: FormData) {
   try {
+    getRequiredRuntimeValue("DATABASE_URL");
+    getRequiredRuntimeValue("ADMIN_SESSION_SECRET");
+
     const title = formData.get("title") as string;
     const category = formData.get("category") as string;
     const content = formData.get("content") as string;
@@ -109,10 +113,13 @@ export async function publishArticle(formData: FormData) {
       message: `Article "${validated.title}" published successfully.`,
     };
   } catch (error) {
-    logger.error("Failed to publish article", { error });
+    const runtimeError = error instanceof Error ? error.message : "Unknown runtime error";
+    logger.error("Failed to publish article", { error: runtimeError });
     return {
       success: false,
-      message: "We could not publish the article. Please try again.",
+      message: runtimeError.includes("not configured")
+        ? runtimeError
+        : "We could not publish the article. Please try again.",
     };
   }
 }
