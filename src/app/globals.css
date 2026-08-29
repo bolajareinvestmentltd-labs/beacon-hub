@@ -145,5 +145,131 @@
   .prose-editorial p {
     overflow-wrap: anywhere;
   }
+
+  .admin-command-center {
+    --admin-ink: #fdf7ed;
+    --admin-muted: #aebbc0;
+    --admin-panel: #18232a;
+    --admin-field: #0e171e;
+    --admin-line: rgba(255, 255, 255, .12);
+    --admin-warm: #ff8a65;
+    --admin-gold: #f6c85f;
+    --admin-cool: #61d0c4;
+    color: var(--admin-ink);
+  }
+
+  .admin-command-center .admin-page-header {
+    border-color: var(--admin-line);
+  }
+
+  .admin-command-center .admin-brand-mark {
+    background: linear-gradient(135deg, var(--admin-warm), var(--admin-gold)) !important;
+    box-shadow: 0 10px 28px rgba(255, 138, 101, .2);
+  }
+
+  .admin-command-center .admin-panel {
+    background: linear-gradient(145deg, rgba(24, 35, 42, .98), rgba(17, 26, 33, .98)) !important;
+    border: 1px solid var(--admin-line) !important;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, .2) !important;
+  }
+
+  .admin-command-center .admin-section-heading {
+    color: var(--admin-warm) !important;
+    border-color: var(--admin-line) !important;
+  }
+
+  .admin-command-center .admin-section-heading h2 {
+    color: var(--admin-ink) !important;
+  }
+
+  .admin-command-center .admin-callout {
+    color: #f5d6b8 !important;
+    background: rgba(255, 138, 101, .1) !important;
+    border-color: rgba(255, 138, 101, .28) !important;
+  }
+
+  .admin-command-center .admin-callout-cool {
+    color: #b9eee7 !important;
+    background: rgba(97, 208, 196, .1) !important;
+    border-color: rgba(97, 208, 196, .28) !important;
+  }
+
+  .admin-command-center label {
+    color: var(--admin-gold) !important;
+    letter-spacing: .18em;
+  }
+
+  .admin-command-center input:not([type="file"]),
+  .admin-command-center select,
+  .admin-command-center textarea {
+    color: var(--admin-ink) !important;
+    background: var(--admin-field) !important;
+    border-color: rgba(255, 255, 255, .16) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, .03);
+  }
+
+  .admin-command-center input::placeholder,
+  .admin-command-center textarea::placeholder {
+    color: #819099 !important;
+  }
+
+  .admin-command-center input:not([type="file"]):focus,
+  .admin-command-center select:focus,
+  .admin-command-center textarea:focus {
+    border-color: var(--admin-warm) !important;
+    outline: 2px solid rgba(255, 138, 101, .18);
+    outline-offset: 1px;
+  }
+
+  .admin-command-center input[type="file"] {
+    color: var(--admin-muted);
+    background: rgba(97, 208, 196, .07);
+    border: 1px dashed rgba(97, 208, 196, .35);
+    padding: .6rem;
+  }
+
+  .admin-command-center input[type="file"]::file-selector-button {
+    color: #102126;
+    background: var(--admin-cool);
+    border: 0;
+    border-radius: .35rem;
+    padding: .55rem .8rem;
+    font-weight: 800;
+    cursor: pointer;
+  }
+
+  .admin-command-center form button[type="submit"] {
+    color: #241611 !important;
+    background: linear-gradient(100deg, var(--admin-warm), var(--admin-gold)) !important;
+    box-shadow: 0 10px 24px rgba(255, 138, 101, .16);
+  }
+
+  .admin-command-center form button[type="submit"]:hover {
+    filter: saturate(1.15) brightness(1.08);
+  }
+
+  .admin-command-center table thead {
+    color: var(--admin-gold) !important;
+    border-color: var(--admin-line) !important;
+  }
+
+  .admin-command-center table tbody tr {
+    border-color: rgba(255, 255, 255, .08) !important;
+  }
+
+  .admin-command-center table tbody tr:hover {
+    background: rgba(97, 208, 196, .06) !important;
+  }
+
+  @media (max-width: 640px) {
+    .admin-command-center {
+      padding-top: 2rem;
+    }
+
+    .admin-command-center .admin-panel {
+      padding: 1.25rem;
+      border-radius: 1rem;
+    }
+  }
 }
 

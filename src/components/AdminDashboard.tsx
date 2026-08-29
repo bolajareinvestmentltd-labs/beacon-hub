@@ -135,15 +135,15 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="w-full max-w-7xl mx-auto py-12 px-4 min-h-screen">
+    <div className="admin-command-center w-full max-w-7xl mx-auto py-12 px-4 min-h-screen">
       {toastMessage && (
         <div role="status" aria-live="polite" className="fixed top-24 right-4 z-[100] max-w-[calc(100vw-2rem)] rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700 shadow-lg dark:border-emerald-900/40 dark:bg-emerald-950/80 dark:text-emerald-300">
           {toastMessage}
         </div>
       )}
 
-      <div className="mb-12 border-b border-black/10 dark:border-white/10 pb-8 flex items-center gap-4">
-        <div className="bg-[#E2725B] text-white p-3 rounded-lg">
+      <div className="admin-page-header mb-12 border-b border-black/10 dark:border-white/10 pb-8 flex items-center gap-4">
+        <div className="admin-brand-mark bg-[#E2725B] text-white p-3 rounded-lg">
           <ShieldCheck size={28} />
         </div>
         <div>
@@ -156,8 +156,8 @@ export default function AdminDashboard() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
-          <div className="flex items-center gap-2 text-[#E2725B] mb-6 border-b border-black/5 dark:border-white/5 pb-4">
+        <div className="admin-panel bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
+          <div className="admin-section-heading flex items-center gap-2 text-[#E2725B] mb-6 border-b border-black/5 dark:border-white/5 pb-4">
             <Database size={18} />
             <h2 className="text-lg font-bold font-playfair text-black dark:text-[#F9F6F0]">Manual Intel Override</h2>
           </div>
@@ -169,7 +169,7 @@ export default function AdminDashboard() {
             onSubmit={handleArticleSubmit}
             className="flex flex-col gap-5"
           >
-            <div className="rounded-xl border border-[#E2725B]/15 bg-[#E2725B]/5 px-3 py-2 text-xs text-slate-600 dark:text-slate-300">
+            <div className="admin-callout rounded-xl border border-[#E2725B]/15 bg-[#E2725B]/5 px-3 py-2 text-xs text-slate-600 dark:text-slate-300">
               Publish a fresh editorial brief to the site instantly. Headline, Brief Excerpt, and Full Briefing are required before deployment.
             </div>
             <div>
@@ -241,14 +241,14 @@ export default function AdminDashboard() {
           </form>
         </div>
 
-        <div className="bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
-          <div className="flex items-center gap-2 text-[#E2725B] mb-6 border-b border-black/5 dark:border-white/5 pb-4">
+        <div className="admin-panel bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
+          <div className="admin-section-heading flex items-center gap-2 text-[#E2725B] mb-6 border-b border-black/5 dark:border-white/5 pb-4">
             <LineChart size={18} />
             <h2 className="text-lg font-bold font-playfair text-black dark:text-[#F9F6F0]">Escrow Asset Deployment</h2>
           </div>
 
           <form action={dealAction} className="flex flex-col gap-5">
-            <div className="rounded-xl border border-[#3A7B7A]/15 bg-[#3A7B7A]/5 px-3 py-2 text-xs text-slate-600 dark:text-slate-300">
+            <div className="admin-callout admin-callout-cool rounded-xl border border-[#3A7B7A]/15 bg-[#3A7B7A]/5 px-3 py-2 text-xs text-slate-600 dark:text-slate-300">
               List a new asset or offer for the marketplace network.
             </div>
             <div>
@@ -306,7 +306,7 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <div className="mt-10 max-w-7xl mx-auto bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
+      <div className="admin-panel mt-10 max-w-7xl mx-auto bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
         <div className="mb-6 flex items-center justify-between gap-4">
           <div>
             <h2 className="text-xl font-bold font-playfair text-black dark:text-[#F9F6F0]">Published Article History</h2>
@@ -405,7 +405,7 @@ export default function AdminDashboard() {
         )}
       </div>
 
-      <div className="mt-10 max-w-7xl mx-auto bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
+      <div className="admin-panel mt-10 max-w-7xl mx-auto bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
         <div className="mb-6">
           <h2 className="text-xl font-bold font-playfair text-black dark:text-[#F9F6F0]">Escrow Asset History</h2>
           <p className="text-sm text-slate-500 dark:text-slate-400">Manage marketplace listings separately from editorial articles.</p>
