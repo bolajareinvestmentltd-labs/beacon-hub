@@ -35,15 +35,8 @@ export default function AdSense({
   const PUB_ID = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID?.trim();
   const isValidClientId = Boolean(PUB_ID && !PUB_ID.includes('xxxxxxxx'));
 
-  if (!isValidClientId) {
-    if (typeof window !== 'undefined') {
-      console.warn('[Beacon Hub AdSense] Skipping ad rendering because NEXT_PUBLIC_ADSENSE_PUB_ID is missing or invalid.');
-    }
-    return null;
-  }
-
   useEffect(() => {
-    if (typeof window === 'undefined') return;
+    if (typeof window === 'undefined' || !isValidClientId) return;
 
     let tries = 0;
 
@@ -76,7 +69,14 @@ export default function AdSense({
 
     const timer = setTimeout(pushAd, 150);
     return () => clearTimeout(timer);
-  }, [pathname, adSlot]);
+  }, [pathname, adSlot, isValidClientId]);
+
+  if (!isValidClientId) {
+    if (typeof window !== 'undefined') {
+      console.warn('[Beacon Hub AdSense] Skipping ad rendering because NEXT_PUBLIC_ADSENSE_PUB_ID is missing or invalid.');
+    }
+    return null;
+  }
 
   if (adFailed) return null;
 
