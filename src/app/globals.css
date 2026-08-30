@@ -146,6 +146,24 @@
     overflow-wrap: anywhere;
   }
 
+  .prose-editorial {
+    color: var(--foreground);
+  }
+
+  .prose-editorial > div,
+  .prose-editorial > div p,
+  .prose-editorial > div li {
+    color: var(--foreground) !important;
+  }
+
+  .prose-editorial > div h1,
+  .prose-editorial > div h2,
+  .prose-editorial > div h3,
+  .prose-editorial > div h4,
+  .prose-editorial > div strong {
+    color: var(--foreground) !important;
+  }
+
   .admin-command-center {
     --admin-ink: #10252B;
     --admin-muted: #52696D;
