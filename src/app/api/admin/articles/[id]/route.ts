@@ -33,7 +33,16 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
   try {
     const articleRows = await runDbOperation(() =>
       db
-        .select()
+        .select({
+          id: articles.id,
+          title: articles.title,
+          slug: articles.slug,
+          category: articles.category,
+          excerpt: articles.excerpt,
+          content: articles.content,
+          author: articles.author,
+          coverImage: articles.coverImage,
+        })
         .from(articles)
         .where(eq(articles.id, articleId))
         .limit(1)

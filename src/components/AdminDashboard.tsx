@@ -149,7 +149,8 @@ export default function AdminDashboard() {
           <ShieldCheck size={28} />
         </div>
         <div>
-          <h1 className="text-3xl font-black font-playfair text-foreground">Command Center</h1>
+          <h1 className=this is whats iyts showing cant retrieve or something and thats how it is for the rest of the existing article post. please kindly fix, i need to make the edit immediately
+          "text-3xl font-black font-playfair text-foreground">Command Center</h1>
           <p className="mt-1 flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground">
             <span className="h-2 w-2 animate-pulse rounded-full bg-accent-secondary"></span>
             Encrypted JCLs Connection
