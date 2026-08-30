@@ -44,11 +44,16 @@ export default function EditArticlePage() {
           credentials: "same-origin",
         });
 
+        const payload = await response.json().catch(() => ({}));
         if (!response.ok) {
-          throw new Error("Could not retrieve article details.");
+          const message = payload?.error || `Article request failed with status ${response.status}.`;
+          throw new Error(message);
         }
 
-        const payload = await response.json();
+        if (!payload?.article) {
+          throw new Error("Article details were not returned by the server.");
+        }
+
         setArticle(payload.article);
         setTitle(payload.article.title || "");
         setCategory(payload.article.category || "");
