@@ -9,6 +9,7 @@ import {
   json,
   smallint,
   date,
+  uniqueIndex,
 } from 'drizzle-orm/pg-core';
 
 // ==========================================
@@ -137,6 +138,20 @@ export const contentMetrics = pgTable('content_metrics', {
   lastUpdated: timestamp('last_updated').defaultNow(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+// ==========================================
+// 4d. SITE TRAFFIC (Anonymous daily check-ins)
+// ==========================================
+export const siteTraffic = pgTable('site_traffic', {
+  id: serial('id').primaryKey(),
+  visitorId: varchar('visitor_id', { length: 64 }).notNull(),
+  visitDate: date('visit_date').notNull(),
+  visits: integer('visits').default(1).notNull(),
+  firstPath: text('first_path'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+}, (table) => ({
+  visitorDateIndex: uniqueIndex('site_traffic_visitor_date_idx').on(table.visitorId, table.visitDate),
+}));
 
 // ==========================================
 // 5. SPECIAL DEALS & MARKETPLACE

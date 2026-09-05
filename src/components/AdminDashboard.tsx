@@ -25,6 +25,13 @@ type DealHistoryItem = {
   createdAt: string;
 };
 
+type TrafficSummary = {
+  todayVisitors: number;
+  todayVisits: number;
+  totalVisitors: number;
+  totalVisits: number;
+};
+
 const initialState: ActionState = {
   success: false,
   message: "",
@@ -41,6 +48,8 @@ export default function AdminDashboard() {
   const [selectedBodyName, setSelectedBodyName] = useState<string>("");
   const [excerptLength, setExcerptLength] = useState(0);
   const [isArticleSubmitting, setIsArticleSubmitting] = useState(false);
+  const [traffic, setTraffic] = useState<TrafficSummary | null>(null);
+  const [trafficError, setTrafficError] = useState<string | null>(null);
   const articleFormRef = useRef<HTMLFormElement | null>(null);
 
   const [dealState, dealAction, isDealPending] = useActionState(
@@ -85,6 +94,13 @@ export default function AdminDashboard() {
       .then((data) => setDealHistory(data.deals || []))
       .catch(() => setDealHistoryError("Unable to load escrow asset history."));
   }, [dealState.success]);
+
+  useEffect(() => {
+    fetch('/api/admin/traffic', { credentials: 'same-origin' })
+      .then((response) => response.ok ? response.json() : Promise.reject())
+      .then((data) => setTraffic(data))
+      .catch(() => setTrafficError('Traffic data is unavailable.'));
+  }, []);
 
   async function handleArticleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -318,6 +334,36 @@ export default function AdminDashboard() {
           </form>
         </div>
       </div>
+
+      <section className="admin-panel mt-10 rounded-2xl border p-6 shadow-xl md:p-8" aria-labelledby="traffic-heading">
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-accent-secondary">Audience signal</p>
+            <h2 id="traffic-heading" className="mt-1 text-xl font-bold font-playfair text-foreground">Site Traffic</h2>
+          </div>
+          <p className="text-xs text-muted-foreground">Anonymous first-party check-ins</p>
+        </div>
+        {trafficError ? (
+          <p className="text-sm text-red-600 dark:text-red-300">{trafficError}</p>
+        ) : traffic ? (
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
+            {[
+              ['Today', traffic.todayVisitors, 'visitors'],
+              ['Today views', traffic.todayVisits, 'page visits'],
+              ['All-time', traffic.totalVisitors, 'unique visitors'],
+              ['All-time views', traffic.totalVisits, 'page visits'],
+            ].map(([label, value, detail]) => (
+              <div key={String(label)} className="rounded-xl border border-border bg-muted/60 p-4">
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">{label}</p>
+                <p className="mt-2 text-2xl font-black text-foreground">{Number(value).toLocaleString()}</p>
+                <p className="mt-1 text-xs text-muted-foreground">{detail}</p>
+              </div>
+            ))}
+          </div>
+        ) : (
+          <p className="text-sm text-muted-foreground">Loading traffic data...</p>
+        )}
+      </section>
 
       <div className="admin-panel mt-10 max-w-7xl mx-auto bg-white dark:bg-[#1C1C1E] border border-black/10 dark:border-white/10 rounded-2xl p-6 md:p-8 shadow-xl">
         <div className="mb-6 flex items-center justify-between gap-4">

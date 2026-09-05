@@ -5,7 +5,41 @@ import * as queries from '@/lib/queries';
 import QuoteCard from '@/components/QuoteCard';
 import RelatedContentGrid from '@/components/RelatedContentGrid';
 import LiveClock from '@/components/LiveClock';
-import { getEditorialSections } from '@/lib/queries';
+import type { Metadata } from 'next';
+import { getArticles, getEditorialSections } from '@/lib/queries';
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.startsWith('https://')
+  ? process.env.NEXT_PUBLIC_SITE_URL
+  : 'https://www.beacon-hub.com.ng';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const fallbackImage = new URL('/logo.png', siteUrl).toString();
+  const latestArticle = (await getArticles(1))[0];
+  const title = latestArticle?.title
+    ? `${latestArticle.title} | Beacon Hub`
+    : 'Beacon Hub - Premium News Platform';
+  const description = latestArticle?.excerpt || 'World-class news journalism with premium editorial design';
+  const image = latestArticle?.coverImage || fallbackImage;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      url: siteUrl,
+      siteName: 'Beacon Hub',
+      type: 'website',
+      images: [{ url: image, width: 1200, height: 630, alt: title }],
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
 
 type ArticleLike = {
   id?: number;

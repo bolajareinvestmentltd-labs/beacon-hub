@@ -15,6 +15,13 @@
       "when": 1781968934738,
       "tag": "0001_lush_shooting_star",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1782345600000,
+      "tag": "0002_site_traffic",
+      "breakpoints": true
     }
   ]
 }
