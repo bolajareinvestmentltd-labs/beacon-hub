@@ -75,6 +75,25 @@
     color: transparent;
   }
 
+  .site-navbar,
+  .site-navbar a,
+  .site-navbar button {
+    color-scheme: light;
+  }
+
+  .site-navbar {
+    color: var(--foreground);
+  }
+
+  .site-navbar > div:last-child a {
+    color: var(--muted-foreground);
+  }
+
+  .site-navbar > div:last-child a[aria-current="page"],
+  .site-navbar > div:last-child a:hover {
+    color: var(--foreground);
+  }
+
   /* Keep older page utilities visually aligned with the new token system. */
   [class*="text-[#E2725B]"], [class*="text-[#C85A32]"], [class*="text-[#9C4A3A]"] {
     color: var(--accent) !important;
