@@ -97,9 +97,15 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     fetch('/api/admin/traffic', { credentials: 'same-origin' })
-      .then((response) => response.ok ? response.json() : Promise.reject())
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data?.error || `Traffic request failed with status ${response.status}.`);
+        }
+        return data;
+      })
       .then((data) => setTraffic(data))
-      .catch(() => setTrafficError('Traffic data is unavailable.'));
+      .catch((error) => setTrafficError(error instanceof Error ? error.message : 'Traffic data is unavailable.'));
   }, []);
 
   async function handleArticleSubmit(event: React.FormEvent<HTMLFormElement>) {

@@ -113,20 +113,21 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
     notFound();
   }
 
+  const articleRecord = article as Record<string, unknown>;
   const articleData = {
     id: Number(article.id),
     slug: String(article.slug || resolvedParams.slug),
     title: String(article.title || 'Article'),
     content: String(article.content || ''),
-    authorPerspective: article.authorPerspective ? String(article.authorPerspective) : undefined,
+    authorPerspective: articleRecord.authorPerspective ? String(articleRecord.authorPerspective) : undefined,
     author: article.author ? String(article.author) : undefined,
     publishedAt: article.publishedAt ? new Date(article.publishedAt) : new Date(),
     excerpt: article.excerpt ? String(article.excerpt) : undefined,
-    metaDescription: article.metaDescription ? String(article.metaDescription) : undefined,
+    metaDescription: articleRecord.metaDescription ? String(articleRecord.metaDescription) : undefined,
     coverImage: article.coverImage ? String(article.coverImage) : undefined,
     category: article.category ? String(article.category) : 'General',
-    wordCount: typeof article.wordCount === 'number' ? article.wordCount : undefined,
-    seoKeywords: Array.isArray(article.seoKeywords) ? article.seoKeywords : [],
+    wordCount: typeof articleRecord.wordCount === 'number' ? articleRecord.wordCount : undefined,
+    seoKeywords: Array.isArray(articleRecord.seoKeywords) ? articleRecord.seoKeywords : [],
   };
 
   // Increment view count (fire and forget)
