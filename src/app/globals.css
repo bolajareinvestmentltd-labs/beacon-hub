@@ -22,23 +22,6 @@
     --muted-foreground: #52696D;
   }
 
-  .dark {
-    /* --- Beacon Citrus Glass (Dark Mode Override) --- */
-    --background: #08151A;
-    --foreground: #F8FAEF;
-    --card: #10252B;
-    --border: #2A4A4D;
-
-    /* Muted colors adapt for dark background */
-    --muted: #173238;
-    --muted-foreground: #A5C1BF;
-    --accent: #FF755F;
-    --accent-secondary: #63D2C3;
-    --highlight: #FFD166;
-    --deep-ink: #08151A;
-    --brand-gradient: linear-gradient(118deg, #FF755F 0%, #FFD166 48%, #63D2C3 100%);
-    --cool-gradient: linear-gradient(118deg, #63D2C3 0%, #53B7A0 52%, #FFD166 100%);
-  }
 }
 
 @layer base {
@@ -61,7 +44,7 @@
   }
 
   html {
-    color-scheme: dark light;
+    color-scheme: light;
   }
 
   @media (display-mode: standalone) {
@@ -180,20 +163,6 @@
     color: var(--admin-ink);
   }
 
-  .dark .admin-command-center {
-    --admin-ink: #F8FAEF;
-    --admin-muted: #A5C1BF;
-    --admin-panel: rgba(16, 37, 43, .78);
-    --admin-field: rgba(5, 17, 22, .68);
-    --admin-line: rgba(214, 246, 232, .16);
-    --admin-warm: #FF755F;
-    --admin-gold: #FFD166;
-    --admin-cool: #63D2C3;
-    --admin-warm-text: #F8C2B7;
-    --admin-warm-line: rgba(255, 117, 95, .38);
-    --admin-cool-text: #B9EEE7;
-    --admin-cool-line: rgba(99, 210, 195, .38);
-  }
 
   .admin-command-center .admin-page-header {
     border-color: var(--admin-line);

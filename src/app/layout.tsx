@@ -27,7 +27,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#0B0B0B',
+  themeColor: '#F2F7F3',
   viewportFit: 'cover',
 };
 
@@ -74,7 +74,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           ></script>
         )}
 
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
+        <ThemeProvider attribute="class" forcedTheme="light" defaultTheme="light" enableSystem={false}>
           <BrandSplash />
           <Navbar />
           <main className="w-full max-w-screen-xl mx-auto flex-1 overflow-x-hidden px-4 pt-[112px] sm:px-6 lg:px-8">{children}</main>

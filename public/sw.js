@@ -1,4 +1,4 @@
-const CACHE_NAME = 'beacon-hub-shell-v1';
+const CACHE_NAME = 'beacon-hub-shell-v2-light';
 const OFFLINE_URL = '/offline.html';
 const SHELL_ASSETS = [
   '/',

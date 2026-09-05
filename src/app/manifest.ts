@@ -12,8 +12,8 @@ export default function manifest(): MetadataRoute.Manifest {
     display_override: ['window-controls-overlay', 'standalone', 'browser'],
     orientation: 'portrait-primary',
     categories: ['news', 'lifestyle', 'productivity'],
-    background_color: '#0B0B0B',
-    theme_color: '#0B0B0B',
+    background_color: '#F2F7F3',
+    theme_color: '#F2F7F3',
     icons: [
       { src: '/logo-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
       { src: '/logo-192.png', sizes: '192x192', type: 'image/png', purpose: 'maskable' },
