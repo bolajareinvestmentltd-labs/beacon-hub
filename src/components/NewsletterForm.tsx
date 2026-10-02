@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { subscribeToNetwork } from "@/lib/email-actions";
+import { subscribeUser } from "@/lib/actions";
 import { Mail, ArrowRight } from "lucide-react";
 
 export default function NewsletterForm() {
@@ -10,14 +10,14 @@ export default function NewsletterForm() {
 
   async function handleAction(formData: FormData) {
     setStatus("loading");
-    const result = await subscribeToNetwork(formData);
+    const result = await subscribeUser(formData);
     
     if (result.error) {
       setStatus("error");
       setMessage(result.error);
     } else if (result.success) {
       setStatus("success");
-      setMessage(result.success);
+      setMessage("You are subscribed to Beacon Hub news updates.");
     }
   }
 

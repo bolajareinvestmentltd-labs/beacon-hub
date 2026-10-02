@@ -9,6 +9,7 @@ import { getReadingTimeString } from "@/lib/readingTime";
 import { ChevronLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
+import ReaderEngagement from "@/components/ReaderEngagement";
 
 const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 const siteUrl = configuredSiteUrl?.startsWith("https://")
@@ -17,12 +18,12 @@ const siteUrl = configuredSiteUrl?.startsWith("https://")
 const siteName = "Beacon Hub";
 const fallbackImageUrl = new URL("/logo.png", siteUrl).toString();
 
-function toAbsoluteUrl(value: string | undefined, fallback: string) {
+function toAbsoluteHttpsUrl(value: string | undefined, fallback: string) {
   if (!value) return fallback;
 
   try {
     const url = new URL(value, siteUrl);
-    return url.protocol === "http:" || url.protocol === "https:" ? url.toString() : fallback;
+    return url.protocol === "https:" ? url.toString() : fallback;
   } catch {
     return fallback;
   }
@@ -73,7 +74,7 @@ export async function generateMetadata({
   const description = truncateDescription(
     String(article.metaDescription || article.excerpt || "Read the latest story from Beacon Hub.")
   );
-  const imageUrl = toAbsoluteUrl(article.coverImage ? String(article.coverImage) : undefined, fallbackImageUrl);
+  const imageUrl = toAbsoluteHttpsUrl(article.coverImage ? String(article.coverImage) : undefined, fallbackImageUrl);
   const author = article.author ? String(article.author) : "Beacon Hub Editorial Board";
 
   // Keep shared preview images under 300 KB; JPEG and PNG are the most reliable formats for WhatsApp.
@@ -146,6 +147,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   // Calculate reading time from content
   const readingTime = getReadingTimeString(articleData.content);
+  const featuredImageUrl = toAbsoluteHttpsUrl(articleData.coverImage, fallbackImageUrl);
 
   return (
     <div className="w-full min-w-0 overflow-x-hidden bg-gradient-to-b from-background via-muted to-background pb-24 text-foreground md:pb-0">
@@ -211,18 +213,19 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         </div>
 
         {/* Featured Image */}
-        {articleData.coverImage && (
-          <div className="my-12 md:my-16">
+        <div className="my-8 w-full sm:my-12 md:my-16">
+          <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-muted shadow-xl">
             <Image
-              src={articleData.coverImage}
+              src={featuredImageUrl}
               alt={articleData.title}
-              width={1200}
-              height={630}
+              fill
+              sizes="(max-width: 768px) calc(100vw - 2.5rem), 896px"
               unoptimized
-              className="w-full h-auto max-h-96 md:max-h-[500px] object-cover rounded-2xl shadow-2xl"
+              loading="eager"
+              className="object-cover object-center"
             />
           </div>
-        )}
+        </div>
       </div>
 
       {/* ARTICLE CONTENT */}
@@ -235,6 +238,8 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
           />
         </div>
       </div>
+
+      <ReaderEngagement articleId={articleData.id} />
 
       {/* MID-STORY INTERSTITIAL AD */}
       <div className="max-w-4xl mx-auto px-4 md:px-8 lg:px-12 my-16">
@@ -284,7 +289,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         {relatedArticles.length > 0 ? (
           <RelatedContentGrid articles={relatedArticles} limit={6} />
         ) : (
-          <p className="text-slate-500 dark:text-slate-400 text-sm">
+          <p className="text-muted-foreground text-sm">
             No related articles at this time.{' '}
             <Link href="/" className="text-[#E2725B] font-bold hover:underline">
               Return to home
@@ -295,11 +300,11 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       </div>
 
       {/* FOOTER CTA */}
-      <div className="max-w-4xl mx-auto px-4 md:px-8 lg:px-12 my-16 py-16 text-center border-t-2 border-slate-200 dark:border-white/10">
-        <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">Want more premium intelligence?</p>
+      <div className="max-w-4xl mx-auto px-4 md:px-8 lg:px-12 my-16 py-16 text-center border-t-2 border-border">
+        <p className="text-sm text-muted-foreground mb-4">Want more premium intelligence?</p>
         <Link
           href="/"
-          className="inline-block px-8 py-3 bg-[#E2725B] text-white font-bold uppercase tracking-wider rounded-lg hover:bg-[#E2725B]/90 transition-all duration-300"
+          className="inline-block px-8 py-3 bg-[#E2725B] text-accent-foreground font-bold uppercase tracking-wider rounded-lg hover:bg-[#E2725B]/90 transition-all duration-300"
         >
           Back to Beacon Hub
         </Link>

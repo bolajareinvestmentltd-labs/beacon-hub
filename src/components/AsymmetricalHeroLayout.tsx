@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ReactNode } from 'react';
+import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
+import { ReactNode, useEffect, useRef, useState } from 'react';
 
 interface HeroArticle {
   id: number;
@@ -46,6 +47,42 @@ export default function AsymmetricalHeroLayout({
   logoAlt = 'Beacon Hub logo',
 }: AsymmetricalHeroLayoutProps) {
   const story = article || heroArticle || null;
+  const carouselRef = useRef<HTMLDivElement>(null);
+  const [activeSlide, setActiveSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+  const slideCount = story ? feedArticles.length + 1 : 0;
+
+  function goToSlide(index: number) {
+    const carousel = carouselRef.current;
+    const slide = carousel?.querySelector<HTMLElement>(`[data-carousel-slide="${index}"]`);
+    if (!carousel || !slide) return;
+
+    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const left = carousel.scrollLeft + slide.getBoundingClientRect().left - carousel.getBoundingClientRect().left;
+    carousel.scrollTo({ left, behavior: reducedMotion ? 'auto' : 'smooth' });
+    setActiveSlide(index);
+  }
+
+  useEffect(() => {
+    if (isPaused || isHovered || isFocused || slideCount < 2) return;
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    const timer = window.setInterval(() => {
+      const nextSlide = (activeSlide + 1) % slideCount;
+      const carousel = carouselRef.current;
+      const slide = carousel?.querySelector<HTMLElement>(`[data-carousel-slide="${nextSlide}"]`);
+
+      if (carousel && slide) {
+        const left = carousel.scrollLeft + slide.getBoundingClientRect().left - carousel.getBoundingClientRect().left;
+        carousel.scrollTo({ left, behavior: 'smooth' });
+        setActiveSlide(nextSlide);
+      }
+    }, 6500);
+
+    return () => window.clearInterval(timer);
+  }, [activeSlide, isFocused, isHovered, isPaused, slideCount]);
 
   const timeAgo = (date?: Date) => {
     if (!date) return '';
@@ -99,9 +136,31 @@ export default function AsymmetricalHeroLayout({
       <div className="grid grid-cols-1 gap-5 md:gap-8 lg:grid-cols-[1.7fr_0.8fr] xl:grid-cols-3 xl:gap-10 w-full">
         <div className="lg:col-span-1 xl:col-span-2">
           {story ? (
-            <div className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden" aria-label="Featured stories">
+            <div
+              ref={carouselRef}
+              className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
+              aria-label="Featured stories"
+              onMouseEnter={() => setIsHovered(true)}
+              onMouseLeave={() => setIsHovered(false)}
+              onFocusCapture={() => setIsFocused(true)}
+              onBlurCapture={(event) => {
+                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsFocused(false);
+              }}
+              onScroll={(event) => {
+                const carousel = event.currentTarget;
+                const slides = Array.from(carousel.querySelectorAll<HTMLElement>('[data-carousel-slide]'));
+                const nextActive = slides.reduce((nearestIndex, slide, index) => {
+                  const nearest = slides[nearestIndex];
+                  return Math.abs(slide.getBoundingClientRect().left - carousel.getBoundingClientRect().left) <
+                    Math.abs(nearest.getBoundingClientRect().left - carousel.getBoundingClientRect().left)
+                    ? index
+                    : nearestIndex;
+                }, 0);
+                setActiveSlide(nextActive);
+              }}
+            >
               {[story, ...feedArticles].map((item, index) => (
-                <article key={`${item.id}-${item.slug}`} className="w-full min-w-full snap-start rounded-[2rem] border border-border/80 bg-surface p-4 shadow-[0_18px_80px_-48px_rgba(15,23,42,0.3)] sm:p-6 md:p-8">
+                <article key={`${item.id}-${item.slug}`} data-carousel-slide={index} className="group w-full min-w-full snap-start rounded-[2rem] border border-border/80 bg-surface p-4 shadow-[0_18px_80px_-48px_rgba(15,23,42,0.3)] sm:p-6 md:p-8">
                   <div className="mb-4 flex flex-wrap items-center gap-3 sm:mb-6">
                     <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-widest text-white shadow-sm">
                       {item.isSponsored ? 'Sponsored' : index === 0 ? 'Latest Briefing' : 'Featured Story'}
@@ -150,6 +209,33 @@ export default function AsymmetricalHeroLayout({
               <div className="h-10 bg-muted rounded w-3/4 mb-4" />
               <div className="h-4 bg-muted rounded w-full mb-2" />
               <div className="h-4 bg-muted rounded w-2/3" />
+            </div>
+          )}
+          {slideCount > 1 && (
+            <div className="mt-3 flex items-center justify-between gap-3" aria-label="Featured story controls">
+              <div className="flex items-center gap-1.5" aria-label={`Slide ${activeSlide + 1} of ${slideCount}`}>
+                {Array.from({ length: slideCount }, (_, index) => (
+                  <button
+                    key={index}
+                    type="button"
+                    aria-label={`Show featured story ${index + 1}`}
+                    aria-current={activeSlide === index ? 'true' : undefined}
+                    onClick={() => goToSlide(index)}
+                    className={`h-2 rounded-full transition-all ${activeSlide === index ? 'w-6 bg-primary' : 'w-2 bg-border hover:bg-primary/60'}`}
+                  />
+                ))}
+              </div>
+              <div className="flex items-center gap-1">
+                <button type="button" onClick={() => goToSlide((activeSlide - 1 + slideCount) % slideCount)} aria-label="Previous featured story" className="rounded-full border border-border p-2 text-foreground transition-colors hover:bg-muted">
+                  <ChevronLeft size={16} />
+                </button>
+                <button type="button" onClick={() => goToSlide((activeSlide + 1) % slideCount)} aria-label="Next featured story" className="rounded-full border border-border p-2 text-foreground transition-colors hover:bg-muted">
+                  <ChevronRight size={16} />
+                </button>
+                <button type="button" onClick={() => setIsPaused((paused) => !paused)} aria-label={isPaused ? 'Resume carousel' : 'Pause carousel'} className="rounded-full border border-border p-2 text-foreground transition-colors hover:bg-muted">
+                  {isPaused ? <Play size={15} /> : <Pause size={15} />}
+                </button>
+              </div>
             </div>
           )}
         </div>

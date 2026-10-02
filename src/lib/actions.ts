@@ -242,9 +242,12 @@ export async function subscribeUser(formData: FormData) {
       return { error: "Too many subscriptions. Please try again later." };
     }
 
-    await db.insert(subscribers).values({ email: sanitizedEmail });
+    await db.insert(subscribers).values({ email: sanitizedEmail, unsubscribedAt: null }).onConflictDoUpdate({
+      target: subscribers.email,
+      set: { unsubscribedAt: null },
+    });
 
-    logger.info("User subscribed", { email: sanitizedEmail });
+    logger.info("User subscribed or reactivated", { email: sanitizedEmail });
     return { success: true };
   } catch (error: any) {
     // Handle duplicate email error

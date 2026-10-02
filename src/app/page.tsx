@@ -6,7 +6,8 @@ import QuoteCard from '@/components/QuoteCard';
 import RelatedContentGrid from '@/components/RelatedContentGrid';
 import LiveClock from '@/components/LiveClock';
 import type { Metadata } from 'next';
-import { getArticles, getEditorialSections } from '@/lib/queries';
+import { getArticles, getArticlesByCategory, getEditorialSections } from '@/lib/queries';
+import { TAXONOMY } from '@/config/taxonomy';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.startsWith('https://')
   ? process.env.NEXT_PUBLIC_SITE_URL
@@ -95,6 +96,14 @@ export default async function HomePage() {
 
   const latest = sortByNewest(articles).slice(0, 18);
   const editorialSections = await getEditorialSections();
+  const categoryFeeds = await Promise.all(
+    TAXONOMY.primary
+      .filter((section) => section.href.startsWith('/category/'))
+      .map(async (section) => ({
+        ...section,
+        articles: await getArticlesByCategory(section.href.split('/').pop() || '', 4),
+      }))
+  );
 
   const heroArticle = latest[0]
     ? {
@@ -190,6 +199,45 @@ export default async function HomePage() {
               </div>
             ))}
           </div>
+        </div>
+
+        <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-14">
+          {categoryFeeds.map((section) => (
+            <section key={section.href} className="border-t border-border/80 py-7 sm:py-9">
+              <div className="mb-5 flex items-end justify-between gap-4">
+                <div>
+                  <p className="font-mono text-[10px] text-[#E2725B]">LIVE DESK</p>
+                  <h2 className="mt-1 text-2xl font-black text-foreground sm:text-3xl">{section.name}</h2>
+                </div>
+                <Link href={section.href} className="shrink-0 text-xs font-bold text-[#E2725B] hover:underline">
+                  All {section.name}
+                </Link>
+              </div>
+              {section.articles.length > 0 ? (
+                <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                  {section.articles.map((article) => (
+                    <Link key={article.id} href={`/read/${article.slug}`} className="group min-w-0 border-b border-border/70 pb-4">
+                      <div className="relative mb-3 aspect-video w-full overflow-hidden rounded-lg bg-muted">
+                        <img
+                          src={article.coverImage || '/logo.png'}
+                          alt=""
+                          loading="lazy"
+                          className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                      <p className="mb-1 font-mono text-[9px] text-muted-foreground">{article.category}</p>
+                      <h3 className="line-clamp-3 text-base font-bold leading-snug text-foreground transition-colors group-hover:text-primary">
+                        {article.title}
+                      </h3>
+                      <p className="mt-2 line-clamp-2 text-xs leading-5 text-muted-foreground">{article.excerpt}</p>
+                    </Link>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">This desk is warming up. New headlines arrive with the next feed update.</p>
+              )}
+            </section>
+          ))}
         </div>
 
         <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-14">

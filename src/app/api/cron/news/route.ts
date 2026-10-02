@@ -1,13 +1,27 @@
 import { NextResponse } from "next/server";
 import { persistIncomingArticles } from '@/lib/news-sync';
 import { isAuthorizedCronRequest } from '@/lib/cron';
+import { sendNewsDigest } from '@/lib/newsletter';
 
 export const maxDuration = 60;
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
 const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
-const NEWS_CATEGORIES = ['Global News', 'Tech & Startups', 'Elections 2027'] as const;
+const NEWS_FEEDS = [
+  { category: 'Global News', query: 'world news Nigeria' },
+  { category: 'Tech & Startups', query: 'technology startups artificial intelligence' },
+  { category: 'Elections 2027', query: 'Nigeria politics election government' },
+  { category: 'Business & Finance', query: 'Nigeria business finance markets' },
+  { category: 'Sports', query: 'Nigeria sports football' },
+  { category: 'Entertainment', query: 'Nigeria entertainment film music' },
+  { category: 'Real Estate', query: 'Nigeria real estate property' },
+  { category: 'Health', query: 'Nigeria health healthcare medicine' },
+  { category: 'Education', query: 'Nigeria education universities' },
+  { category: 'Science & AI', query: 'science research artificial intelligence' },
+  { category: 'Climate & Energy', query: 'Nigeria climate energy environment' },
+  { category: 'Nigeria News', query: 'Nigeria latest news' },
+] as const;
 
 type GNewsArticle = {
   title?: unknown;
@@ -29,69 +43,70 @@ function slugify(value: string) {
     .slice(0, 240);
 }
 
-function classifyNews(title: string, description: string) {
-  const searchableText = `${title} ${description}`.toLowerCase();
-
-  if (/election|politic|government|senate|president|governor|party/.test(searchableText)) {
-    return 'Elections 2027';
-  }
-
-  if (/tech|startup|software|artificial intelligence|digital|cyber|innovation/.test(searchableText)) {
-    return 'Tech & Startups';
-  }
-
-  return 'Global News';
-}
-
 async function fetchNewsFromGNews() {
   if (!GNEWS_API_KEY) {
     return [];
   }
 
-  const query = encodeURIComponent('Elections 2027 OR Global News OR Tech & Startups');
-  const url = `https://gnews.io/api/v4/search?q=${query}&lang=en&max=10&sortby=publishedAt&token=${GNEWS_API_KEY}`;
+  const collected: ReturnType<typeof normalizeGNewsArticle>[] = [];
+  const failures: string[] = [];
 
-  const response = await fetch(url, { method: 'GET' });
-  const text = await response.text();
+  for (const feed of NEWS_FEEDS) {
+    const query = new URLSearchParams({
+      q: feed.query,
+      lang: 'en',
+      max: '3',
+      sortby: 'publishedAt',
+      token: GNEWS_API_KEY,
+    });
+    const response = await fetch(`https://gnews.io/api/v4/search?${query}`, { method: 'GET' });
+    const text = await response.text();
+    let data: { articles?: GNewsArticle[]; message?: string };
 
-  let data: { articles?: GNewsArticle[]; message?: string };
-  try {
-    data = JSON.parse(text);
-  } catch (parseError) {
-    throw new Error(`GNews returned invalid JSON: ${(parseError as Error).message}`);
+    try {
+      data = JSON.parse(text);
+    } catch (parseError) {
+      failures.push(`${feed.category}: invalid GNews JSON (${(parseError as Error).message})`);
+      continue;
+    }
+
+    if (!response.ok || !Array.isArray(data.articles)) {
+      failures.push(`${feed.category}: ${data?.message || `GNews status ${response.status}`}`);
+      continue;
+    }
+
+    collected.push(...data.articles.map((article, index) => normalizeGNewsArticle(article, feed.category, index)));
   }
 
-  if (!response.ok) {
-    const message = data?.message || `GNews request failed with status ${response.status}`;
-    throw new Error(message);
+  if (!collected.length && failures.length) {
+    throw new Error(failures.join('; '));
   }
 
-  if (!Array.isArray(data.articles)) {
-    throw new Error('GNews returned an unexpected response shape.');
+  if (failures.length) {
+    console.warn('Some category feeds failed:', failures);
   }
 
-  return data.articles.map((article, index: number) => {
-    const title = String(article.title || `News item ${index + 1}`).trim();
-    const description = String(article.description || '').trim();
-    const content = String(article.content || description || title).trim();
-    const category = classifyNews(title, description);
-    const articleUrl = typeof article.url === 'string' ? article.url : '';
-    const slugCandidate = articleUrl ? slugify(`${articleUrl}-${title}`) : slugify(title);
+  return collected;
+}
 
-    return {
-      title,
-      category,
-      slug: slugCandidate,
-      image_url: typeof article.image === 'string' ? article.image : null,
-      excerpt: description || content.slice(0, 220),
-      content: `${content}
+function normalizeGNewsArticle(article: GNewsArticle, category: string, index: number) {
+  const title = String(article.title || `News item ${index + 1}`).trim();
+  const description = String(article.description || '').trim();
+  const content = String(article.content || description || title).trim();
+  const articleUrl = typeof article.url === 'string' ? article.url : '';
+  const slugCandidate = articleUrl ? slugify(`${articleUrl}-${title}`) : slugify(title);
 
-    Source: ${category}${articleUrl ? `\nRead more: ${articleUrl}` : ''}`,
-      author: typeof article.author === 'string' ? article.author.trim() : category,
-      source: typeof article.source?.name === 'string' ? article.source.name.trim() : 'GNews',
-      published_at: typeof article.publishedAt === 'string' ? article.publishedAt : new Date().toISOString(),
-    };
-  });
+  return {
+    title,
+    category,
+    slug: slugCandidate,
+    image_url: typeof article.image === 'string' ? article.image : null,
+    excerpt: description || content.slice(0, 220),
+    content: `${content}\n\nSource: ${category}${articleUrl ? `\nRead more: ${articleUrl}` : ''}`,
+    author: typeof article.author === 'string' ? article.author.trim() : category,
+    source: typeof article.source?.name === 'string' ? article.source.name.trim() : 'GNews',
+    published_at: typeof article.publishedAt === 'string' ? article.publishedAt : new Date().toISOString(),
+  };
 }
 
 async function fetchNewsFromGemini() {
@@ -99,7 +114,7 @@ async function fetchNewsFromGemini() {
     throw new Error("Missing Gemini API Key");
   }
 
-  const prompt = `You are the Senior Editor for Beacon Hub. Generate 2 original editorial news articles across these categories only: ${NEWS_CATEGORIES.join(', ')}. Return strictly as a JSON array with the keys title, category, slug, image_url, content, excerpt, metaDescription, author, and source. Use null for image_url unless you can provide a real, publicly accessible HTTPS JPEG or PNG URL. The content must contain at least 4 detailed paragraphs, and metaDescription must be 50-160 characters. Keep the tone objective and analytical.`;
+  const prompt = `You are the Senior Editor for Beacon Hub. Generate 2 original editorial news articles across these categories only: ${NEWS_FEEDS.map((feed) => feed.category).join(', ')}. Return strictly as a JSON array with the keys title, category, slug, image_url, content, excerpt, metaDescription, author, and source. Use null for image_url unless you can provide a real, publicly accessible HTTPS JPEG or PNG URL. The content must contain at least 4 detailed paragraphs, and metaDescription must be 50-160 characters. Keep the tone objective and analytical.`;
 
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
@@ -179,12 +194,23 @@ export async function GET(req: Request) {
     }
 
     const result = await persistIncomingArticles(articles);
+    let emailDigest = { sent: 0, failed: 0 };
+
+    if (result.inserted.length > 0) {
+      try {
+        emailDigest = await sendNewsDigest(result.inserted);
+      } catch (error) {
+        console.error('News published, but subscriber digest delivery failed:', error);
+        emailDigest.failed = 1;
+      }
+    }
 
     return NextResponse.json({
       success: true,
       source,
       inserted: result.inserted.length,
       skipped: result.skipped.length,
+      emailDigest,
       message: `${source} intelligence deployed successfully.`,
     });
   } catch (error) {

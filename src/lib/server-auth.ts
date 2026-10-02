@@ -56,3 +56,38 @@ export function verifyAdminSessionToken(token: string, secret: string) {
     return false;
   }
 }
+
+export function createReaderSessionToken(email: string, maxAgeSeconds: number, secret: string) {
+  const payload = {
+    email,
+    exp: Math.floor(Date.now() / 1000) + maxAgeSeconds,
+    iat: Math.floor(Date.now() / 1000),
+  };
+  const encoded = Buffer.from(JSON.stringify(payload)).toString('base64url');
+  const signature = createHmac('sha256', secret).update(encoded).digest('base64url');
+  return `${encoded}.${signature}`;
+}
+
+export function verifyReaderSessionToken(token: string, secret: string) {
+  const [encoded, signature] = token.split('.');
+  if (!encoded || !signature) return null;
+
+  const expected = createHmac('sha256', secret).update(encoded).digest('base64url');
+  try {
+    if (!timingSafeEqual(Buffer.from(signature), Buffer.from(expected))) return null;
+  } catch {
+    return null;
+  }
+
+  try {
+    const payload = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8')) as {
+      email?: unknown;
+      exp?: unknown;
+    };
+    if (typeof payload.email !== 'string' || typeof payload.exp !== 'number') return null;
+    if (payload.exp <= Math.floor(Date.now() / 1000)) return null;
+    return payload.email;
+  } catch {
+    return null;
+  }
+}

@@ -74,7 +74,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           ></script>
         )}
 
-        <ThemeProvider attribute="class" forcedTheme="light" defaultTheme="light" enableSystem={false}>
+        <ThemeProvider>
           <BrandSplash />
           <Navbar />
           <main className="w-full max-w-screen-xl mx-auto flex-1 overflow-x-hidden px-4 pt-[112px] sm:px-6 lg:px-8">{children}</main>

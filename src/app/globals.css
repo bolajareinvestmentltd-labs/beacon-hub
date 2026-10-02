@@ -1,16 +1,35 @@
 @import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme inline {
+  --color-background: var(--bg-primary);
+  --color-foreground: var(--text-primary);
+  --color-card: var(--bg-surface);
+  --color-border: var(--border-color);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--text-secondary);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent-secondary: var(--accent-secondary);
+  --color-primary: var(--accent);
+  --color-primary-foreground: var(--accent-foreground);
+}
 
 @layer base {
   :root {
-    /* --- Beacon Citrus Glass (Light Mode - Default) --- */
-    --background: #F2F7F3;
-    --foreground: #10252B;
-    --card: #FBFEFC;
-    --border: #C8D8D2;
+    color-scheme: light;
+    --bg-primary: #F2F7F3;
+    --bg-surface: #FBFEFC;
+    --text-primary: #10252B;
+    --text-secondary: #52696D;
+    --border-color: #C8D8D2;
+    --background: var(--bg-primary);
+    --foreground: var(--text-primary);
+    --card: var(--bg-surface);
+    --border: var(--border-color);
 
-    /* Brand Accent */
     --accent: #F05D4E;
-    --accent-foreground: #FFFFFF;
+    --accent-foreground: #10252B;
     --accent-secondary: #007F82;
     --highlight: #E9B949;
     --deep-ink: #10252B;
@@ -22,6 +41,28 @@
     --muted-foreground: #52696D;
   }
 
+  .dark {
+    color-scheme: dark;
+    --bg-primary: #0C171D;
+    --bg-surface: #14242B;
+    --text-primary: #F8FAFC;
+    --text-secondary: #B9C9CE;
+    --border-color: #35484F;
+    --background: var(--bg-primary);
+    --foreground: var(--text-primary);
+    --card: var(--bg-surface);
+    --border: var(--border-color);
+    --accent: #F47B6D;
+    --accent-foreground: #10252B;
+    --accent-secondary: #52C5BF;
+    --highlight: #F1C75B;
+    --deep-ink: #F8FAFC;
+    --muted: #1C3037;
+    --muted-foreground: #B9C9CE;
+    --brand-gradient: linear-gradient(118deg, #F47B6D 0%, #F1C75B 48%, #52C5BF 100%);
+    --cool-gradient: linear-gradient(118deg, #52C5BF 0%, #58B89D 52%, #F1C75B 100%);
+  }
+
 }
 
 @layer base {
@@ -31,9 +72,9 @@
   }
 
   body {
-    background-color: var(--background);
+    background-color: var(--bg-primary);
     background-image: linear-gradient(120deg, color-mix(in srgb, var(--accent-secondary) 5%, transparent), transparent 38%), linear-gradient(300deg, color-mix(in srgb, var(--accent) 5%, transparent), transparent 42%);
-    color: var(--foreground);
+    color: var(--text-primary);
     overflow-x: hidden;
     min-height: 100dvh;
     overscroll-behavior-y: none;
@@ -41,10 +82,6 @@
     -webkit-font-smoothing: antialiased;
     touch-action: manipulation;
     padding-bottom: max(1rem, env(safe-area-inset-bottom));
-  }
-
-  html {
-    color-scheme: light;
   }
 
   @media (display-mode: standalone) {
@@ -75,23 +112,17 @@
     color: transparent;
   }
 
-  .site-navbar,
-  .site-navbar a,
-  .site-navbar button {
-    color-scheme: light;
-  }
-
   .site-navbar {
-    color: var(--foreground);
+    color: var(--text-primary);
   }
 
   .site-navbar > div:last-child a {
-    color: var(--muted-foreground);
+    color: var(--text-secondary);
   }
 
   .site-navbar > div:last-child a[aria-current="page"],
   .site-navbar > div:last-child a:hover {
-    color: var(--foreground);
+    color: var(--text-primary);
   }
 
   /* Keep older page utilities visually aligned with the new token system. */
@@ -149,13 +180,13 @@
   }
 
   .prose-editorial {
-    color: var(--foreground);
+    color: var(--text-primary);
   }
 
   .prose-editorial > div,
   .prose-editorial > div p,
   .prose-editorial > div li {
-    color: var(--foreground) !important;
+    color: var(--text-primary) !important;
   }
 
   .prose-editorial > div h1,
@@ -163,7 +194,7 @@
   .prose-editorial > div h3,
   .prose-editorial > div h4,
   .prose-editorial > div strong {
-    color: var(--foreground) !important;
+    color: var(--text-primary) !important;
   }
 
   .admin-command-center {

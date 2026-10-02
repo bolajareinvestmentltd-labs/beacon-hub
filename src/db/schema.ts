@@ -54,8 +54,30 @@ export const articles = pgTable('articles', {
 export const subscribers = pgTable('subscribers', {
   id: serial('id').primaryKey(),
   email: varchar('email', { length: 255 }).notNull().unique(),
+  unsubscribedAt: timestamp('unsubscribed_at'),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
+
+export const readerVerificationCodes = pgTable('reader_verification_codes', {
+  email: varchar('email', { length: 255 }).primaryKey(),
+  codeHash: varchar('code_hash', { length: 64 }).notNull(),
+  expiresAt: timestamp('expires_at').notNull(),
+  attempts: integer('attempts').default(0).notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
+export const articleInteractions = pgTable('article_interactions', {
+  id: serial('id').primaryKey(),
+  articleId: integer('article_id').notNull().references(() => articles.id, { onDelete: 'cascade' }),
+  email: varchar('email', { length: 255 }).notNull(),
+  reaction: varchar('reaction', { length: 8 }),
+  rating: smallint('rating'),
+  comment: text('comment'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  updatedAt: timestamp('updated_at').defaultNow().notNull(),
+}, (table) => ({
+  articleEmailIndex: uniqueIndex('article_interactions_article_email_idx').on(table.articleId, table.email),
+}));
 
 // ==========================================
 // 3. ADMIN PORTAL (JCLs / Editors)

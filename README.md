@@ -1,3 +1,5 @@
+# Beacon Hub
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
@@ -15,6 +17,16 @@ bun dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Newsroom automation and reader features
+
+Configure `DATABASE_URL`, `GNEWS_API_KEY`, `GEMINI_API_KEY`, and `RESEND_API_KEY` in `.env.local`. Set `NEXT_PUBLIC_SITE_URL` to the public HTTPS site URL and `READER_SESSION_SECRET` to a cryptographically random value of at least 32 characters. In production, also configure `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`; reader email-code endpoints stay disabled without distributed rate limiting. `RESEND_FROM_EMAIL` should be a sender address verified with Resend. The daily `/api/cron/news` job queries each newsroom category, saves new stories, and emails one digest to active newsletter subscribers. Reader reactions and reviews require email verification; the verification code expires after 10 minutes.
+
+Apply the database migrations before deploying these features:
+
+```bash
+npx drizzle-kit migrate
+```
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

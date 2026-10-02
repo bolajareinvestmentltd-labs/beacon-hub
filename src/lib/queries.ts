@@ -8,7 +8,7 @@ import {
   contentMetrics,
   editorialSections,
 } from '@/db/schema';
-import { desc, eq } from 'drizzle-orm';
+import { desc, eq, ilike } from 'drizzle-orm';
 import { runDbOperation } from '@/lib/db-utils';
 
 const articleOrder = (column: typeof articles.publishedAt) => desc(column);
@@ -79,19 +79,25 @@ export async function getArticles(limit = 12) {
 }
 
 export async function getArticlesByCategory(category: string, limit = 24) {
-  const normalizedCategory = category.trim().toLowerCase().replace(/[-_]+/g, ' ');
+  const categoryWords = category
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, ' ')
+    .replace(/[-_]+/g, ' ')
+    .replace(/[^a-z0-9 ]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const categoryPattern = `%${categoryWords.split(' ').join('%')}%`;
+  if (!categoryWords) return [];
 
   try {
-    const allArticles = await runDbOperation(() =>
+    return await runDbOperation(() =>
       db
         .select()
         .from(articles)
+        .where(ilike(articles.category, categoryPattern))
         .orderBy(articleOrder(articles.publishedAt))
         .limit(limit)
-    );
-
-    return allArticles.filter((article) =>
-      String(article.category || '').trim().toLowerCase() === normalizedCategory
     );
   } catch (error) {
     console.error('Error fetching articles by category:', error);

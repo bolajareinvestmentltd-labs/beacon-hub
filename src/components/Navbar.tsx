@@ -49,6 +49,19 @@ export default function Navbar() {
       <div className="w-full border-t border-border/60 bg-muted/90">
         <div className="max-w-7xl mx-auto overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]">
           <ul className="flex items-center px-4 h-12">
+            <li className="shrink-0">
+              <Link
+                href="/curated-news"
+                aria-current={pathname === "/curated-news" ? "page" : undefined}
+                className={`block px-4 py-3 text-[12px] md:text-[13px] font-bold tracking-wide transition-colors border-b-[3px] ${
+                  pathname === "/curated-news"
+                    ? "text-primary border-primary"
+                    : "border-transparent text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Curated News
+              </Link>
+            </li>
             {TAXONOMY.primary.map((cat) => {
               const isActive = pathname === cat.href;
               return (
