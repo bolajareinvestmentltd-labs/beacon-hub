@@ -1,4 +1,5 @@
 ﻿import Link from 'next/link';
+import Image from 'next/image';
 import AsymmetricalHeroLayout from '@/components/AsymmetricalHeroLayout';
 import SectionHeaderComponent from '@/components/SectionHeaderComponent';
 import * as queries from '@/lib/queries';
@@ -8,10 +9,24 @@ import LiveClock from '@/components/LiveClock';
 import type { Metadata } from 'next';
 import { getArticles, getArticlesByCategory, getEditorialSections } from '@/lib/queries';
 import { TAXONOMY } from '@/config/taxonomy';
+import PushNotificationOptIn from '@/components/PushNotificationOptIn';
+import NewsNotificationRail from '@/components/NewsNotificationRail';
+import TrendingNewsTicker from '@/components/TrendingNewsTicker';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.startsWith('https://')
   ? process.env.NEXT_PUBLIC_SITE_URL
   : 'https://www.beacon-hub.com.ng';
+
+function toAbsoluteImageUrl(value?: string | null, fallback = new URL('/logo.png', siteUrl).toString()) {
+  if (!value) return fallback;
+
+  try {
+    const parsed = new URL(value, siteUrl);
+    return parsed.protocol === 'https:' ? parsed.toString() : fallback;
+  } catch {
+    return fallback;
+  }
+}
 
 export async function generateMetadata(): Promise<Metadata> {
   const fallbackImage = new URL('/logo.png', siteUrl).toString();
@@ -20,7 +35,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ? `${latestArticle.title} | Beacon Hub`
     : 'Beacon Hub - Premium News Platform';
   const description = latestArticle?.excerpt || 'World-class news journalism with premium editorial design';
-  const image = latestArticle?.coverImage || fallbackImage;
+  const image = toAbsoluteImageUrl(latestArticle?.coverImage ?? null, fallbackImage);
 
   return {
     title,
@@ -155,6 +170,26 @@ export default async function HomePage() {
     latest[0]?.excerpt ?? latest[0]?.description ?? 'Editorial clarity cuts through the noise and keeps the signal sharp.';
   const quoteAuthor = latest[0]?.category ? `${latest[0].category} Desk` : 'Beacon-Hub Editorial';
 
+  const rotatingHeadlines = Array.from(
+    new Map(
+      [...latest, ...categoryFeeds.flatMap((section) => (section.articles ?? []).slice(0, 2).map((article) => ({
+        ...article,
+        category: String(article.category || section.name || 'Top News'),
+      })))]
+        .filter((article) => article?.slug && article?.title)
+        .map((article) => [String(article.slug), article] as const)
+    ).values()
+  ).slice(0, 12);
+
+  const tickerItems = rotatingHeadlines.length > 0
+    ? rotatingHeadlines
+    : latest.slice(0, 8).map((article, index) => ({
+        ...article,
+        category: String(article.category ?? 'Top News'),
+        slug: String(article.slug ?? `fallback-headline-${index + 1}`),
+        title: String(article.title ?? 'Headline update'),
+      }));
+
   return (
     <div className="min-h-screen w-full bg-background py-4 sm:py-8">
       <div className="flex w-full flex-col">
@@ -179,6 +214,17 @@ export default async function HomePage() {
             headerAdLabel="Latest Signal"
           />
         </div>
+
+        <PushNotificationOptIn />
+        <NewsNotificationRail articles={latest.slice(0, 4).map((article, index) => ({
+          id: article.id ?? index + 1,
+          slug: article.slug ?? 'latest-news',
+          title: article.title ?? 'Latest news',
+          excerpt: article.excerpt ?? article.description ?? '',
+          category: article.category ?? 'Top News',
+          coverImage: article.coverImage,
+          publishedAt: article.publishedAt,
+        }))} />
 
         <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-14">
           <SectionHeaderComponent eyebrow="THE DESKS" title="Choose your signal" description="Move through the newsroom by subject, perspective, and pace." />
@@ -218,10 +264,12 @@ export default async function HomePage() {
                   {section.articles.map((article) => (
                     <Link key={article.id} href={`/read/${article.slug}`} className="group min-w-0 border-b border-border/70 pb-4">
                       <div className="relative mb-3 aspect-video w-full overflow-hidden rounded-lg bg-muted">
-                        <img
+                        <Image
                           src={article.coverImage || '/logo.png'}
-                          alt=""
-                          loading="lazy"
+                          alt={article.title || 'Featured story'}
+                          fill
+                          unoptimized
+                          sizes="(max-width: 768px) 100vw, (max-width: 1280px) 50vw, 25vw"
                           className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                         />
                       </div>
