@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 768 768" fill="none">
+  <defs>
+    <linearGradient id="ribbon-a" x1="226" y1="183" x2="554" y2="477" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#28ECF1"/>
+      <stop offset=".45" stop-color="#8D52F7"/>
+      <stop offset="1" stop-color="#FF4FCB"/>
+    </linearGradient>
+    <linearGradient id="ribbon-b" x1="232" y1="448" x2="538" y2="168" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#FF4FCB"/>
+      <stop offset=".5" stop-color="#FC655F"/>
+      <stop offset="1" stop-color="#29EAF0"/>
+    </linearGradient>
+    <linearGradient id="flare" x1="192" y1="274" x2="578" y2="274" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#F7378C" stop-opacity="0"/>
+      <stop offset=".5" stop-color="#FF6C59" stop-opacity=".85"/>
+      <stop offset="1" stop-color="#9A49EC" stop-opacity="0"/>
+    </linearGradient>
+    <radialGradient id="back-glow" cx="0" cy="0" r="1" gradientTransform="matrix(0 235 -256 0 384 282)" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#5426A7" stop-opacity=".34"/>
+      <stop offset="1" stop-color="#08091C" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="neon" x="130" y="88" width="508" height="462" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+      <feGaussianBlur stdDeviation="12" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+  <path fill="#070819" d="M0 0h768v768H0z"/>
+  <path fill="url(#back-glow)" d="M0 0h768v600H0z"/>
+  <g stroke="#36405F" stroke-opacity=".25">
+    <path d="M0 126h768M0 194h768M0 507h768M0 612h768"/>
+    <path d="M84 0v768M684 0v768"/>
+    <path d="m84 194 43-43M684 126l-43 43M84 507l43 43M684 612l-43-43"/>
+  </g>
+  <path d="M183 275h402" stroke="url(#flare)" stroke-width="88" opacity=".65"/>
+  <g stroke-linecap="round" opacity=".68">
+    <path d="M384 118v90M318 145l35 65M448 145l-35 65M257 184l76 47M511 184l-76 47" stroke="url(#ribbon-a)" stroke-width="3"/>
+    <path d="M254 274h72M442 274h73" stroke="url(#ribbon-b)" stroke-width="3"/>
+  </g>
+  <g fill="#40EAF1">
+    <circle cx="220" cy="316" r="2.5"/><circle cx="270" cy="357" r="2"/>
+    <circle cx="502" cy="354" r="2.5"/><circle cx="546" cy="309" r="2"/>
+    <circle cx="483" cy="412" r="2.5"/><circle cx="285" cy="411" r="2"/>
+  </g>
+  <path d="M280 220c0-27 22-49 49-49h80c42 0 71 28 71 64 0 31-19 52-57 74l-118 68c-32 18-48 37-48 61 0 33 27 58 62 58h93c39 0 67-25 67-60" stroke="url(#ribbon-a)" stroke-width="38" stroke-linecap="round" stroke-linejoin="round" filter="url(#neon)" opacity=".8"/>
+  <path d="M280 220c0-27 22-49 49-49h80c42 0 71 28 71 64 0 31-19 52-57 74l-118 68c-32 18-48 37-48 61 0 33 27 58 62 58h93c39 0 67-25 67-60" stroke="url(#ribbon-a)" stroke-width="23" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M488 220c0-27-22-49-49-49h-80c-42 0-71 28-71 64 0 31 19 52 57 74l118 68c32 18 48 37 48 61 0 33-27 58-62 58h-93c-39 0-67-25-67-60" stroke="url(#ribbon-b)" stroke-width="38" stroke-linecap="round" stroke-linejoin="round" filter="url(#neon)" opacity=".72"/>
+  <path d="M488 220c0-27-22-49-49-49h-80c-42 0-71 28-71 64 0 31 19 52 57 74l118 68c32 18 48 37 48 61 0 33-27 58-62 58h-93c-39 0-67-25-67-60" stroke="url(#ribbon-b)" stroke-width="23" stroke-linecap="round" stroke-linejoin="round"/>
+  <text x="384" y="558" text-anchor="middle" font-family="Arial, Helvetica, sans-serif" font-size="53" font-weight="800" letter-spacing="2">
+    <tspan fill="#F8F9FF">BEACON</tspan><tspan dx="14" fill="#FF5367">HUB</tspan>
+  </text>
+  <text x="384" y="594" text-anchor="middle" fill="#27CFE0" font-family="Arial, Helvetica, sans-serif" font-size="19" font-weight="700" letter-spacing="6">NEWS CONTEXTX</text>
+</svg>

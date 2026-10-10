@@ -27,7 +27,7 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   userScalable: false,
-  themeColor: '#F2F7F3',
+  themeColor: '#F4F6FC',
   viewportFit: 'cover',
 };
 
@@ -51,13 +51,13 @@ export const metadata: Metadata = {
     url: siteUrl,
     siteName: 'Beacon Hub',
     type: 'website',
-    images: [{ url: '/logo.png', alt: 'Beacon Hub logo' }],
+    images: [{ url: '/beacon-hub-lockup.png', alt: 'Beacon Hub, News ContextX' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Beacon Hub - Premium News Platform',
     description: 'World-class news journalism with premium editorial design',
-    images: ['/logo.png'],
+    images: ['/beacon-hub-lockup.png'],
   },
 };
 

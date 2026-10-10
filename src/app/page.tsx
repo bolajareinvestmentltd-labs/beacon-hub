@@ -15,7 +15,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.startsWith('https://')
   ? process.env.NEXT_PUBLIC_SITE_URL
   : 'https://www.beacon-hub.com.ng';
 
-function toAbsoluteImageUrl(value?: string | null, fallback = new URL('/beacon-logo.svg', siteUrl).toString()) {
+function toAbsoluteImageUrl(value?: string | null, fallback = new URL('/beacon-hub-lockup.png', siteUrl).toString()) {
   if (!value) return fallback;
 
   try {
@@ -27,7 +27,7 @@ function toAbsoluteImageUrl(value?: string | null, fallback = new URL('/beacon-l
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const fallbackImage = new URL('/beacon-logo.svg', siteUrl).toString();
+  const fallbackImage = new URL('/beacon-hub-lockup.png', siteUrl).toString();
   const latestArticle = (await getArticles(1))[0];
   const title = latestArticle?.title
     ? `${latestArticle.title} | Beacon Hub`

@@ -51,7 +51,7 @@ export default function Footer() {
             <div>
               <p className="text-lg font-black text-foreground dark:text-white">Beacon Hub</p>
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground dark:text-slate-400">
-                Premium News Platform
+                News ContextX
               </p>
             </div>
           </div>
