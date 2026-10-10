@@ -15,7 +15,7 @@ type EngagementData = {
   comments: Array<{ comment: string | null; rating: number | null; updatedAt: string }>;
 };
 
-type ModalStage = 'email' | 'code' | 'review';
+type ModalStage = 'email' | 'review';
 
 const emptyEngagement: EngagementData = {
   likes: 0,
@@ -34,7 +34,6 @@ export default function ReaderEngagement({ articleId }: { articleId: number }) {
   const [email, setEmail] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [stage, setStage] = useState<ModalStage>('email');
-  const [code, setCode] = useState('');
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [pendingReaction, setPendingReaction] = useState<Reaction | null>(null);
@@ -107,42 +106,21 @@ export default function ReaderEngagement({ articleId }: { articleId: number }) {
     }
   }
 
-  async function requestCode(event: React.FormEvent<HTMLFormElement>) {
+  async function continueWithEmail(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setBusy(true);
     setMessage('');
     try {
-      const response = await fetch('/api/reader-auth/request-code', {
+      const response = await fetch('/api/reader-auth/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email }),
       });
       const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Could not send your code.');
-      setStage('code');
-      setMessage(result.message || 'Check your inbox for a sign-in code.');
-    } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Could not send your code.');
-    } finally {
-      setBusy(false);
-    }
-  }
-
-  async function verifyCode(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
-    setBusy(true);
-    setMessage('');
-    try {
-      const response = await fetch('/api/reader-auth/verify-code', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, code }),
-      });
-      const result = await response.json();
-      if (!response.ok) throw new Error(result.error || 'Could not verify your code.');
+      if (!response.ok) throw new Error(result.error || 'Could not continue.');
       setIsAuthenticated(true);
       setStage('review');
-      setMessage('Email verified. You can now react and review this story.');
+      setMessage('Email added. It is not verified; you can continue with this device.');
       if (pendingReaction) {
         const reactionResponse = await fetch(`/api/articles/${articleId}/interactions`, {
           method: 'POST',
@@ -150,13 +128,12 @@ export default function ReaderEngagement({ articleId }: { articleId: number }) {
           body: JSON.stringify({ reaction: pendingReaction }),
         });
         const reactionResult = await reactionResponse.json();
-        if (!reactionResponse.ok) throw new Error(reactionResult.error || 'Email verified, but the reaction could not be saved.');
+        if (!reactionResponse.ok) throw new Error(reactionResult.error || 'Email saved, but your reaction could not be saved.');
         setPendingReaction(null);
         await refreshEngagement();
-        setMessage('Email verified and your reaction was saved. You can also review this story.');
       }
     } catch (error) {
-      setMessage(error instanceof Error ? error.message : 'Could not verify your code.');
+      setMessage(error instanceof Error ? error.message : 'Could not continue.');
     } finally {
       setBusy(false);
     }
@@ -190,7 +167,7 @@ export default function ReaderEngagement({ articleId }: { articleId: number }) {
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <h2 className="text-2xl font-black text-foreground">Join the conversation</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Verify your email to react or leave a review.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Add an email to react or leave a review. No code required.</p>
           <p className="mt-2 text-sm font-semibold text-foreground">
             {engagement.averageRating === null ? 'No ratings yet' : `${engagement.averageRating.toFixed(1)} / 5`}
             <span className="ml-2 font-normal text-muted-foreground">({engagement.ratingCount} ratings)</span>
@@ -245,7 +222,7 @@ export default function ReaderEngagement({ articleId }: { articleId: number }) {
               <div>
                 <p className="font-mono text-[10px] text-primary">BEACON HUB / READER DESK</p>
                 <h2 id="reader-dialog-title" className="mt-2 text-2xl font-black">
-                  {stage === 'review' ? 'Review this story' : 'Verify your email'}
+                  {stage === 'review' ? 'Review this story' : 'Continue with email'}
                 </h2>
               </div>
               <button type="button" onClick={() => setModalOpen(false)} aria-label="Close dialog" className="rounded-md p-2 text-muted-foreground hover:bg-muted hover:text-foreground">
@@ -254,23 +231,12 @@ export default function ReaderEngagement({ articleId }: { articleId: number }) {
             </div>
 
             {stage === 'email' && (
-              <form onSubmit={requestCode} className="space-y-4">
-                <p className="text-sm leading-6 text-muted-foreground">Enter your email and we’ll send a one-time code before you can participate.</p>
+              <form onSubmit={continueWithEmail} className="space-y-4">
+                <p className="text-sm leading-6 text-muted-foreground">Enter an email to continue. We do not verify it or add it to marketing mail without separate consent.</p>
                 <label className="block text-sm font-semibold" htmlFor="reader-email">Email address</label>
                 <input id="reader-email" type="email" autoComplete="email" required value={email} onChange={(event) => setEmail(event.target.value)} className="w-full rounded-md border border-border bg-background px-3 py-3 text-foreground outline-none focus:border-primary" />
                 <button disabled={busy} className="min-h-11 w-full rounded-md bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-50">
-                  {busy ? 'Sending code…' : 'Email me a sign-in code'}
-                </button>
-              </form>
-            )}
-
-            {stage === 'code' && (
-              <form onSubmit={verifyCode} className="space-y-4">
-                <p className="text-sm leading-6 text-muted-foreground">Enter the six-digit code sent to {email}.</p>
-                <label className="block text-sm font-semibold" htmlFor="reader-code">Verification code</label>
-                <input id="reader-code" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6} required value={code} onChange={(event) => setCode(event.target.value.replace(/\D/g, '').slice(0, 6))} className="w-full rounded-md border border-border bg-background px-3 py-3 text-center font-mono text-xl tracking-[0.25em] text-foreground outline-none focus:border-primary" />
-                <button disabled={busy} className="min-h-11 w-full rounded-md bg-primary px-4 text-sm font-bold text-primary-foreground disabled:opacity-50">
-                  {busy ? 'Verifying…' : 'Verify email'}
+                  {busy ? 'Continuing…' : 'Continue'}
                 </button>
               </form>
             )}

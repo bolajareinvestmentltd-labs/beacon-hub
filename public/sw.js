@@ -28,6 +28,44 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+self.addEventListener('push', (event) => {
+  let payload = {};
+  try {
+    payload = event.data ? event.data.json() : {};
+  } catch {
+    payload = { body: event.data?.text() || 'New Beacon Hub coverage is available.' };
+  }
+
+  const title = payload.title || 'Beacon Hub / New story';
+  const options = {
+    body: payload.body || 'Read the latest coverage from Beacon Hub.',
+    icon: payload.icon || '/logo-192.png',
+    badge: '/logo-192.png',
+    image: payload.image || undefined,
+    tag: payload.tag || 'beacon-hub-news',
+    renotify: true,
+    data: { url: payload.url || '/' },
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+  const destination = new URL(event.notification.data?.url || '/', self.location.origin).toString();
+
+  event.waitUntil(
+    self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
+      const existing = clients.find((client) => new URL(client.url).origin === self.location.origin);
+      if (existing) {
+        existing.navigate(destination);
+        return existing.focus();
+      }
+      return self.clients.openWindow(destination);
+    })
+  );
+});
+
 self.addEventListener('fetch', (event) => {
   const request = event.request;
   if (request.method !== 'GET') return;

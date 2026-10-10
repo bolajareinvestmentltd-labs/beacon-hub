@@ -1,4 +1,4 @@
-import { inArray, isNull } from 'drizzle-orm';
+import { and, eq, inArray, isNull } from 'drizzle-orm';
 import { Resend } from 'resend';
 import { db } from '@/db';
 import { articles, subscribers } from '@/db/schema';
@@ -34,7 +34,7 @@ export async function sendNewsDigest(slugs: string[]) {
   stories.sort((left, right) => (storyOrder.get(left.slug) ?? 0) - (storyOrder.get(right.slug) ?? 0));
   const activeSubscribers = await db.select({ email: subscribers.email })
     .from(subscribers)
-    .where(isNull(subscribers.unsubscribedAt));
+    .where(and(isNull(subscribers.unsubscribedAt), eq(subscribers.newsUpdates, true)));
 
   if (!stories.length || !activeSubscribers.length) return { sent: 0, failed: 0 };
 

@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { sendContactEmail } from '@/lib/email-actions';
 
-export default function ContactForm() {
+export default function ContactForm({ initialSubject = '' }: { initialSubject?: string }) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
   const [message, setMessage] = useState('');
@@ -95,12 +95,14 @@ export default function ContactForm() {
             <select
               id="subject"
               name="subject"
+              defaultValue={initialSubject}
               required
               disabled={isSubmitting}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-[#1A1A1A] text-[#1A1A1A] dark:text-white focus:outline-none focus:ring-2 focus:ring-[#9C4A3A] disabled:opacity-50"
             >
               <option value="">Select a subject...</option>
               <option value="general">General Inquiry</option>
+              <option value="horoscope">Personal Horoscope Reading</option>
               <option value="technical">Technical Support</option>
               <option value="marketplace">Marketplace Issue</option>
               <option value="partnership">Business Partnership</option>

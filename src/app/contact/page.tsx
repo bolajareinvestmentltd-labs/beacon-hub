@@ -6,7 +6,14 @@ export const metadata: Metadata = {
   description: "Get in touch with Beacon-Hub - send us your inquiries, feedback, or business inquiries.",
 };
 
-export default function ContactPage() {
+export default async function ContactPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ topic?: string }>;
+}) {
+  const { topic } = await searchParams;
+  const initialSubject = topic === 'horoscope' ? 'horoscope' : '';
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-12">
       <h1 className="text-4xl font-bold mb-8 text-[#1A1A1A] dark:text-white">Contact Us</h1>
@@ -62,7 +69,7 @@ export default function ContactPage() {
         </div>
 
         {/* Contact Form Component */}
-        <ContactForm />
+        <ContactForm initialSubject={initialSubject} />
       </div>
     </div>
   );

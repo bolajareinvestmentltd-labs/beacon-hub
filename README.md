@@ -20,13 +20,19 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## Newsroom automation and reader features
 
-Configure `DATABASE_URL`, `GNEWS_API_KEY`, `GEMINI_API_KEY`, and `RESEND_API_KEY` in `.env.local`. Set `NEXT_PUBLIC_SITE_URL` to the public HTTPS site URL and `READER_SESSION_SECRET` to a cryptographically random value of at least 32 characters. In production, also configure `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN`; reader email-code endpoints stay disabled without distributed rate limiting. `RESEND_FROM_EMAIL` should be a sender address verified with Resend. The daily `/api/cron/news` job queries each newsroom category, saves new stories, and emails one digest to active newsletter subscribers. Reader reactions and reviews require email verification; the verification code expires after 10 minutes.
+Configure `DATABASE_URL`, `GNEWS_API_KEY`, `GEMINI_API_KEY`, and `RESEND_API_KEY` in `.env.local`. Set `NEXT_PUBLIC_SITE_URL` to the public HTTPS site URL and `READER_SESSION_SECRET` to a cryptographically random value of at least 32 characters. In production, also configure `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` for reader rate limiting. Reader participation asks for an email but does not verify it; it is a contact label, not proof of identity or newsletter consent. `RESEND_FROM_EMAIL` should be a sender address verified with Resend. The daily `/api/cron/news` job queries each newsroom category, saves new stories, emails opted-in subscribers, and sends Web Push alerts to devices that enabled them.
+
+For Web Push, run `npm install` to install `web-push` and refresh `package-lock.json`, generate VAPID keys using `npx web-push generate-vapid-keys`, and configure `NEXT_PUBLIC_VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` in the deployment environment. Push requires HTTPS and explicit permission. The browser/Android OS controls the exact system notification layout; Beacon Hub supplies the headline, excerpt, cover image, and story link. The rich system notification flow targets supported browsers and installed PWAs; the Capacitor Android shell needs Firebase/Capacitor push credentials to receive native FCM notifications.
+
+Astrology subscribers choose a zodiac sign and receive that sign's daily horoscope and Tarot reflection. The news and astrology mailing preferences are separate; the signed unsubscribe link stops all Beacon Hub email for that address.
 
 Apply the database migrations before deploying these features:
 
 ```bash
 npx drizzle-kit migrate
 ```
+
+The existing website admin is unchanged: sign in at `/login`, then manage content at `/admin`. The standalone Django backend has its own admin at `http://localhost:8000/admin/`; create its staff login from `backend/` with `python manage.py createsuperuser`. Django's admin is for the RSS `Sources` and curated `Articles`; it does not replace the Next.js publishing dashboard.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 

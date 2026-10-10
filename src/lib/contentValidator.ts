@@ -43,7 +43,7 @@ export const HoroscopeReadingSchema = z.object({
       'Pisces',
     ])
     .describe('Zodiac sign'),
-  reading: z.string().min(150).max(400).describe('Deep reading: 150-400 words with celestial context'),
+  reading: z.string().min(150).max(4000).describe('Deep reading: 150-400 words with celestial context'),
   lunarPhase: z
     .enum([
       'New Moon',
@@ -64,6 +64,8 @@ export const HoroscopeReadingSchema = z.object({
   loveForecast: z.string().min(50).max(200).describe('Love/relationships forecast'),
   financialTip: z.string().min(50).max(200).describe('Financial guidance'),
   powerAffirmation: z.string().min(20).max(150).describe('Empowering affirmation statement'),
+  tarotCard: z.string().min(2).max(100).describe('One tarot card drawn for the day'),
+  tarotMessage: z.string().min(50).max(400).describe('A grounded daily tarot reflection'),
 });
 
 // Batch News Articles Response

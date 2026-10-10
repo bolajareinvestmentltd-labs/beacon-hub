@@ -55,20 +55,16 @@ export const subscribers = pgTable('subscribers', {
   id: serial('id').primaryKey(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   unsubscribedAt: timestamp('unsubscribed_at'),
-  createdAt: timestamp('created_at').defaultNow().notNull(),
-});
-
-export const readerVerificationCodes = pgTable('reader_verification_codes', {
-  email: varchar('email', { length: 255 }).primaryKey(),
-  codeHash: varchar('code_hash', { length: 64 }).notNull(),
-  expiresAt: timestamp('expires_at').notNull(),
-  attempts: integer('attempts').default(0).notNull(),
+  newsUpdates: boolean('news_updates').default(true).notNull(),
+  horoscopeUpdates: boolean('horoscope_updates').default(false).notNull(),
+  zodiacSign: varchar('zodiac_sign', { length: 20 }),
   createdAt: timestamp('created_at').defaultNow().notNull(),
 });
 
 export const articleInteractions = pgTable('article_interactions', {
   id: serial('id').primaryKey(),
   articleId: integer('article_id').notNull().references(() => articles.id, { onDelete: 'cascade' }),
+  readerId: varchar('reader_id', { length: 64 }).notNull(),
   email: varchar('email', { length: 255 }).notNull(),
   reaction: varchar('reaction', { length: 8 }),
   rating: smallint('rating'),
@@ -76,8 +72,17 @@ export const articleInteractions = pgTable('article_interactions', {
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 }, (table) => ({
-  articleEmailIndex: uniqueIndex('article_interactions_article_email_idx').on(table.articleId, table.email),
+  articleReaderIndex: uniqueIndex('article_interactions_article_reader_idx').on(table.articleId, table.readerId),
 }));
+
+export const pushSubscriptions = pgTable('push_subscriptions', {
+  endpoint: text('endpoint').primaryKey(),
+  readerId: varchar('reader_id', { length: 64 }).notNull(),
+  email: varchar('email', { length: 255 }).notNull(),
+  p256dh: text('p256dh').notNull(),
+  auth: text('auth').notNull(),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
 
 // ==========================================
 // 3. ADMIN PORTAL (JCLs / Editors)
@@ -110,6 +115,8 @@ export const horoscopes = pgTable('horoscopes', {
   loveForecast: text('love_forecast').default(''),
   financialTip: text('financial_tip').default(''),
   powerAffirmation: text('power_affirmation').default(''),
+  tarotCard: varchar('tarot_card', { length: 100 }).default(''),
+  tarotMessage: text('tarot_message').default(''),
   zodiacIcon: varchar('zodiac_icon', { length: 255 }).default(''),
 
   // NOTE: schema conflict existed; we keep the field name used by earlier side

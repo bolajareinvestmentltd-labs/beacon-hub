@@ -9,6 +9,7 @@ import BrandSplash from '@/components/BrandSplash';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MobileDock from '@/components/MobileDock';
+import NewsAssistant from '@/components/NewsAssistant';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import TrafficTracker from '@/components/TrafficTracker';
 import './globals.css';
@@ -80,6 +81,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <main className="w-full max-w-screen-xl mx-auto flex-1 overflow-x-hidden px-4 pt-[112px] sm:px-6 lg:px-8">{children}</main>
           <Footer />
           <MobileDock />
+          <NewsAssistant />
           <PwaInstallPrompt />
           <ServiceWorkerRegistration />
           <TrafficTracker />

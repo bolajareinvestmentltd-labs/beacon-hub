@@ -22,7 +22,7 @@ async function resolveArticleId(value: string) {
   return article[0]?.id ?? null;
 }
 
-async function resolveReaderEmail() {
+async function resolveReaderSession() {
   const secret = process.env.READER_SESSION_SECRET;
   const token = (await cookies()).get('reader_session')?.value;
   return secret && secret.length >= 32 && token ? verifyReaderSessionToken(token, secret) : null;
@@ -33,7 +33,7 @@ export async function GET(_request: Request, { params }: { params: Promise<{ art
   const articleId = await resolveArticleId(rawId);
   if (!articleId) return NextResponse.json({ error: 'Article not found.' }, { status: 404 });
 
-  const [likesResult, dislikesResult, ratings, comments, readerEmail] = await Promise.all([
+  const [likesResult, dislikesResult, ratings, comments, reader] = await Promise.all([
     db.select({ total: count() }).from(articleInteractions).where(and(eq(articleInteractions.articleId, articleId), eq(articleInteractions.reaction, 'like'))),
     db.select({ total: count() }).from(articleInteractions).where(and(eq(articleInteractions.articleId, articleId), eq(articleInteractions.reaction, 'dislike'))),
     db.select({ average: avg(articleInteractions.rating), total: count() })
@@ -44,13 +44,13 @@ export async function GET(_request: Request, { params }: { params: Promise<{ art
       .where(and(eq(articleInteractions.articleId, articleId), isNotNull(articleInteractions.comment)))
       .orderBy(desc(articleInteractions.updatedAt))
       .limit(30),
-    resolveReaderEmail(),
+    resolveReaderSession(),
   ]);
 
-  const readerInteraction = readerEmail
+  const readerInteraction = reader
     ? (await db.select({ reaction: articleInteractions.reaction, rating: articleInteractions.rating, comment: articleInteractions.comment })
         .from(articleInteractions)
-        .where(and(eq(articleInteractions.articleId, articleId), eq(articleInteractions.email, readerEmail)))
+        .where(and(eq(articleInteractions.articleId, articleId), eq(articleInteractions.readerId, reader.readerId)))
         .limit(1))[0]
     : null;
   const rawAverage = ratings[0]?.average;
@@ -78,8 +78,8 @@ export async function POST(request: Request, { params }: { params: Promise<{ art
     return NextResponse.json({ error: 'Too many requests. Try again later.' }, { status: 429 });
   }
 
-  const email = await resolveReaderEmail();
-  if (!email) return NextResponse.json({ error: 'Verify your email to participate.' }, { status: 401 });
+  const reader = await resolveReaderSession();
+  if (!reader) return NextResponse.json({ error: 'Enter your email to participate.' }, { status: 401 });
 
   const { articleId: rawId } = await params;
   const articleId = await resolveArticleId(rawId);
@@ -98,7 +98,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ art
   }
 
   const current = (await db.select().from(articleInteractions)
-    .where(and(eq(articleInteractions.articleId, articleId), eq(articleInteractions.email, email)))
+    .where(and(eq(articleInteractions.articleId, articleId), eq(articleInteractions.readerId, reader.readerId)))
     .limit(1))[0];
   const values = {
     reaction: parsed.data.reaction ?? current?.reaction ?? null,
@@ -109,11 +109,12 @@ export async function POST(request: Request, { params }: { params: Promise<{ art
 
   await db.insert(articleInteractions).values({
     articleId,
-    email,
+    readerId: reader.readerId,
+    email: reader.email,
     ...values,
     createdAt: current?.createdAt ?? new Date(),
   }).onConflictDoUpdate({
-    target: [articleInteractions.articleId, articleInteractions.email],
+    target: [articleInteractions.articleId, articleInteractions.readerId],
     set: values,
   });
 

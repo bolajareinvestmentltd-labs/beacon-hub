@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { persistIncomingArticles } from '@/lib/news-sync';
 import { isAuthorizedCronRequest } from '@/lib/cron';
 import { sendNewsDigest } from '@/lib/newsletter';
+import { sendNewsPush } from '@/lib/push-news';
 
 export const maxDuration = 60;
 
@@ -195,6 +196,7 @@ export async function GET(req: Request) {
 
     const result = await persistIncomingArticles(articles);
     let emailDigest = { sent: 0, failed: 0 };
+    let pushNotifications = { sent: 0, failed: 0 };
 
     if (result.inserted.length > 0) {
       try {
@@ -202,6 +204,13 @@ export async function GET(req: Request) {
       } catch (error) {
         console.error('News published, but subscriber digest delivery failed:', error);
         emailDigest.failed = 1;
+      }
+
+      try {
+        pushNotifications = await sendNewsPush(result.inserted);
+      } catch (error) {
+        console.error('News published, but mobile push delivery failed:', error);
+        pushNotifications.failed = 1;
       }
     }
 
@@ -211,6 +220,7 @@ export async function GET(req: Request) {
       inserted: result.inserted.length,
       skipped: result.skipped.length,
       emailDigest,
+      pushNotifications,
       message: `${source} intelligence deployed successfully.`,
     });
   } catch (error) {

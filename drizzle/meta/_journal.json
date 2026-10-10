@@ -36,6 +36,34 @@
       "when": 1783036800000,
       "tag": "0004_newsletter_unsubscribe",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1783123200000,
+      "tag": "0005_reader_identity",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1783209600000,
+      "tag": "0006_daily_tarot",
+      "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1783296000000,
+      "tag": "0007_horoscope_subscriptions",
+      "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1783382400000,
+      "tag": "0008_push_subscriptions",
+      "breakpoints": true
     }
   ]
 }

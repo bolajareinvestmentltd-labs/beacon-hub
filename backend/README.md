@@ -13,6 +13,7 @@ python -c "from django.core.management.utils import get_random_secret_key; print
 docker compose up -d db redis
 python manage.py migrate
 python manage.py seed_sources
+python manage.py createsuperuser
 python manage.py runserver 0.0.0.0:8000
 ```
 

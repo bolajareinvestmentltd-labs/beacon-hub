@@ -130,9 +130,9 @@ export default async function HomePage() {
     slug: article.slug ?? `article-${index + 1}`,
     title: article.title ?? 'Latest news',
     category: article.category ?? 'Top News',
-    excerpt: article.excerpt ?? article.description ?? '',
+    excerpt: article.excerpt ?? ('description' in article ? article.description : undefined) ?? '',
     coverImage: article.coverImage ?? '',
-    isSponsored: article.isSponsored,
+    isSponsored: article.isSponsored ?? undefined,
     publishedAt: article.publishedAt ? new Date(article.publishedAt) : new Date(),
   }));
 

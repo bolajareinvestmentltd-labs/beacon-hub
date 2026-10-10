@@ -3,6 +3,7 @@ import { db } from "@/db";
 import { horoscopes } from "@/db/schema";
 import { validateHoroscopeReading, validateContentDepth, HoroscopeReadingsBatchSchema } from "@/lib/contentValidator";
 import { isAuthorizedCronRequest } from '@/lib/cron';
+import { sendDailyAstroUpdates } from '@/lib/astro-newsletter';
 
 export const maxDuration = 60;
 
@@ -33,6 +34,7 @@ CRITICAL REQUIREMENTS FOR EACH READING:
 - Compatible signs: Top 3 most compatible signs for today
 - Lunar phase from today (choose one: New Moon, Waxing Crescent, First Quarter, Waxing Gibbous, Full Moon, Waning Gibbous, Last Quarter, Waning Crescent)
 - Fortune level: Rating from 1-5
+- Tarot card: one named card and a practical 2-3 sentence reflection
 
 Return ONLY a JSON array. Each object must match EXACTLY:
 {
@@ -46,7 +48,9 @@ Return ONLY a JSON array. Each object must match EXACTLY:
   "careerForecast": "Career guidance text",
   "loveForecast": "Love/relationships text",
   "financialTip": "Financial guidance text",
-  "powerAffirmation": "Empowering affirmation statement"
+  "powerAffirmation": "Empowering affirmation statement",
+  "tarotCard": "The Star",
+  "tarotMessage": "A concise reflection with one practical prompt for the day."
 }
 
 ALL 12 SIGNS REQUIRED: Aries, Taurus, Gemini, Cancer, Leo, Virgo, Libra, Scorpio, Sagittarius, Capricorn, Aquarius, Pisces
@@ -64,6 +68,7 @@ RETURN ONLY VALID JSON ARRAY - NO MARKDOWN, NO BACKTICKS, NO COMMENTARY.`;
         body: JSON.stringify({
           generationConfig: {
             responseMimeType: "application/json",
+            maxOutputTokens: 8192,
             responseSchema: {
               type: "ARRAY",
               items: {
@@ -96,7 +101,10 @@ RETURN ONLY VALID JSON ARRAY - NO MARKDOWN, NO BACKTICKS, NO COMMENTARY.`;
                   loveForecast: { type: "STRING" },
                   financialTip: { type: "STRING" },
                   powerAffirmation: { type: "STRING" },
+                  tarotCard: { type: "STRING" },
+                  tarotMessage: { type: "STRING" },
                 },
+                required: ["sign", "reading", "lunarPhase", "fortuneLevel", "luckyColor", "luckyNumber", "compatibleSigns", "careerForecast", "loveForecast", "financialTip", "powerAffirmation", "tarotCard", "tarotMessage"],
               },
             },
           },
@@ -197,6 +205,8 @@ RETURN ONLY VALID JSON ARRAY - NO MARKDOWN, NO BACKTICKS, NO COMMENTARY.`;
         loveForecast: validatedData.loveForecast,
         financialTip: validatedData.financialTip,
         powerAffirmation: validatedData.powerAffirmation,
+        tarotCard: validatedData.tarotCard,
+        tarotMessage: validatedData.tarotMessage,
         publishDate: new Date(),
       });
     }
@@ -218,10 +228,19 @@ RETURN ONLY VALID JSON ARRAY - NO MARKDOWN, NO BACKTICKS, NO COMMENTARY.`;
       .values(validatedReadings)
       .returning();
 
+    let emailUpdates = { sent: 0, failed: 0 };
+    try {
+      emailUpdates = await sendDailyAstroUpdates(validatedReadings);
+    } catch (error) {
+      console.error('Horoscopes published, but astrology email delivery failed:', error);
+      emailUpdates.failed = 1;
+    }
+
     return NextResponse.json({
       success: true,
       message: `12 Deep Celestial Intelligence Readings deployed successfully.`,
       readingsCreated: insertedReadings.length,
+      emailUpdates,
       validationErrors: errors.length > 0 ? errors : undefined,
     });
   } catch (error: any) {

@@ -15,6 +15,7 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.beacon-hub.com.
  */
 const subjectToCategoryMap: Record<string, string> = {
   'general': 'Support',
+  'horoscope': 'Support',
   'technical': 'Support',
   'marketplace': 'Support',
   'partnership': 'Partnership',

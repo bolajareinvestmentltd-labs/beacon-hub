@@ -1,5 +1,5 @@
 import { getArticleBySlug, getRelatedArticles, incrementArticleViews } from "@/lib/queries";
-import { normalizeArticleSlug, slugToArticleTitle, getArticleSlugCandidates } from "@/lib/metadata";
+import { normalizeArticleSlug, slugToArticleTitle } from "@/lib/metadata";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import EditorialColumnComponent from "@/components/EditorialColumnComponent";
@@ -10,13 +10,14 @@ import { ChevronLeft } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import ReaderEngagement from "@/components/ReaderEngagement";
+import ReaderEmailPrompt from "@/components/ReaderEmailPrompt";
 
 const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 const siteUrl = configuredSiteUrl?.startsWith("https://")
   ? configuredSiteUrl
   : "https://www.beacon-hub.com.ng";
 const siteName = "Beacon Hub";
-const fallbackImageUrl = new URL("/logo.png", siteUrl).toString();
+const fallbackImageUrl = new URL("/beacon-hub-lockup.png", siteUrl).toString();
 
 function toAbsoluteHttpsUrl(value: string | undefined, fallback: string) {
   if (!value) return fallback;
@@ -41,7 +42,6 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const { slug } = await params;
   const normalizedSlug = normalizeArticleSlug(slug);
-  const candidates = getArticleSlugCandidates(slug);
   const article = await getArticleBySlug(normalizedSlug);
   const articleUrl = new URL(`/read/${encodeURIComponent(normalizedSlug || slug)}`, siteUrl).toString();
 
@@ -240,6 +240,7 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
       </div>
 
       <ReaderEngagement articleId={articleData.id} />
+      <ReaderEmailPrompt />
 
       {/* MID-STORY INTERSTITIAL AD */}
       <div className="max-w-4xl mx-auto px-4 md:px-8 lg:px-12 my-16">

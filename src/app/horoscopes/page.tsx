@@ -3,6 +3,7 @@ import ZodiacCarouselFilter from "@/components/ZodiacCarouselFilter";
 import SectionHeaderComponent from "@/components/SectionHeaderComponent";
 import { Sparkles } from "lucide-react";
 import Link from "next/link";
+import HoroscopeSubscriptionForm from "@/components/HoroscopeSubscriptionForm";
 
 export const dynamic = 'force-dynamic';
 
@@ -52,6 +53,8 @@ const fetchHoroscopes =
         <ZodiacCarouselFilter />
       </div>
 
+      <HoroscopeSubscriptionForm />
+
       <div className="mb-16">
         <SectionHeaderComponent
           eyebrow="SELECT YOUR SIGN"
@@ -93,7 +96,7 @@ const fetchHoroscopes =
                   <span
                     className={`text-[9px] uppercase tracking-wider font-bold ${statusClasses}`}
                   >
-                    {hasReading ? 'Ready' : 'Computing...'}
+                    {hasReading ? 'Ready today' : 'Refreshes 06:00 UTC'}
                   </span>
                 </div>
                 <div className="absolute bottom-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">

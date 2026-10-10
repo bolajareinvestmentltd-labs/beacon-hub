@@ -16,6 +16,9 @@ const EnvSchema = z.object({
   RESEND_FROM_EMAIL: z.string().optional(),
   RESEND_ADMIN_EMAIL: z.string().email().optional(),
   READER_SESSION_SECRET: z.string().min(32, 'READER_SESSION_SECRET must be at least 32 characters').optional(),
+  NEXT_PUBLIC_VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  VAPID_SUBJECT: z.string().optional(),
   
   // Error tracking (optional)
   NEXT_PUBLIC_SENTRY_DSN: z.string().optional(),

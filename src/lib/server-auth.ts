@@ -1,4 +1,4 @@
-import { createHmac, randomBytes, scryptSync, timingSafeEqual } from 'crypto';
+import { createHmac, randomBytes, randomUUID, scryptSync, timingSafeEqual } from 'crypto';
 
 export function hashPassword(password: string) {
   const salt = randomBytes(16).toString('hex');
@@ -57,9 +57,10 @@ export function verifyAdminSessionToken(token: string, secret: string) {
   }
 }
 
-export function createReaderSessionToken(email: string, maxAgeSeconds: number, secret: string) {
+export function createReaderSessionToken(email: string, maxAgeSeconds: number, secret: string, readerId: string = randomUUID()) {
   const payload = {
     email,
+    readerId,
     exp: Math.floor(Date.now() / 1000) + maxAgeSeconds,
     iat: Math.floor(Date.now() / 1000),
   };
@@ -82,11 +83,12 @@ export function verifyReaderSessionToken(token: string, secret: string) {
   try {
     const payload = JSON.parse(Buffer.from(encoded, 'base64url').toString('utf8')) as {
       email?: unknown;
+      readerId?: unknown;
       exp?: unknown;
     };
-    if (typeof payload.email !== 'string' || typeof payload.exp !== 'number') return null;
+    if (typeof payload.email !== 'string' || typeof payload.readerId !== 'string' || typeof payload.exp !== 'number') return null;
     if (payload.exp <= Math.floor(Date.now() / 1000)) return null;
-    return payload.email;
+    return { email: payload.email, readerId: payload.readerId };
   } catch {
     return null;
   }

@@ -1,11 +1,22 @@
 import { NextResponse } from "next/server";
 import { cookies } from "next/headers";
+import { revalidatePath } from "next/cache";
 import { eq } from "drizzle-orm";
+import { z } from "zod";
 import { db } from "@/db";
 import { articles } from "@/db/schema";
 import { verifyAdminSessionToken } from "@/lib/server-auth";
 import { runDbOperation } from "@/lib/db-utils";
 import { sanitizeHTML, sanitizeInput } from "@/lib/sanitize";
+
+const EditArticleSchema = z.object({
+  title: z.string().trim().min(3).max(200),
+  category: z.string().trim().min(2).max(100),
+  author: z.string().trim().min(2).max(100),
+  excerpt: z.string().trim().min(1).max(1000),
+  content: z.string().trim().min(10).max(50000),
+  coverImage: z.union([z.string().url(), z.literal(""), z.null()]).optional(),
+});
 
 async function authorizeAdmin() {
   const cookieStore = await cookies();
@@ -71,17 +82,25 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
     return NextResponse.json({ error: "Invalid article identifier." }, { status: 400 });
   }
 
-  const payload = await req.json().catch(() => ({}));
-  const title = sanitizeInput(String(payload.title || "")).trim();
-  const category = sanitizeInput(String(payload.category || "")).trim();
-  const author = sanitizeInput(String(payload.author || "")).trim();
-  const excerpt = sanitizeHTML(String(payload.excerpt || "")).trim();
-  const content = sanitizeHTML(String(payload.content || "")).trim();
-  const coverImage = sanitizeInput(String(payload.coverImage || "")).trim() || null;
-
-  if (!title || !category || !excerpt || !content || !author) {
-    return NextResponse.json({ error: "Missing required article fields." }, { status: 400 });
+  const payload = await req.json().catch(() => null);
+  if (!payload || typeof payload !== "object") {
+    return NextResponse.json({ error: "Provide valid article fields." }, { status: 400 });
   }
+
+  const parsed = EditArticleSchema.safeParse(payload);
+  if (!parsed.success) {
+    return NextResponse.json({
+      error: parsed.error.issues[0]?.message || "One or more article fields are invalid.",
+      field: parsed.error.issues[0]?.path[0] || null,
+    }, { status: 400 });
+  }
+
+  const title = sanitizeInput(parsed.data.title).trim();
+  const category = sanitizeInput(parsed.data.category).trim();
+  const author = sanitizeInput(parsed.data.author).trim();
+  const excerpt = sanitizeHTML(parsed.data.excerpt).trim();
+  const content = sanitizeHTML(parsed.data.content).trim();
+  const coverImage = parsed.data.coverImage ? sanitizeInput(parsed.data.coverImage).trim() : null;
 
   try {
     const result = await runDbOperation(() =>
@@ -96,9 +115,19 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
           coverImage,
         })
         .where(eq(articles.id, articleId))
+        .returning({ id: articles.id, slug: articles.slug })
     );
 
-    return NextResponse.json({ success: true, message: "Article updated successfully.", result });
+    const updatedArticle = result[0];
+    if (!updatedArticle) {
+      return NextResponse.json({ error: "Article not found; no changes were saved." }, { status: 404 });
+    }
+
+    revalidatePath("/admin");
+    revalidatePath("/");
+    revalidatePath(`/read/${updatedArticle.slug}`);
+
+    return NextResponse.json({ success: true, message: "Article updated successfully.", article: updatedArticle });
   } catch (error) {
     console.error("Failed to update article", error);
     return NextResponse.json({ error: "Unable to update article." }, { status: 500 });
