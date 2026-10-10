@@ -2,8 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { ChevronLeft, ChevronRight, Pause, Play } from 'lucide-react';
-import { ReactNode, useEffect, useRef, useState } from 'react';
+import { ReactNode, useEffect, useState } from 'react';
 
 interface HeroArticle {
   id: number;
@@ -32,9 +31,6 @@ interface AsymmetricalHeroLayoutProps {
   heroArticle?: HeroArticle;
   feedArticles?: FeedArticle[];
   headerAd?: ReactNode;
-  headerAdLabel?: string;
-  logoUrl?: string;
-  logoAlt?: string;
 }
 
 export default function AsymmetricalHeroLayout({
@@ -42,47 +38,22 @@ export default function AsymmetricalHeroLayout({
   heroArticle,
   feedArticles = [],
   headerAd,
-  headerAdLabel = 'Advertisement',
-  logoUrl,
-  logoAlt = 'Beacon Hub logo',
 }: AsymmetricalHeroLayoutProps) {
   const story = article || heroArticle || null;
-  const carouselRef = useRef<HTMLDivElement>(null);
   const [activeSlide, setActiveSlide] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [isHovered, setIsHovered] = useState(false);
-  const [isFocused, setIsFocused] = useState(false);
-  const slideCount = story ? feedArticles.length + 1 : 0;
-
-  function goToSlide(index: number) {
-    const carousel = carouselRef.current;
-    const slide = carousel?.querySelector<HTMLElement>(`[data-carousel-slide="${index}"]`);
-    if (!carousel || !slide) return;
-
-    const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    const left = carousel.scrollLeft + slide.getBoundingClientRect().left - carousel.getBoundingClientRect().left;
-    carousel.scrollTo({ left, behavior: reducedMotion ? 'auto' : 'smooth' });
-    setActiveSlide(index);
-  }
+  const slides = story ? [story, ...feedArticles] : [];
+  const current = slides[activeSlide % Math.max(slides.length, 1)];
 
   useEffect(() => {
-    if (isPaused || isHovered || isFocused || slideCount < 2) return;
+    if (slides.length < 2) return;
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
 
     const timer = window.setInterval(() => {
-      const nextSlide = (activeSlide + 1) % slideCount;
-      const carousel = carouselRef.current;
-      const slide = carousel?.querySelector<HTMLElement>(`[data-carousel-slide="${nextSlide}"]`);
-
-      if (carousel && slide) {
-        const left = carousel.scrollLeft + slide.getBoundingClientRect().left - carousel.getBoundingClientRect().left;
-        carousel.scrollTo({ left, behavior: 'smooth' });
-        setActiveSlide(nextSlide);
-      }
-    }, 6500);
+      setActiveSlide((index) => (index + 1) % slides.length);
+    }, 5000);
 
     return () => window.clearInterval(timer);
-  }, [activeSlide, isFocused, isHovered, isPaused, slideCount]);
+  }, [slides.length]);
 
   const timeAgo = (date?: Date) => {
     if (!date) return '';
@@ -97,185 +68,47 @@ export default function AsymmetricalHeroLayout({
     }
   };
 
+  if (!current) return null;
+
   return (
-    <div className="w-full">
-      <div className="mb-5 sm:mb-6 text-center">
-        <div className="mx-auto mb-3 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
-          {logoUrl && (
+    <section className="w-full overflow-hidden rounded-xl border border-border/80 bg-surface shadow-sm" aria-label="Latest headlines">
+      {headerAd ? <div className="border-b border-border/70 p-3 text-center">{headerAd}</div> : null}
+      <article key={current.slug} className="grid min-w-0 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
+        <Link href={`/read/${current.slug}`} className="group relative block aspect-[16/9] min-h-0 overflow-hidden bg-muted lg:aspect-auto lg:min-h-[24rem]">
+          {current.coverImage ? (
             <Image
-              src={logoUrl}
-              alt={logoAlt}
-              width={48}
-              height={48}
+              src={current.coverImage}
+              alt={current.title}
+              fill
               unoptimized
-              className="h-12 w-12 rounded-full border border-border/70 object-cover shadow-sm"
+              priority={activeSlide === 0}
+              sizes="(max-width: 1024px) 100vw, 58vw"
+              className="object-cover transition-transform duration-700 group-hover:scale-[1.02]"
             />
-          )}
-          <span className="text-[9px] sm:text-[10px] font-semibold uppercase tracking-[0.3em] sm:tracking-[0.45em] text-primary/90">
-            New & Latest News
-          </span>
-        </div>
-
-        <h1 className="mt-3 text-3xl sm:text-4xl lg:text-6xl font-black font-serif tracking-tight text-foreground">
-          Beacon Hub
-        </h1>
-        <p className="mx-auto mt-2 sm:mt-3 max-w-2xl text-sm sm:text-base text-muted-foreground leading-6 sm:leading-7">
-          Fast-moving coverage, clear analysis, and the top stories shaping the day.
-        </p>
-      </div>
-
-      {headerAd && (
-        <div className="mb-8 w-full">
-          <div className="text-[9px] font-sans font-bold uppercase tracking-[0.25em] text-muted-foreground mb-2 text-center select-none">
-            {headerAdLabel}
-          </div>
-          <div className="flex justify-center">{headerAd}</div>
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 gap-5 md:gap-8 lg:grid-cols-[1.7fr_0.8fr] xl:grid-cols-3 xl:gap-10 w-full">
-        <div className="lg:col-span-1 xl:col-span-2">
-          {story ? (
-            <div
-              ref={carouselRef}
-              className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-              aria-label="Featured stories"
-              onMouseEnter={() => setIsHovered(true)}
-              onMouseLeave={() => setIsHovered(false)}
-              onFocusCapture={() => setIsFocused(true)}
-              onBlurCapture={(event) => {
-                if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsFocused(false);
-              }}
-              onScroll={(event) => {
-                const carousel = event.currentTarget;
-                const slides = Array.from(carousel.querySelectorAll<HTMLElement>('[data-carousel-slide]'));
-                const nextActive = slides.reduce((nearestIndex, slide, index) => {
-                  const nearest = slides[nearestIndex];
-                  return Math.abs(slide.getBoundingClientRect().left - carousel.getBoundingClientRect().left) <
-                    Math.abs(nearest.getBoundingClientRect().left - carousel.getBoundingClientRect().left)
-                    ? index
-                    : nearestIndex;
-                }, 0);
-                setActiveSlide(nextActive);
-              }}
-            >
-              {[story, ...feedArticles].map((item, index) => (
-                <article key={`${item.id}-${item.slug}`} data-carousel-slide={index} className="group w-full min-w-full snap-start rounded-[2rem] border border-border/80 bg-surface p-4 shadow-[0_18px_80px_-48px_rgba(15,23,42,0.3)] sm:p-6 md:p-8">
-                  <div className="mb-4 flex flex-wrap items-center gap-3 sm:mb-6">
-                    <span className="rounded-full bg-primary px-3 py-1 text-[10px] font-sans font-bold uppercase tracking-widest text-white shadow-sm">
-                      {item.isSponsored ? 'Sponsored' : index === 0 ? 'Latest Briefing' : 'Featured Story'}
-                    </span>
-                    <span className="text-[10px] font-sans font-bold uppercase tracking-wider text-muted-foreground">
-                      {item.category || 'Top Story'}
-                    </span>
-                  </div>
-
-                  {item.coverImage && (
-                    <Link href={`/read/${item.slug || ''}`}>
-                      <div className="relative mb-5 aspect-video max-h-64 w-full overflow-hidden rounded-[1.5rem] bg-muted shadow-lg sm:max-h-80 md:mb-6 md:aspect-[21/9] md:max-h-96">
-                        <Image
-                          src={item.coverImage}
-                          alt={item.title || 'Headline Image'}
-                          fill
-                          unoptimized
-                          className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                        />
-                      </div>
-                    </Link>
-                  )}
-
-                  <Link href={`/read/${item.slug || ''}`}>
-                    <h2 className="mb-4 text-lg font-bold leading-tight text-foreground transition-colors hover:text-primary sm:text-3xl md:text-4xl lg:text-5xl">
-                      {item.title || 'Intelligence Briefing Generating...'}
-                    </h2>
-                  </Link>
-
-                  {item.excerpt && (
-                    <p className="mb-5 max-w-3xl font-sans text-sm leading-relaxed text-muted-foreground sm:text-base md:text-lg">
-                      {item.excerpt}
-                    </p>
-                  )}
-
-                  <div className="text-[11px] font-mono font-medium uppercase tracking-widest text-muted-foreground">
-                    {timeAgo(item.publishedAt)}
-                  </div>
-                </article>
-              ))}
-            </div>
           ) : (
-            <div className="w-full py-16 border border-border rounded-[2rem] bg-surface animate-pulse">
-              <div className="h-4 bg-muted rounded w-32 mb-6" />
-              <div className="w-full h-[350px] bg-muted rounded-[1.75rem] mb-6" />
-              <div className="h-10 bg-muted rounded w-3/4 mb-4" />
-              <div className="h-4 bg-muted rounded w-full mb-2" />
-              <div className="h-4 bg-muted rounded w-2/3" />
-            </div>
+            <div className="flex h-full min-h-48 items-center justify-center bg-muted text-sm font-bold uppercase text-muted-foreground">Beacon Hub</div>
           )}
-          {slideCount > 1 && (
-            <div className="mt-3 flex items-center justify-between gap-3" aria-label="Featured story controls">
-              <div className="flex items-center gap-1.5" aria-label={`Slide ${activeSlide + 1} of ${slideCount}`}>
-                {Array.from({ length: slideCount }, (_, index) => (
-                  <button
-                    key={index}
-                    type="button"
-                    aria-label={`Show featured story ${index + 1}`}
-                    aria-current={activeSlide === index ? 'true' : undefined}
-                    onClick={() => goToSlide(index)}
-                    className={`h-2 rounded-full transition-all ${activeSlide === index ? 'w-6 bg-primary' : 'w-2 bg-border hover:bg-primary/60'}`}
-                  />
-                ))}
-              </div>
-              <div className="flex items-center gap-1">
-                <button type="button" onClick={() => goToSlide((activeSlide - 1 + slideCount) % slideCount)} aria-label="Previous featured story" className="rounded-full border border-border p-2 text-foreground transition-colors hover:bg-muted">
-                  <ChevronLeft size={16} />
-                </button>
-                <button type="button" onClick={() => goToSlide((activeSlide + 1) % slideCount)} aria-label="Next featured story" className="rounded-full border border-border p-2 text-foreground transition-colors hover:bg-muted">
-                  <ChevronRight size={16} />
-                </button>
-                <button type="button" onClick={() => setIsPaused((paused) => !paused)} aria-label={isPaused ? 'Resume carousel' : 'Pause carousel'} className="rounded-full border border-border p-2 text-foreground transition-colors hover:bg-muted">
-                  {isPaused ? <Play size={15} /> : <Pause size={15} />}
-                </button>
-              </div>
-            </div>
-          )}
-        </div>
+        </Link>
 
-        <div className="lg:col-span-1 xl:col-span-1">
-          <div className="sticky top-6 lg:top-24">
-            <div className="rounded-[1.75rem] border border-border/70 bg-surface p-6 shadow-sm">
-              <h2 className="text-[10px] font-sans font-bold uppercase tracking-[0.2em] text-primary mb-6">
-                Latest Wire Updates
-              </h2>
-
-              {feedArticles.length > 0 ? (
-                <div className="space-y-6 divide-y divide-border/40">
-                  {feedArticles.map((item) => (
-                    <Link
-                      key={item.id}
-                      href={`/read/${item.slug || ''}`}
-                      className="group block pt-4 first:pt-0 hover:translate-x-1 transition-transform"
-                    >
-                      <span className="text-[9px] font-sans font-bold uppercase tracking-wider text-primary block mb-1">
-                        {item.category || 'News'}
-                      </span>
-                      <h3 className="text-sm font-serif font-bold text-foreground group-hover:text-primary transition-colors line-clamp-2 leading-snug mb-1.5">
-                        {item.title || 'Untitled Dispatch'}
-                      </h3>
-                      {item.publishedAt && (
-                        <span className="text-[10px] font-mono text-muted-foreground block">
-                          {timeAgo(item.publishedAt)}
-                        </span>
-                      )}
-                    </Link>
-                  ))}
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground italic">No secondary updates incoming.</p>
-              )}
-            </div>
+        <div className="flex min-w-0 flex-col justify-center p-5 sm:p-7 lg:p-8">
+          <div className="mb-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[10px] font-bold uppercase tracking-[0.16em]">
+            <span className="text-primary">{current.category || 'Top News'}</span>
+            <span className="text-muted-foreground">{current.isSponsored ? 'Sponsored' : 'Latest'}</span>
           </div>
+          <Link href={`/read/${current.slug}`} className="group/title">
+            <h2 className="line-clamp-4 text-2xl font-black leading-tight text-foreground transition-colors group-hover/title:text-primary sm:text-3xl lg:text-4xl">
+              {current.title}
+            </h2>
+          </Link>
+          {current.excerpt ? (
+            <p className="mt-3 line-clamp-3 text-sm leading-6 text-muted-foreground sm:text-base">
+              {current.excerpt}
+            </p>
+          ) : null}
+          <p className="mt-5 font-mono text-[10px] text-muted-foreground">{timeAgo(current.publishedAt)}</p>
+          <span className="sr-only" aria-live="polite">Headline {activeSlide + 1} of {slides.length}</span>
         </div>
-      </div>
-    </div>
+      </article>
+    </section>
   );
 }

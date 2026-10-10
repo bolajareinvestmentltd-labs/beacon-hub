@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" fill="none">
+	<defs>
+		<linearGradient id="ribbon" x1="18" y1="19" x2="112" y2="111" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#19D9E8"/>
+			<stop offset=".48" stop-color="#8A61FF"/>
+			<stop offset="1" stop-color="#F05AD7"/>
+		</linearGradient>
+		<linearGradient id="crossing" x1="31" y1="105" x2="99" y2="25" gradientUnits="userSpaceOnUse">
+			<stop stop-color="#F05AD7"/>
+			<stop offset=".52" stop-color="#8A61FF"/>
+			<stop offset="1" stop-color="#19D9E8"/>
+		</linearGradient>
+		<filter id="glow" x="0" y="0" width="128" height="128" color-interpolation-filters="sRGB" filterUnits="userSpaceOnUse">
+			<feGaussianBlur stdDeviation="5" result="blur"/>
+			<feComposite in="SourceGraphic" in2="blur" operator="over"/>
+		</filter>
+	</defs>
+	<path d="M29 38c0-11 9-20 20-20h25c14 0 25 10 25 22 0 11-7 18-18 24l-34 19c-11 6-17 12-17 21 0 10 9 18 20 18h26c12 0 21-8 21-19" stroke="url(#ribbon)" stroke-linecap="round" stroke-linejoin="round" stroke-width="13" filter="url(#glow)" opacity=".72"/>
+	<path d="M29 38c0-11 9-20 20-20h25c14 0 25 10 25 22 0 11-7 18-18 24l-34 19c-11 6-17 12-17 21 0 10 9 18 20 18h26c12 0 21-8 21-19" stroke="url(#ribbon)" stroke-linecap="round" stroke-linejoin="round" stroke-width="7"/>
+	<path d="M99 38c0-11-9-20-20-20H53c-14 0-25 10-25 22 0 11 7 18 18 24l34 19c11 6 17 12 17 21 0 10-9 18-20 18H51c-12 0-21-8-21-19" stroke="url(#crossing)" stroke-linecap="round" stroke-linejoin="round" stroke-width="13" filter="url(#glow)" opacity=".62"/>
+	<path d="M99 38c0-11-9-20-20-20H53c-14 0-25 10-25 22 0 11 7 18 18 24l34 19c11 6 17 12 17 21 0 10-9 18-20 18H51c-12 0-21-8-21-19" stroke="url(#crossing)" stroke-linecap="round" stroke-linejoin="round" stroke-width="7"/>
+</svg>

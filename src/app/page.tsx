@@ -1,23 +1,21 @@
 ﻿import Link from 'next/link';
 import Image from 'next/image';
 import AsymmetricalHeroLayout from '@/components/AsymmetricalHeroLayout';
-import SectionHeaderComponent from '@/components/SectionHeaderComponent';
 import * as queries from '@/lib/queries';
 import QuoteCard from '@/components/QuoteCard';
 import RelatedContentGrid from '@/components/RelatedContentGrid';
 import LiveClock from '@/components/LiveClock';
 import type { Metadata } from 'next';
-import { getArticles, getArticlesByCategory, getEditorialSections } from '@/lib/queries';
+import { getArticles, getArticlesByCategory } from '@/lib/queries';
 import { TAXONOMY } from '@/config/taxonomy';
 import PushNotificationOptIn from '@/components/PushNotificationOptIn';
 import NewsNotificationRail from '@/components/NewsNotificationRail';
-import TrendingNewsTicker from '@/components/TrendingNewsTicker';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.startsWith('https://')
   ? process.env.NEXT_PUBLIC_SITE_URL
   : 'https://www.beacon-hub.com.ng';
 
-function toAbsoluteImageUrl(value?: string | null, fallback = new URL('/logo.png', siteUrl).toString()) {
+function toAbsoluteImageUrl(value?: string | null, fallback = new URL('/beacon-logo.svg', siteUrl).toString()) {
   if (!value) return fallback;
 
   try {
@@ -29,7 +27,7 @@ function toAbsoluteImageUrl(value?: string | null, fallback = new URL('/logo.png
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const fallbackImage = new URL('/logo.png', siteUrl).toString();
+  const fallbackImage = new URL('/beacon-logo.svg', siteUrl).toString();
   const latestArticle = (await getArticles(1))[0];
   const title = latestArticle?.title
     ? `${latestArticle.title} | Beacon Hub`
@@ -110,7 +108,6 @@ export default async function HomePage() {
   }
 
   const latest = sortByNewest(articles).slice(0, 18);
-  const editorialSections = await getEditorialSections();
   const categoryFeeds = await Promise.all(
     TAXONOMY.primary
       .filter((section) => section.href.startsWith('/category/'))
@@ -120,22 +117,17 @@ export default async function HomePage() {
       }))
   );
 
-  const heroArticle = latest[0]
-    ? {
-        id: latest[0].id ?? 1,
-        slug: latest[0].slug ?? 'latest-news',
-        title: latest[0].title ?? 'Latest news',
-        excerpt: latest[0].excerpt ?? latest[0].description ?? '',
-        category: latest[0].category ?? 'Top News',
-        coverImage: latest[0].coverImage ?? '',
-        isSponsored: latest[0].isSponsored,
-        publishedAt: latest[0].publishedAt ? new Date(latest[0].publishedAt) : new Date(),
-      }
-    : undefined;
+  const carouselStories = Array.from(
+    new Map(
+      [...latest, ...categoryFeeds.flatMap((section) => section.articles ?? [])]
+        .filter((article) => article?.slug && article?.title)
+        .map((article) => [String(article.slug), article] as const)
+    ).values()
+  ).slice(0, 16);
 
-  const feedArticles = latest.slice(1, 6).map((article, index) => ({
-    id: article.id ?? index + 2,
-    slug: article.slug ?? `article-${index + 2}`,
+  const heroStories = carouselStories.map((article, index) => ({
+    id: article.id ?? index + 1,
+    slug: article.slug ?? `article-${index + 1}`,
     title: article.title ?? 'Latest news',
     category: article.category ?? 'Top News',
     excerpt: article.excerpt ?? article.description ?? '',
@@ -143,6 +135,9 @@ export default async function HomePage() {
     isSponsored: article.isSponsored,
     publishedAt: article.publishedAt ? new Date(article.publishedAt) : new Date(),
   }));
+
+  const heroArticle = heroStories[0];
+  const feedArticles = heroStories.slice(1);
 
   const moreStories = latest.slice(6, 12).map((article, index) => ({
     id: article.id ?? index + 7,
@@ -170,26 +165,6 @@ export default async function HomePage() {
     latest[0]?.excerpt ?? latest[0]?.description ?? 'Editorial clarity cuts through the noise and keeps the signal sharp.';
   const quoteAuthor = latest[0]?.category ? `${latest[0].category} Desk` : 'Beacon-Hub Editorial';
 
-  const rotatingHeadlines = Array.from(
-    new Map(
-      [...latest, ...categoryFeeds.flatMap((section) => (section.articles ?? []).slice(0, 2).map((article) => ({
-        ...article,
-        category: String(article.category || section.name || 'Top News'),
-      })))]
-        .filter((article) => article?.slug && article?.title)
-        .map((article) => [String(article.slug), article] as const)
-    ).values()
-  ).slice(0, 12);
-
-  const tickerItems = rotatingHeadlines.length > 0
-    ? rotatingHeadlines
-    : latest.slice(0, 8).map((article, index) => ({
-        ...article,
-        category: String(article.category ?? 'Top News'),
-        slug: String(article.slug ?? `fallback-headline-${index + 1}`),
-        title: String(article.title ?? 'Headline update'),
-      }));
-
   return (
     <div className="min-h-screen w-full bg-background py-4 sm:py-8">
       <div className="flex w-full flex-col">
@@ -206,12 +181,10 @@ export default async function HomePage() {
             <LiveClock />
           </div>
         </div>
-        <div className="mt-2 sm:mt-4 md:mt-6">
+        <div className="mt-3 sm:mt-5">
           <AsymmetricalHeroLayout
             article={heroArticle}
             feedArticles={feedArticles}
-            logoUrl="/logo.png"
-            headerAdLabel="Latest Signal"
           />
         </div>
 
@@ -225,27 +198,6 @@ export default async function HomePage() {
           coverImage: article.coverImage,
           publishedAt: article.publishedAt,
         }))} />
-
-        <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-14">
-          <SectionHeaderComponent eyebrow="THE DESKS" title="Choose your signal" description="Move through the newsroom by subject, perspective, and pace." />
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-            {editorialSections.slice(0, 6).map((section: { id: number; name: string; description?: string | null; accentColor?: string | null; slug?: string | null }) => (
-              <div
-                key={section.id}
-                className="rounded-2xl border border-slate-200 bg-white/80 p-5 shadow-sm backdrop-blur dark:border-white/10 dark:bg-slate-900/60"
-              >
-                <div className="mb-3 h-1 w-14 rounded-full" style={{ backgroundColor: section.accentColor || '#E2725B' }} />
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white">{section.name}</h3>
-                {section.description ? (
-                  <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{section.description}</p>
-                ) : null}
-                <Link href={`/category/${section.slug || section.name.toLowerCase()}`} className="mt-4 inline-flex text-sm font-semibold text-[#E2725B] hover:underline">
-                  Explore section →
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
 
         <div className="mt-8 sm:mt-10 md:mt-12 lg:mt-14">
           {categoryFeeds.map((section) => (

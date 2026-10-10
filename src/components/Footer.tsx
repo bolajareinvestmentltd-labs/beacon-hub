@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 import { Home, Sparkles, Tags, Menu, X } from 'lucide-react';
 
 const PRIMARY_ITEMS = [
@@ -46,7 +47,7 @@ export default function Footer() {
       <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-12 md:px-6 lg:flex-row lg:justify-between">
         <div className="max-w-md">
           <div className="flex items-center gap-3">
-            <img src="/logo.png" alt="Beacon Hub logo" className="h-10 w-10 rounded-full object-cover" />
+            <Image src="/beacon-logo.svg" alt="" width={40} height={40} unoptimized className="h-10 w-10" />
             <div>
               <p className="text-lg font-black text-foreground dark:text-white">Beacon Hub</p>
               <p className="text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground dark:text-slate-400">
@@ -69,7 +70,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-3 text-sm">
               {QUICK_LINKS.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="transition hover:text-[#2F6FED]">
+                  <Link href={link.href} className="transition hover:text-primary">
                     {link.label}
                   </Link>
                 </li>
@@ -84,7 +85,7 @@ export default function Footer() {
             <ul className="mt-4 space-y-3 text-sm">
               {CATEGORY_LINKS.map((link) => (
                 <li key={link.label}>
-                  <Link href={link.href} className="transition hover:text-[#2F6FED]">
+                  <Link href={link.href} className="transition hover:text-primary">
                     {link.label}
                   </Link>
                 </li>

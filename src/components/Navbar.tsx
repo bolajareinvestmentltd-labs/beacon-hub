@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { Search, Terminal } from "lucide-react";
 import { TAXONOMY } from "@/config/taxonomy";
@@ -18,7 +19,8 @@ export default function Navbar() {
         {/* Left: BH Logo firmly anchored */}
         <div className="flex items-center whitespace-nowrap">
           <Link href="/" className="flex items-center">
-            <img src="/logo.png" alt="Beacon Hub logo" className="h-10 w-10 object-cover rounded-full" />
+            <Image src="/beacon-logo.svg" alt="" width={40} height={40} unoptimized className="h-10 w-10" />
+            <span className="ml-2 text-sm font-black text-foreground sm:text-base">Beacon Hub</span>
           </Link>
         </div>
 
