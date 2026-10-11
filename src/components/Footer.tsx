@@ -1,16 +1,7 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import Image from 'next/image';
-import { Home, Sparkles, Tags, Menu, X } from 'lucide-react';
-
-const PRIMARY_ITEMS = [
-  { label: 'Home', href: '/', icon: Home },
-  { label: 'Categories', href: '/category/top-news', icon: Tags },
-  { label: 'Astrology', href: '/horoscopes', icon: Sparkles },
-];
 
 const QUICK_LINKS = [
   { label: 'About', href: '/about' },
@@ -31,17 +22,6 @@ const SOCIAL_LINKS = [
 ];
 
 export default function Footer() {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const pathname = usePathname();
-
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMenuOpen(false);
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, []);
-
   return (
     <footer className="border-t border-border/70 bg-surface-elevated/95 text-foreground dark:border-white/10 dark:bg-slate-950/95 dark:text-slate-300">
       <div className="mx-auto flex max-w-7xl flex-col gap-10 px-4 py-12 md:px-6 lg:flex-row lg:justify-between">

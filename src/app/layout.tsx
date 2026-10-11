@@ -10,6 +10,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import MobileDock from '@/components/MobileDock';
 import NewsAssistant from '@/components/NewsAssistant';
+import CookieBanner from '@/components/CookieBanner';
 import ServiceWorkerRegistration from '@/components/ServiceWorkerRegistration';
 import TrafficTracker from '@/components/TrafficTracker';
 import './globals.css';
@@ -21,7 +22,7 @@ const configuredSiteUrl = process.env.NEXT_PUBLIC_SITE_URL?.trim();
 const siteUrl = configuredSiteUrl?.startsWith('https://')
   ? configuredSiteUrl
   : 'https://www.beacon-hub.com.ng';
-const ADSENSE_CLIENT_ID = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID?.trim();
+const ADSENSE_PUBLISHER_ID = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID?.trim();
 
 export const viewport: Viewport = {
   width: 'device-width',
@@ -66,15 +67,6 @@ export default function RootLayout({ children }: { children: ReactNode }) {
   return (
     <html lang="en" suppressHydrationWarning>
       <body className={`${inter.variable} ${playfair.variable} min-h-screen bg-background text-foreground antialiased`}>
-        {ADSENSE_CLIENT_ID && !ADSENSE_CLIENT_ID.includes('xxxxxxxx') && (
-          <script
-            id="google-adsense-master"
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${ADSENSE_CLIENT_ID}`}
-            crossOrigin="anonymous"
-          ></script>
-        )}
-
         <ThemeProvider>
           <BrandSplash />
           <Navbar />
@@ -82,6 +74,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           <Footer />
           <MobileDock />
           <NewsAssistant />
+          <CookieBanner publisherId={ADSENSE_PUBLISHER_ID} />
           <PwaInstallPrompt />
           <ServiceWorkerRegistration />
           <TrafficTracker />

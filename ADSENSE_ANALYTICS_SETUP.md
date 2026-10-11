@@ -2,11 +2,11 @@
 
 This document provides instructions for completing Google AdSense and Google Analytics integration for Beacon-Hub.
 
-## ✅ Completed Setup
+## Current Integration
 
 ### 1. AdSense Component Created
 - **Location**: `src/components/AdSense.tsx`
-- **Purpose**: Reusable component for displaying AdSense ads
+- **Purpose**: Reusable component for displaying AdSense ads when a real publisher ID and slot are configured
 - **Usage**:
   ```tsx
   import AdSense from "@/components/AdSense";
@@ -14,9 +14,9 @@ This document provides instructions for completing Google AdSense and Google Ana
   <AdSense adSlot="1234567890" adFormat="rectangle" />
   ```
 
-### 2. ads.txt File Created
+### 2. ads.txt File
 - **Location**: `public/ads.txt`
-- **Status**: Template created (requires AdSense Publisher ID)
+- **Status**: Contains an instruction comment only. Replace it with the seller record Google issues after account setup; the repository intentionally does not publish a fake publisher ID.
 - **Purpose**: Declares authorized digital ad sellers
 
 ### 3. SEO Configuration Complete
@@ -29,12 +29,12 @@ This document provides instructions for completing Google AdSense and Google Ana
 - **Twitter Card Tags**: Configured ✓
 - **Verification Tag**: Added to metadata (needs Google verification code)
 
-### 4. AdSense Integrated Into Pages
-- **Homepage**: `src/app/page.tsx`
-  - Ad placement after hero section (rectangle ad)
-  - Ad placement after every 3 feed articles
-  - Full-width responsive ad at bottom
-- **Component**: Ready to use on any page
+### 4. Consent-Gated AdSense Loader
+- The site loads the AdSense script only after the visitor accepts the cookie banner.
+- Sample publisher IDs and sample slot numbers are ignored.
+- Auto Ads can be enabled from the AdSense account after approval. Manual slots are optional and require real slot IDs.
+- For traffic in regions where Google requires a certified consent management platform, configure an approved CMP; the current basic consent banner is not a substitute for Google's certified CMP requirement.
+- AdSense approval and ad serving cannot be verified until a real publisher account/ID, the matching `ads.txt` seller record, and any required site verification are configured.
 
 ---
 
@@ -52,23 +52,15 @@ This document provides instructions for completing Google AdSense and Google Ana
 
 ### Step 2: Update Publisher ID
 
-Once approved, you'll receive a **Publisher ID** (format: `pub-xxxxxxxxxxxxxxxx`)
+Once Google issues your **Publisher ID** (format: `ca-pub-` followed by 16 digits), configure `NEXT_PUBLIC_ADSENSE_PUB_ID` in the deployment environment. The sample value currently in local development is deliberately ignored.
 
-**Update the following files:**
+**Configure the following:**
 
-1. **`src/components/AdSense.tsx`**
-   ```tsx
-   data-ad-client="ca-pub-xxxxxxxxxxxxxxxx"  // Replace with your Publisher ID
+1. Set `NEXT_PUBLIC_ADSENSE_PUB_ID` in the hosting provider's environment settings.
+
+2. Replace the instruction comment in `public/ads.txt` with the exact seller record from AdSense, for example:
    ```
-
-2. **`src/app/layout.tsx`**
-   ```tsx
-   src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-xxxxxxxxxxxxxxxx"
-   ```
-
-3. **`public/ads.txt`**
-   ```
-   google.com, pub-xxxxxxxxxxxxxxxx, DIRECT, f08c47fec0942fa0
+   google.com, pub-<16-digit-publisher-id>, DIRECT, f08c47fec0942fa0
    ```
 
 ### Step 3: Create Ad Units
@@ -76,14 +68,9 @@ Once approved, you'll receive a **Publisher ID** (format: `pub-xxxxxxxxxxxxxxxx`
 In Google AdSense dashboard:
 
 1. Go to **Ads** > **Ad units**
-2. Create ad units for each placement type:
-   - **Homepage Rectangle Ad**: `1234567890` (300x250 or 336x280)
-   - **Homepage Feed Ads**: Use same or different slot
-   - **Homepage Bottom Ad**: `0987654321` (responsive)
+3. Create ad units only for the placements you plan to use.
 
-3. Update ad slots in your code:
-   - `src/app/page.tsx`: Update `adSlot` values
-   - Any other pages using AdSense
+3. Configure the real numeric slot IDs as `NEXT_PUBLIC_ADSENSE_HOME_SLOT`, `NEXT_PUBLIC_ADSENSE_ARTICLE_SLOT`, and/or `NEXT_PUBLIC_ADSENSE_SIDEBAR_SLOT` in the hosting environment. Do not use sample IDs.
 
 ### Step 4: Google Search Console Setup
 
@@ -147,8 +134,7 @@ In Google AdSense dashboard:
 ## 📋 Checklist
 
 - [ ] Google AdSense account created and approved
-- [ ] Publisher ID added to `AdSense.tsx`
-- [ ] Publisher ID added to `layout.tsx`
+- [ ] Real publisher ID configured as `NEXT_PUBLIC_ADSENSE_PUB_ID`
 - [ ] ads.txt updated with Publisher ID
 - [ ] Ad units created in AdSense dashboard
 - [ ] Ad slot numbers updated in pages

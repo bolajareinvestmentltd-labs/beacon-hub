@@ -1,21 +1,26 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { ShieldCheck } from "lucide-react";
+import { useState, useSyncExternalStore } from "react";
+import { Eye, EyeOff, ShieldCheck } from "lucide-react";
 import { loginAction } from "@/lib/auth-actions";
 
-export default function LoginPage() {
-  const [resolvedParams, setResolvedParams] = useState<{ error?: string }>({});
+function subscribeToLocation(onStoreChange: () => void) {
+  window.addEventListener("popstate", onStoreChange);
+  return () => window.removeEventListener("popstate", onStoreChange);
+}
 
-  useEffect(() => {
-    try {
-      const sp = new URLSearchParams(window.location.search);
-      const err = sp.get("error") || undefined;
-      setResolvedParams({ error: err });
-    } catch {
-      // ignore in non-browser environments
-    }
-  }, []);
+function getLocationSearch() {
+  return window.location.search;
+}
+
+function getServerLocationSearch() {
+  return "";
+}
+
+export default function LoginPage() {
+  const [showPassword, setShowPassword] = useState(false);
+  const search = useSyncExternalStore(subscribeToLocation, getLocationSearch, getServerLocationSearch);
+  const loginError = new URLSearchParams(search).get("error");
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4">
@@ -30,9 +35,9 @@ export default function LoginPage() {
           <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">Use the seeded admin account to enter the command center.</p>
         </div>
 
-        {resolvedParams.error && (
+        {loginError && (
           <div className="bg-red-50 dark:bg-red-950/30 text-red-600 dark:text-red-400 border border-red-200 dark:border-red-900/50 p-3 rounded-md text-xs font-bold text-center mb-6 uppercase tracking-wider">
-            {resolvedParams.error}
+            {loginError}
           </div>
         )}
 
@@ -53,16 +58,28 @@ export default function LoginPage() {
 
           <div>
             <label className="text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-widest mb-2 block">Password</label>
-            <input
-              type="password"
-              name="password"
-              required
-              minLength={8}
-              className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 text-black dark:text-white focus:outline-none focus:border-[#E2725B] focus:ring-1 focus:ring-[#E2725B] transition-all"
-              placeholder="Enter your admin password"
-              defaultValue=""
-              title="Password must be at least 8 characters"
-            />
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                name="password"
+                autoComplete="current-password"
+                required
+                minLength={8}
+                className="w-full bg-slate-50 dark:bg-black border border-black/10 dark:border-white/10 rounded-md px-4 py-3 pr-12 text-black dark:text-white focus:outline-none focus:border-[#E2725B] focus:ring-1 focus:ring-[#E2725B] transition-all"
+                placeholder="Enter your admin password"
+                defaultValue=""
+                title="Password must be at least 8 characters"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((visible) => !visible)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+                className="absolute inset-y-0 right-0 inline-flex w-11 items-center justify-center text-slate-500 transition hover:text-[#E2725B]"
+              >
+                {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+              </button>
+            </div>
           </div>
 
           <label className="inline-flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">

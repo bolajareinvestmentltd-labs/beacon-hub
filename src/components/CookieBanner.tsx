@@ -1,8 +1,35 @@
 'use client';
 
 import CookieConsent from 'react-cookie-consent';
+import { useEffect } from 'react';
 
-export default function CookieBanner() {
+const CONSENT_COOKIE = 'beacon_hub_consent';
+
+function hasProductionPublisherId(value?: string) {
+  return Boolean(
+    value &&
+    /^ca-pub-\d{16}$/.test(value) &&
+    !['ca-pub-1234567890123456', 'ca-pub-0000000000000000'].includes(value)
+  );
+}
+
+function loadAdSense(publisherId?: string) {
+  if (!hasProductionPublisherId(publisherId) || document.getElementById('google-adsense-master')) return;
+
+  const script = document.createElement('script');
+  script.id = 'google-adsense-master';
+  script.async = true;
+  script.crossOrigin = 'anonymous';
+  script.src = `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${publisherId}`;
+  document.head.appendChild(script);
+}
+
+export default function CookieBanner({ publisherId }: { publisherId?: string }) {
+  useEffect(() => {
+    const accepted = document.cookie.split(';').some((cookie) => cookie.trim() === `${CONSENT_COOKIE}=true`);
+    if (accepted) loadAdSense(publisherId);
+  }, [publisherId]);
+
   return (
     <CookieConsent
       location="bottom"
@@ -15,20 +42,23 @@ export default function CookieBanner() {
       declineButtonClasses="cookie-button-decline"
       enableDeclineButton
       onAccept={() => {
-        // Track analytics consent
+        loadAdSense(publisherId);
         if (typeof window !== 'undefined' && window.gtag) {
           window.gtag('consent', 'update', {
             'analytics_storage': 'granted',
-            'ad_storage': 'granted'
+            'ad_storage': 'granted',
+            'ad_user_data': 'granted',
+            'ad_personalization': 'granted',
           });
         }
       }}
       onDecline={() => {
-        // Disable analytics on decline
         if (typeof window !== 'undefined' && window.gtag) {
           window.gtag('consent', 'update', {
             'analytics_storage': 'denied',
-            'ad_storage': 'denied'
+            'ad_storage': 'denied',
+            'ad_user_data': 'denied',
+            'ad_personalization': 'denied',
           });
         }
       }}

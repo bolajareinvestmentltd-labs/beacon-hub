@@ -11,7 +11,6 @@ interface EditorialColumnComponentProps {
 }
 
 export default function EditorialColumnComponent({
-  title,
   content,
   children,
   accentColor = '#E2725B',

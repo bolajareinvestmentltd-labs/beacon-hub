@@ -6,22 +6,20 @@ import { sendNewsPush } from '@/lib/push-news';
 
 export const maxDuration = 60;
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const GNEWS_API_KEY = process.env.GNEWS_API_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-2.0-flash';
 const NEWS_FEEDS = [
-  { category: 'Global News', query: 'world news Nigeria' },
-  { category: 'Tech & Startups', query: 'technology startups artificial intelligence' },
-  { category: 'Elections 2027', query: 'Nigeria politics election government' },
-  { category: 'Business & Finance', query: 'Nigeria business finance markets' },
-  { category: 'Sports', query: 'Nigeria sports football' },
-  { category: 'Entertainment', query: 'Nigeria entertainment film music' },
-  { category: 'Real Estate', query: 'Nigeria real estate property' },
-  { category: 'Health', query: 'Nigeria health healthcare medicine' },
-  { category: 'Education', query: 'Nigeria education universities' },
-  { category: 'Science & AI', query: 'science research artificial intelligence' },
-  { category: 'Climate & Energy', query: 'Nigeria climate energy environment' },
-  { category: 'Nigeria News', query: 'Nigeria latest news' },
+  { category: 'Global News', query: 'world news Nigeria', fallbackQuery: 'Africa international news' },
+  { category: 'Tech & Startups', query: 'technology startups artificial intelligence', fallbackQuery: 'Nigeria technology startup' },
+  { category: 'Elections 2027', query: 'Nigeria politics election government', fallbackQuery: 'Nigeria election politics' },
+  { category: 'Business & Finance', query: 'Nigeria business finance markets', fallbackQuery: 'Nigeria economy business markets' },
+  { category: 'Sports', query: 'Nigeria sports football', fallbackQuery: 'Nigerian sports football' },
+  { category: 'Entertainment', query: 'Nigeria entertainment film music', fallbackQuery: 'Nollywood Nigeria entertainment' },
+  { category: 'Real Estate', query: 'Nigeria real estate property', fallbackQuery: 'Nigeria housing property' },
+  { category: 'Health', query: 'Nigeria health healthcare medicine', fallbackQuery: 'Nigeria hospital health medicine' },
+  { category: 'Education', query: 'Nigeria education universities', fallbackQuery: 'Nigeria schools education' },
+  { category: 'Science & AI', query: 'science research artificial intelligence', fallbackQuery: 'science technology research Africa' },
+  { category: 'Climate & Energy', query: 'Nigeria climate energy environment', fallbackQuery: 'Nigeria power renewable energy' },
+  { category: 'Nigeria News', query: 'Nigeria latest news', fallbackQuery: 'Nigeria government news' },
 ] as const;
 
 type GNewsArticle = {
@@ -46,37 +44,44 @@ function slugify(value: string) {
 
 async function fetchNewsFromGNews() {
   if (!GNEWS_API_KEY) {
-    return [];
+    throw new Error('GNEWS_API_KEY is required to ingest verified news. Generated stories are not published as news.');
   }
 
   const collected: ReturnType<typeof normalizeGNewsArticle>[] = [];
   const failures: string[] = [];
+  const emptyCategories: string[] = [];
 
   for (const feed of NEWS_FEEDS) {
-    const query = new URLSearchParams({
-      q: feed.query,
-      lang: 'en',
-      max: '3',
-      sortby: 'publishedAt',
-      token: GNEWS_API_KEY,
-    });
-    const response = await fetch(`https://gnews.io/api/v4/search?${query}`, { method: 'GET' });
-    const text = await response.text();
-    let data: { articles?: GNewsArticle[]; message?: string };
+    let categoryArticles: ReturnType<typeof normalizeGNewsArticle>[] = [];
 
-    try {
-      data = JSON.parse(text);
-    } catch (parseError) {
-      failures.push(`${feed.category}: invalid GNews JSON (${(parseError as Error).message})`);
-      continue;
+    for (const searchTerm of [feed.query, feed.fallbackQuery]) {
+      const query = new URLSearchParams({
+        q: searchTerm,
+        lang: 'en',
+        max: '5',
+        sortby: 'publishedAt',
+        token: GNEWS_API_KEY,
+      });
+
+      try {
+        const response = await fetch(`https://gnews.io/api/v4/search?${query}`, { method: 'GET' });
+        const data = await response.json().catch(() => null) as { articles?: GNewsArticle[]; message?: string } | null;
+        if (!response.ok || !Array.isArray(data?.articles)) {
+          failures.push(`${feed.category}: ${data?.message || `GNews status ${response.status}`}`);
+          continue;
+        }
+
+        categoryArticles = data.articles
+          .filter((article) => typeof article.url === 'string' && /^https?:\/\//.test(article.url))
+          .map((article, index) => normalizeGNewsArticle(article, feed.category, index));
+        if (categoryArticles.length) break;
+      } catch (error) {
+        failures.push(`${feed.category}: ${error instanceof Error ? error.message : 'GNews request failed'}`);
+      }
     }
 
-    if (!response.ok || !Array.isArray(data.articles)) {
-      failures.push(`${feed.category}: ${data?.message || `GNews status ${response.status}`}`);
-      continue;
-    }
-
-    collected.push(...data.articles.map((article, index) => normalizeGNewsArticle(article, feed.category, index)));
+    if (categoryArticles.length) collected.push(...categoryArticles);
+    else emptyCategories.push(feed.category);
   }
 
   if (!collected.length && failures.length) {
@@ -87,7 +92,7 @@ async function fetchNewsFromGNews() {
     console.warn('Some category feeds failed:', failures);
   }
 
-  return collected;
+  return { articles: collected, emptyCategories };
 }
 
 function normalizeGNewsArticle(article: GNewsArticle, category: string, index: number) {
@@ -110,74 +115,6 @@ function normalizeGNewsArticle(article: GNewsArticle, category: string, index: n
   };
 }
 
-async function fetchNewsFromGemini() {
-  if (!GEMINI_API_KEY) {
-    throw new Error("Missing Gemini API Key");
-  }
-
-  const prompt = `You are the Senior Editor for Beacon Hub. Generate 2 original editorial news articles across these categories only: ${NEWS_FEEDS.map((feed) => feed.category).join(', ')}. Return strictly as a JSON array with the keys title, category, slug, image_url, content, excerpt, metaDescription, author, and source. Use null for image_url unless you can provide a real, publicly accessible HTTPS JPEG or PNG URL. The content must contain at least 4 detailed paragraphs, and metaDescription must be 50-160 characters. Keep the tone objective and analytical.`;
-
-  const response = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: {
-          responseMimeType: "application/json",
-          maxOutputTokens: 4096,
-          temperature: 0.4,
-          topP: 0.95,
-        },
-      }),
-    }
-  );
-
-  const rawResult = await response.text();
-  let data: { candidates?: Array<{ content?: { parts?: Array<{ text?: unknown }> } }>; error?: { message?: string; status?: string } } | null = null;
-
-  try {
-    data = JSON.parse(rawResult);
-  } catch {
-    // Fall back to raw text when Gemini returns non-JSON error details.
-  }
-
-  if (!response.ok) {
-    const retryAfter = response.headers.get('retry-after');
-    const message =
-      data?.error?.message || data?.error?.status || `Gemini request failed with status ${response.status}`;
-    const details = retryAfter ? `${message}; retry-after=${retryAfter}` : message;
-
-    if (response.status === 429) {
-      throw new Error(`Gemini rate limit reached: ${details}`);
-    }
-
-    throw new Error(details);
-  }
-
-  if (data?.error) {
-    const errorMessage = data.error.message || data.error.status || "Gemini API error";
-    throw new Error(errorMessage);
-  }
-
-  const textResponse = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-  if (!textResponse || typeof textResponse !== 'string') {
-    throw new Error("Empty or invalid response from Gemini engine");
-  }
-
-  const cleaned = textResponse.trim();
-  try {
-    const parsed: unknown = JSON.parse(cleaned);
-    if (!Array.isArray(parsed)) {
-      throw new Error('Gemini response must be an array of articles');
-    }
-    return parsed;
-  } catch (parseError) {
-    throw new Error(`Gemini returned invalid JSON payload; parse error: ${(parseError as Error).message}; body=${cleaned.slice(0, 500)}`);
-  }
-}
-
 export async function GET(req: Request) {
   const isAuthorized = isAuthorizedCronRequest(req, { allowVercelCron: true });
 
@@ -186,12 +123,13 @@ export async function GET(req: Request) {
   }
 
   try {
-    let articles = await fetchNewsFromGNews();
-    let source = 'GNews';
-
+    const { articles, emptyCategories } = await fetchNewsFromGNews();
     if (!articles.length) {
-      articles = await fetchNewsFromGemini();
-      source = 'Gemini';
+      return NextResponse.json({
+        success: false,
+        error: 'GNews returned no verified articles for the configured categories.',
+        emptyCategories,
+      }, { status: 502 });
     }
 
     const result = await persistIncomingArticles(articles);
@@ -216,12 +154,15 @@ export async function GET(req: Request) {
 
     return NextResponse.json({
       success: true,
-      source,
+      source: 'GNews',
       inserted: result.inserted.length,
       skipped: result.skipped.length,
+      emptyCategories,
       emailDigest,
       pushNotifications,
-      message: `${source} intelligence deployed successfully.`,
+      message: emptyCategories.length
+        ? `GNews updated with verified articles; no recent items were found for ${emptyCategories.join(', ')}.`
+        : 'GNews updated every configured category with verified articles.',
     });
   } catch (error) {
     console.error("News sync failed:", error);

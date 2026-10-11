@@ -1,0 +1,164 @@
+npm notice run beacon-hub@0.1.0 npx
+npm notice run eslint src
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\about\page.tsx
+  121:43  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\admin\deals\[id]\edit\page.tsx
+   9:36  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  15:62  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\api\assistant\route.ts
+  54:46  warning  '_content' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\api\cron\astro\route.ts
+    4:58  warning  'HoroscopeReadingsBatchSchema' is defined but never used  @typescript-eslint/no-unused-vars
+  117:22  error    Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+  246:19  error    Unexpected any. Specify a different type                  @typescript-eslint/no-explicit-any
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\api\horoscope-subscriptions\route.ts
+  2:10  warning  'eq' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\api\traffic\check-in\route.ts
+  2:10  warning  'and' is defined but never used  @typescript-eslint/no-unused-vars
+  2:15  warning  'eq' is defined but never used   @typescript-eslint/no-unused-vars
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\archive\page.tsx
+  10:17  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\category\[category]\page.tsx
+  48:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\deals\[id]\checkout\page.tsx
+  31:22  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\deals\[id]\checkout\page.tsx:31:22
+  29 |           </div>
+  30 |           <div className="text-right font-mono text-xs text-slate-500">
+> 31 |             REF: TR-{Math.random().toString(36).substring(2, 10).toUpperCase()}
+     |                      ^^^^^^^^^^^^^ Cannot call impure function
+  32 |           </div>
+  33 |         </div>
+  34 |       </header>  react-hooks/purity
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\deals\[id]\page.tsx
+  48:13  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\deals\page.tsx
+  41:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\horoscopes\[sign]\page.tsx
+  33:18  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\horoscopes\page.tsx
+  47:65  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  68:19  error  Unexpected any. Specify a different type                         @typescript-eslint/no-explicit-any
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\page.tsx
+  234:25  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\privacy-policy\page.tsx
+  63:185  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  63:571  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\privacy\page.tsx
+   20:25   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   20:29   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   20:31   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   20:35   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   20:37   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   20:42   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   20:47   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   20:55   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   20:106  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   20:114  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+   72:74   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  141:82   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\app\terms\page.tsx
+  20:63   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  20:71   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  27:124  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  34:58   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  34:65   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  35:61   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  35:68   error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  42:40   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  49:256  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  56:50   error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+  63:270  error  `'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`  react/no-unescaped-entities
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\components\AdPlacementManager.tsx
+  54:3  warning  'articleContent' is defined but never used  @typescript-eslint/no-unused-vars
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\components\HoroscopeDatePicker.tsx
+  17:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\components\HoroscopeDatePicker.tsx:17:5
+  15 |
+  16 |   useEffect(() => {
+> 17 |     setDisplayDate(currentDate);
+     |     ^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  18 |   }, [currentDate]);
+  19 |
+  20 |   const handlePreviousDay = () => {  react-hooks/set-state-in-effect
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\components\NewsAssistant.tsx
+  71:19  warning  Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element  @next/next/no-img-element
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\components\QuoteCard.tsx
+  23:11  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  23:19  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\components\ThemeSwitcher.tsx
+  12:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\components\ThemeSwitcher.tsx:12:5
+  10 |
+  11 |   useEffect(() => {
+> 12 |     setMounted(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  13 |   }, []);
+  14 |
+  15 |   const isDark = mounted && resolvedTheme === "dark";  react-hooks/set-state-in-effect
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\db\seed.ts
+  1:1  error  Do not use "@ts-nocheck" because it alters compilation errors  @typescript-eslint/ban-ts-comment
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\db\update-kwara.ts
+  1:1  error  Do not use "@ts-nocheck" because it alters compilation errors  @typescript-eslint/ban-ts-comment
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\lib\actions.ts
+  252:19  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\lib\contentValidator.ts
+   81:46  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   97:51  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  117:47  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\lib\logger.ts
+  6:18  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\lib\rateLimit.ts
+  32:61  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+C:\Users\GLORY COMPUTERS\Desktop\beacon-hub\src\lib\relatedContentEngine.ts
+   9:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  31:12  error  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+Γ£û 60 problems (49 errors, 11 warnings)
+

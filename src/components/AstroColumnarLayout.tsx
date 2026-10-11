@@ -177,14 +177,14 @@ export default function AstroColumnarLayout({
               ✨ Power Affirmation
             </span>
             <p className="text-lg md:text-xl font-serif text-black dark:text-white italic">
-              "{currentHoroscope.powerAffirmation}"
+              &ldquo;{currentHoroscope.powerAffirmation}&rdquo;
             </p>
           </div>
         )}
 
         {currentHoroscope.tarotCard && currentHoroscope.tarotMessage && (
           <section className="my-12 rounded-xl border border-border bg-muted/60 p-5 sm:p-7" aria-label="Daily tarot reflection">
-            <p className="font-mono text-[10px] text-primary">TODAY'S TAROT</p>
+            <p className="font-mono text-[10px] text-primary">TODAY&apos;S TAROT</p>
             <h2 className="mt-2 text-2xl font-black text-foreground">{currentHoroscope.tarotCard}</h2>
             <p className="mt-3 text-sm leading-7 text-muted-foreground">{currentHoroscope.tarotMessage}</p>
             <p className="mt-3 text-[11px] text-muted-foreground">For reflection and entertainment; not a substitute for professional advice.</p>

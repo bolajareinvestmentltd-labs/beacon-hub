@@ -33,10 +33,15 @@ export default function AdSense({
   const [adFailed, setAdFailed] = useState(false);
 
   const PUB_ID = process.env.NEXT_PUBLIC_ADSENSE_PUB_ID?.trim();
-  const isValidClientId = Boolean(PUB_ID && !PUB_ID.includes('xxxxxxxx'));
+  const isValidClientId = Boolean(
+    PUB_ID &&
+    /^ca-pub-\d{16}$/.test(PUB_ID) &&
+    !['ca-pub-1234567890123456', 'ca-pub-0000000000000000'].includes(PUB_ID)
+  );
+  const isValidAdSlot = /^\d{6,12}$/.test(adSlot) && !['1234567890', '0987654321', '5555555555', '9999999999'].includes(adSlot);
 
   useEffect(() => {
-    if (typeof window === 'undefined' || !isValidClientId) return;
+    if (typeof window === 'undefined' || !isValidClientId || !isValidAdSlot) return;
 
     let tries = 0;
 
@@ -59,7 +64,7 @@ export default function AdSense({
       if (isFilled === 'done') return;
 
       try {
-        const adsbygoogle = (window as any).adsbygoogle || [];
+        const adsbygoogle = (window as unknown as { adsbygoogle?: unknown[] }).adsbygoogle || [];
         adsbygoogle.push({});
       } catch (err) {
         console.warn(`[Beacon Hub Ad Engine] Slot ${adSlot} failed to hydrate:`, err);
@@ -69,9 +74,9 @@ export default function AdSense({
 
     const timer = setTimeout(pushAd, 150);
     return () => clearTimeout(timer);
-  }, [pathname, adSlot, isValidClientId]);
+  }, [pathname, adSlot, isValidAdSlot, isValidClientId]);
 
-  if (!isValidClientId) {
+  if (!isValidClientId || !isValidAdSlot) {
     if (typeof window !== 'undefined') {
       console.warn('[Beacon Hub AdSense] Skipping ad rendering because NEXT_PUBLIC_ADSENSE_PUB_ID is missing or invalid.');
     }

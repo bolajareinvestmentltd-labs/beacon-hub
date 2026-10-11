@@ -1,7 +1,6 @@
 'use client';
 
 import type { ReactNode } from 'react';
-import { useState, useEffect } from 'react';
 import AdSense from './AdSense';
 
 export interface AdZoneConfig {
@@ -22,30 +21,33 @@ export interface AdPlacementManagerProps {
   children?: ReactNode;
 }
 
-// Default production slot IDs
 const DEFAULT_ADS: AdZoneConfig[] = [
   {
     id: 'header-leaderboard',
     format: 'horizontal',
-    slot: '1234567890',
+    slot: process.env.NEXT_PUBLIC_ADSENSE_HOME_SLOT?.trim() || '',
     position: 'header',
     label: 'Advertisement',
   },
   {
     id: 'mid-story-interstitial',
     format: 'rectangle',
-    slot: '0987654321',
+    slot: process.env.NEXT_PUBLIC_ADSENSE_ARTICLE_SLOT?.trim() || '',
     position: 'mid-story',
     label: 'Advertisement',
   },
   {
     id: 'sidebar-rectangle',
     format: 'vertical',
-    slot: '5555555555',
+    slot: process.env.NEXT_PUBLIC_ADSENSE_SIDEBAR_SLOT?.trim() || '',
     position: 'sidebar',
     label: 'Advertisement',
   },
 ];
+
+function isConfiguredSlot(slot: string) {
+  return /^\d{6,12}$/.test(slot) && !['1234567890', '0987654321', '5555555555', '9999999999'].includes(slot);
+}
 
 const AdPlacementManager = ({
   zone,
@@ -57,20 +59,13 @@ const AdPlacementManager = ({
   customAds,
 }: AdPlacementManagerProps) => {
   const adsConfig = customAds || DEFAULT_ADS;
-  const [contentHeight, setContentHeight] = useState(0);
-
-  useEffect(() => {
-    if (articleContent) {
-      setContentHeight(articleContent.length / 3);
-    }
-  }, [articleContent]);
 
   // ============================================================================
   // MODE 1: STANDALONE ZONE INJECTION (Used by app/page.tsx Grid)
   // ============================================================================
   if (zone) {
     const targetAd = adsConfig.find((ad) => ad.position === zone);
-    if (!targetAd) return null;
+    if (!targetAd || !isConfiguredSlot(targetAd.slot)) return null;
 
     return (
       <div className="w-full flex flex-col items-center justify-center my-1 overflow-hidden">
@@ -94,7 +89,7 @@ const AdPlacementManager = ({
   return (
     <div className="relative w-full">
       {/* 1. HEADER LEADERBOARD */}
-      {showHeaderAd && headerAd && (
+      {showHeaderAd && headerAd && isConfiguredSlot(headerAd.slot) && (
         <div className="w-full flex justify-center mb-8 px-4 border-b border-border/40 pb-4">
           <div className="w-full max-w-6xl">
             <AdSense
@@ -115,7 +110,7 @@ const AdPlacementManager = ({
           <div className="content-area">{children}</div>
 
           {/* 2. MID-STORY INTERSTITIAL */}
-          {showMidStoryAd && midStoryAd && (
+          {showMidStoryAd && midStoryAd && isConfiguredSlot(midStoryAd.slot) && (
             <div className="my-12 py-6 border-y border-border/60 flex justify-center bg-card/30 rounded-xl">
               <AdSense
                 adSlot={midStoryAd.slot}
@@ -127,7 +122,7 @@ const AdPlacementManager = ({
         </div>
 
         {/* 3. STICKY SIDEBAR (25% Width) */}
-        {showSidebarAd && sidebarAd && (
+        {showSidebarAd && sidebarAd && isConfiguredSlot(sidebarAd.slot) && (
           <aside className="hidden lg:block lg:col-span-1">
             <div className="sticky top-24 bg-card border border-border/80 rounded-xl p-3 text-center shadow-2xs">
               <AdSense

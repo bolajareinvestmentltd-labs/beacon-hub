@@ -54,18 +54,15 @@ export default function AdminDashboard() {
 
   const [dealState, dealAction, isDealPending] = useActionState(
     async (_prevState: ActionState, formData: FormData) => {
-      return await publishDeal(formData);
+      const result = await publishDeal(formData);
+      if (result.success && result.message) {
+        setToastMessage(result.message);
+        window.setTimeout(() => setToastMessage(null), 4000);
+      }
+      return result;
     },
     initialState
   );
-
-  useEffect(() => {
-    if (dealState.success && dealState.message) {
-      setToastMessage(dealState.message);
-      const timeout = window.setTimeout(() => setToastMessage(null), 4000);
-      return () => window.clearTimeout(timeout);
-    }
-  }, [dealState]);
 
   useEffect(() => {
     async function loadHistory() {
@@ -80,7 +77,7 @@ export default function AdminDashboard() {
         const data = await response.json();
         setHistory(data.articles || []);
         setHistoryError(null);
-      } catch (error) {
+      } catch {
         setHistoryError("Unable to load published article history.");
       }
     }
@@ -452,7 +449,7 @@ export default function AdminDashboard() {
                             setHistory(history.filter(h => h.id !== item.id));
                             setToastMessage('Article deleted successfully');
                             setTimeout(() => setToastMessage(null), 4000);
-                          } catch (error) {
+                          } catch {
                             setToastMessage('Failed to delete article');
                             setTimeout(() => setToastMessage(null), 4000);
                           }

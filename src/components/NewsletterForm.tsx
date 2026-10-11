@@ -4,7 +4,7 @@ import { useState } from "react";
 import { subscribeUser } from "@/lib/actions";
 import { Mail, ArrowRight } from "lucide-react";
 
-export default function NewsletterForm() {
+export default function NewsletterForm({ onSubscribed }: { onSubscribed?: () => void }) {
   const [status, setStatus] = useState<"idle" | "loading" | "success" | "error">("idle");
   const [message, setMessage] = useState("");
 
@@ -18,6 +18,7 @@ export default function NewsletterForm() {
     } else if (result.success) {
       setStatus("success");
       setMessage("You are subscribed to Beacon Hub news updates.");
+      onSubscribed?.();
     }
   }
 

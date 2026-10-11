@@ -7,12 +7,8 @@ if (typeof process !== 'undefined' && process.versions && process.versions.node)
   dotenv.config({ path: '.env.local' });
 }
 
-const databaseUrl = process.env.DATABASE_URL?.trim();
+// This securely connects to Neon using the URL in your .env.local
+const sql = neon(process.env.DATABASE_URL!);
 
-const unavailableDatabase = new Proxy({} as ReturnType<typeof drizzle>, {
-  get() {
-    throw new Error('DATABASE_URL is required for database-backed Beacon Hub features.');
-  },
-});
-
-export const db = databaseUrl ? drizzle(neon(databaseUrl)) : unavailableDatabase;
+// Creates the Drizzle ORM instance
+export const db = drizzle(sql);
