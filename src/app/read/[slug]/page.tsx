@@ -74,10 +74,13 @@ export async function generateMetadata({
   const description = truncateDescription(
     String(article.metaDescription || article.excerpt || "Read the latest story from Beacon Hub.")
   );
-  const imageUrl = toAbsoluteHttpsUrl(article.coverImage ? String(article.coverImage) : undefined, fallbackImageUrl);
+  // Served by /api/og/[slug]: fetches the article cover server-side and re-serves it over our own https domain,
+  // falling back to the brand lockup. This keeps WhatsApp/Facebook crawlers from hitting hotlink-blocked or http images.
+  const imageUrl = article.coverImage
+    ? new URL(`/api/og/${encodeURIComponent(normalizedSlug || slug)}`, siteUrl).toString()
+    : fallbackImageUrl;
   const author = article.author ? String(article.author) : "Beacon Hub Editorial Board";
 
-  // Keep shared preview images under 300 KB; JPEG and PNG are the most reliable formats for WhatsApp.
   return {
     title,
     description,
@@ -91,7 +94,7 @@ export async function generateMetadata({
       type: "article",
       publishedTime: article.publishedAt?.toISOString(),
       authors: [author],
-      images: [{ url: imageUrl, width: 1200, height: 630, alt: title }],
+      images: [{ url: imageUrl, secureUrl: imageUrl, alt: title }],
     },
     twitter: {
       card: "summary_large_image",
@@ -251,7 +254,9 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         </div>
         <div className="flex justify-center">
           <div className="w-full max-w-[720px]">
-            <AdSense adSlot="9999999999" adFormat="rectangle" label="Advertisement" />
+            {process.env.NEXT_PUBLIC_ADSENSE_ARTICLE_SLOT ? (
+              <AdSense adSlot={process.env.NEXT_PUBLIC_ADSENSE_ARTICLE_SLOT} adFormat="rectangle" label="Advertisement" />
+            ) : null}
           </div>
         </div>
       </div>

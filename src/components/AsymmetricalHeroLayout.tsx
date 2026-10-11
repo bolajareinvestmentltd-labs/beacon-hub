@@ -31,7 +31,11 @@ interface AsymmetricalHeroLayoutProps {
   heroArticle?: HeroArticle;
   feedArticles?: FeedArticle[];
   headerAd?: ReactNode;
+  logoUrl?: string;
+  headerAdLabel?: string;
 }
+
+const SLIDE_INTERVAL_MS = 5000;
 
 export default function AsymmetricalHeroLayout({
   article,
@@ -41,19 +45,24 @@ export default function AsymmetricalHeroLayout({
 }: AsymmetricalHeroLayoutProps) {
   const story = article || heroArticle || null;
   const [activeSlide, setActiveSlide] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
   const slides = story ? [story, ...feedArticles] : [];
-  const current = slides[activeSlide % Math.max(slides.length, 1)];
+  const slideCount = slides.length;
+  const current = slides[activeSlide % Math.max(slideCount, 1)];
 
   useEffect(() => {
-    if (slides.length < 2) return;
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (slideCount < 2 || isPaused) return;
 
+    // Slide changes are a plain content swap (no motion), so they run even when the OS reports reduced motion.
     const timer = window.setInterval(() => {
-      setActiveSlide((index) => (index + 1) % slides.length);
-    }, 5000);
+      setActiveSlide((index) => (index + 1) % slideCount);
+    }, SLIDE_INTERVAL_MS);
 
     return () => window.clearInterval(timer);
-  }, [slides.length]);
+  }, [slideCount, isPaused, activeSlide]);
+
+  const goTo = (index: number) => setActiveSlide(((index % slideCount) + slideCount) % slideCount);
+
 
   const timeAgo = (date?: Date) => {
     if (!date) return '';
@@ -71,7 +80,15 @@ export default function AsymmetricalHeroLayout({
   if (!current) return null;
 
   return (
-    <section className="w-full overflow-hidden rounded-xl border border-border/80 bg-surface shadow-sm" aria-label="Latest headlines">
+    <section
+      className="w-full overflow-hidden rounded-xl border border-border/80 bg-surface shadow-sm"
+      aria-label="Latest headlines"
+      aria-roledescription="carousel"
+      onPointerEnter={(event) => { if (event.pointerType === 'mouse') setIsPaused(true); }}
+      onPointerLeave={(event) => { if (event.pointerType === 'mouse') setIsPaused(false); }}
+      onFocusCapture={(event) => { if ((event.target as HTMLElement).matches(':focus-visible')) setIsPaused(true); }}
+      onBlurCapture={() => setIsPaused(false)}
+    >
       {headerAd ? <div className="border-b border-border/70 p-3 text-center">{headerAd}</div> : null}
       <article key={current.slug} className="grid min-w-0 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
         <Link href={`/read/${current.slug}`} className="group relative block aspect-[16/9] min-h-0 overflow-hidden bg-muted lg:aspect-auto lg:min-h-[24rem]">
@@ -109,6 +126,21 @@ export default function AsymmetricalHeroLayout({
           <span className="sr-only" aria-live="polite">Headline {activeSlide + 1} of {slides.length}</span>
         </div>
       </article>
+      {slideCount > 1 ? (
+        <div className="flex items-center justify-center gap-2 border-t border-border/70 px-4 py-3" role="tablist" aria-label="Choose headline">
+          {slides.map((slide, index) => (
+            <button
+              key={slide.slug}
+              type="button"
+              role="tab"
+              aria-selected={index === activeSlide}
+              aria-label={`Show headline ${index + 1}: ${slide.title}`}
+              onClick={() => goTo(index)}
+              className={`h-2 rounded-full transition-all ${index === activeSlide ? 'w-6 bg-primary' : 'w-2 bg-muted-foreground/40 hover:bg-muted-foreground'}`}
+            />
+          ))}
+        </div>
+      ) : null}
     </section>
   );
 }

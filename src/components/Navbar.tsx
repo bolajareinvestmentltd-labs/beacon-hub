@@ -3,12 +3,16 @@
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Search, Terminal } from "lucide-react";
+import { Search } from "lucide-react";
+import { useState } from "react";
 import { TAXONOMY } from "@/config/taxonomy";
 import { ThemeSwitcher } from "@/components/ThemeSwitcher";
+import NewsletterModal from "@/components/NewsletterModal";
+import NavbarAccount from "@/components/NavbarAccount";
 
 export default function Navbar() {
   const pathname = usePathname();
+  const [isSubscribeOpen, setIsSubscribeOpen] = useState(false);
 
   return (
     <header className="site-navbar fixed top-0 left-0 right-0 z-50 w-screen border-b border-border/70 bg-card/95 shadow-sm backdrop-blur-md transition-colors duration-300">
@@ -32,20 +36,15 @@ export default function Navbar() {
             <Search size={18} strokeWidth={2} />
           </button>
 
-          <Link
-            href="/dev-log"
-            className="flex items-center gap-1 rounded-sm border border-border/70 bg-muted/70 px-1.5 py-1 text-[10px] font-mono text-muted-foreground transition-all hover:border-primary hover:bg-primary/10 hover:text-primary"
-          >
-            <Terminal size={12} className="text-primary" />
-            <span className="hidden lg:inline font-bold tracking-widest uppercase">v1.2.0</span>
-          </Link>
+          <NavbarAccount />
 
-          <button className="text-[10px] md:text-xs font-bold uppercase tracking-wider border border-primary text-primary px-3 py-1.5 rounded-sm hover:bg-primary hover:text-primary-foreground transition-all duration-300">
-            <span className="md:hidden">Get App</span>
-            <span className="hidden md:inline">Subscribe</span>
+          <button type="button" onClick={() => setIsSubscribeOpen(true)} className="text-[10px] md:text-xs font-bold uppercase tracking-wider border border-primary text-primary px-3 py-1.5 rounded-sm hover:bg-primary hover:text-primary-foreground transition-all duration-300">
+            Subscribe
           </button>
         </div>
       </div>
+
+      <NewsletterModal isOpen={isSubscribeOpen} onClose={() => setIsSubscribeOpen(false)} />
 
       {/* BOTTOM TIER: Horizontal Categories Array */}
       <div className="w-full border-t border-border/60 bg-muted/90">

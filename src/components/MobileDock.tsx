@@ -1,9 +1,10 @@
-﻿"use client";
+"use client";
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Home, Menu, Newspaper, Sparkles, Tags, X } from "lucide-react";
-import { useRef, useState } from "react";
+import { useRef, useState, useSyncExternalStore } from "react";
+import { createPortal } from "react-dom";
 import { TAXONOMY } from "@/config/taxonomy";
 
 const MAIN_LINKS = [
@@ -31,11 +32,23 @@ export default function MobileDock() {
   const isActive = (href: string) =>
     pathname === href || pathname.startsWith(`${href}/`);
 
-  return (
+  const isMounted = useSyncExternalStore(() => () => {}, () => true, () => false);
+
+  // Rendered into document.body so no ancestor overflow/transform/stacking context can hide the dock.
+  if (!isMounted) return null;
+
+  return createPortal(
     <>
       <div
-        className="fixed bottom-[max(0.65rem,env(safe-area-inset-bottom))] left-1/2 z-50 w-[min(26rem,calc(100vw-6rem))] -translate-x-1/2 rounded-2xl border border-border/80 bg-card/95 px-2 py-2 shadow-xl backdrop-blur md:hidden"
-        style={{ transform: `translate(calc(-50% + ${dragOffset.x}px), ${dragOffset.y}px)` }}
+        className="rounded-2xl border border-border/80 bg-card/95 px-2 py-2 shadow-xl backdrop-blur lg:hidden"
+        style={{
+          position: "fixed",
+          left: "50%",
+          bottom: "max(0.65rem, env(safe-area-inset-bottom))",
+          zIndex: 55,
+          width: "min(26rem, calc(100vw - 1.5rem))",
+          transform: `translate(calc(-50% + ${dragOffset.x}px), ${dragOffset.y}px)`,
+        }}
       >
         <button
           type="button"
@@ -98,7 +111,7 @@ export default function MobileDock() {
       </div>
 
       {isTrayOpen ? (
-        <div className="fixed inset-0 z-[60] bg-slate-950/70 backdrop-blur-sm md:hidden">
+        <div className="fixed inset-0 z-[60] bg-slate-950/70 backdrop-blur-sm lg:hidden">
           <div className="absolute inset-x-0 bottom-0 max-h-[80dvh] overflow-y-auto rounded-t-2xl border border-border bg-card p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] text-foreground shadow-2xl">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold uppercase tracking-[0.24em] text-foreground">
@@ -128,6 +141,7 @@ export default function MobileDock() {
           </div>
         </div>
       ) : null}
-    </>
+    </>,
+    document.body
   );
 }
