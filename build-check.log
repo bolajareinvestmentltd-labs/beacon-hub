@@ -11,3 +11,87 @@ npm notice run next build
 
   Learn more: https://nextjs.org/docs/messages/middleware-to-proxy
   Creating an optimized production build ...
+Γ£ô Compiled successfully in 8.2min
+Γ£ô Finished writing to filesystem cache in 27.6s
+  Running TypeScript ...
+Γ£ô Finished filesystem cache database compaction in 74s
+  Finished TypeScript in 2.2min ...
+  Collecting page data using 3 workers ...
+Γùç injected env (0) from .env.local // tip: Γîü auth for agents [www.vestauth.com]
+Γùç injected env (0) from .env.local // tip: Γîÿ custom filepath { path: '/custom/path/.env' }
+Γùç injected env (0) from .env.local // tip: Γîÿ custom filepath { path: '/custom/path/.env' }
+Rate limiting disabled: Missing Upstash credentials
+Γùç injected env (0) from .env.local // tip: Γîü auth for agents [www.vestauth.com]
+  Generating static pages using 3 workers (0/31) ...
+Rate limiting disabled: Missing Upstash credentials
+  Generating static pages using 3 workers (7/31) 
+Unable to load curated articles: [TypeError: fetch failed] {
+  [cause]: AggregateError: 
+      at ignore-listed frames {
+    code: 'ECONNREFUSED',
+    [errors]: [ [Error], [Error] ]
+  }
+}
+Unable to load curated articles: [TypeError: fetch failed] {
+  [cause]: AggregateError: 
+      at ignore-listed frames {
+    code: 'ECONNREFUSED',
+    [errors]: [ [Error], [Error] ]
+  }
+}
+  Generating static pages using 3 workers (15/31) 
+  Generating static pages using 3 workers (23/31) 
+Γ£ô Generating static pages using 3 workers (31/31) in 46s
+  Finalizing page optimization ...
+
+Route (app)                                 Revalidate  Expire
+Γöî ╞Æ /
+Γö£ Γùï /_not-found
+Γö£ Γùï /about
+Γö£ ╞Æ /admin
+Γö£ ╞Æ /admin/articles/[id]/edit
+Γö£ Γùï /admin/create
+Γö£ ╞Æ /admin/deals/[id]/edit
+Γö£ ╞Æ /api/admin/articles
+Γö£ ╞Æ /api/admin/articles/[id]
+Γö£ ╞Æ /api/admin/deals
+Γö£ ╞Æ /api/admin/deals/[id]
+Γö£ ╞Æ /api/admin/fetch-news
+Γö£ ╞Æ /api/admin/repair-slugs
+Γö£ ╞Æ /api/admin/session
+Γö£ ╞Æ /api/admin/traffic
+Γö£ ╞Æ /api/articles/[articleId]/interactions
+Γö£ ╞Æ /api/assistant
+Γö£ ╞Æ /api/cron/astro
+Γö£ ╞Æ /api/cron/news
+Γö£ ╞Æ /api/horoscope-subscriptions
+Γö£ ╞Æ /api/newsletter/unsubscribe
+Γö£ ╞Æ /api/og/[slug]
+Γö£ ╞Æ /api/push/subscription
+Γö£ ╞Æ /api/reader-auth/session
+Γö£ ╞Æ /api/traffic/check-in
+Γö£ Γùï /archive                                        1m      1y
+Γö£ ╞Æ /category/[category]
+Γö£ ╞Æ /contact
+Γö£ Γùï /curated-news                                   1h      1y
+Γö£ ╞Æ /deals
+Γö£ ╞Æ /deals/[id]
+Γö£ ╞Æ /deals/[id]/checkout
+Γö£ Γùï /dev-log
+Γö£ Γùï /disclaimer
+Γö£ ╞Æ /horoscopes
+Γö£ ╞Æ /horoscopes/[sign]
+Γö£ Γùï /login
+Γö£ Γùï /manifest.webmanifest
+Γö£ Γùï /privacy
+Γö£ Γùï /privacy-policy
+Γö£ ╞Æ /read/[slug]
+Γö£ Γùï /sitemap.xml
+Γöö Γùï /terms
+
+
+╞Æ Proxy (Middleware)
+
+Γùï  (Static)   prerendered as static content
+╞Æ  (Dynamic)  server-rendered on demand
+
