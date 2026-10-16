@@ -1,15 +1,38 @@
 import { neon } from "@neondatabase/serverless";
 import Link from "next/link";
 import { Database } from "lucide-react";
+import { z } from "zod";
 
 export const revalidate = 60;
+
+type ArchiveArticle = {
+  id: number;
+  title: string;
+  slug: string;
+  category: string;
+  created_at: string;
+};
+
+const ArchiveArticleSchema = z.object({
+  id: z.coerce.number(),
+  title: z.string(),
+  slug: z.string(),
+  category: z.string(),
+  created_at: z.coerce.string(),
+});
 
 export default async function ArchivePage() {
   const sql = neon(process.env.DATABASE_URL || "");
   
-  let articles: any[] = [];
+  let articles: ArchiveArticle[] = [];
   try {
-    articles = await sql`SELECT id, title, slug, category, created_at FROM articles ORDER BY created_at DESC`;
+    const rows: unknown = await sql`SELECT id, title, slug, category, created_at FROM articles ORDER BY created_at DESC`;
+    if (Array.isArray(rows)) {
+      articles = rows.flatMap((row) => {
+        const parsed = ArchiveArticleSchema.safeParse(row);
+        return parsed.success ? [parsed.data] : [];
+      });
+    }
   } catch (err) {
     console.error("Failed to load archive", err);
   }

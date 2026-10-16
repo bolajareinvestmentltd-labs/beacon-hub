@@ -30,7 +30,7 @@ export default async function HoroscopePage({
 
         <div className="text-center py-16">
           <p className="text-slate-500 dark:text-slate-400 font-playfair text-lg italic">
-            Today's reading is not available yet. The daily desk refreshes at 06:00 UTC.
+            Today&apos;s reading is not available yet. The daily desk refreshes at 06:00 UTC.
           </p>
           <Link href="/contact?topic=horoscope" className="mt-6 inline-flex rounded-md bg-primary px-5 py-3 text-sm font-bold text-primary-foreground hover:opacity-90">
             Ask about a personal reading

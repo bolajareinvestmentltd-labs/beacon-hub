@@ -2,9 +2,7 @@ import * as Sentry from '@sentry/nextjs';
 
 export type LogLevel = 'error' | 'warning' | 'info' | 'debug';
 
-interface LogContext {
-  [key: string]: any;
-}
+type LogContext = Record<string, unknown>;
 
 class Logger {
   private isDevelopment = process.env.NODE_ENV === 'development';

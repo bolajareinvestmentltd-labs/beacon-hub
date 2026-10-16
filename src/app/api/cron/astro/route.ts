@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { db } from "@/db";
 import { horoscopes } from "@/db/schema";
-import { validateHoroscopeReading, validateContentDepth, HoroscopeReadingsBatchSchema } from "@/lib/contentValidator";
+import { validateHoroscopeReading, validateContentDepth } from "@/lib/contentValidator";
 import { isAuthorizedCronRequest } from '@/lib/cron';
 import { sendDailyAstroUpdates } from '@/lib/astro-newsletter';
 
@@ -114,7 +114,7 @@ RETURN ONLY VALID JSON ARRAY - NO MARKDOWN, NO BACKTICKS, NO COMMENTARY.`;
     );
 
     if (!res.ok) {
-      let errorData: any = null;
+      let errorData: unknown = null;
       let rawBody: string | undefined = undefined;
       try {
         errorData = await res.json();
@@ -144,19 +144,16 @@ RETURN ONLY VALID JSON ARRAY - NO MARKDOWN, NO BACKTICKS, NO COMMENTARY.`;
     }
 
     // Parse JSON response
-    let readings;
+    let readings: unknown[];
     try {
-      readings = JSON.parse(textResponse);
+      const parsedResponse: unknown = JSON.parse(textResponse);
+      readings = Array.isArray(parsedResponse) ? parsedResponse : [parsedResponse];
     } catch (parseError) {
       console.error("JSON parse error:", parseError, "Response:", textResponse.substring(0, 500));
       return NextResponse.json(
         { error: "Failed to parse Gemini response as JSON" },
         { status: 500 }
       );
-    }
-
-    if (!Array.isArray(readings)) {
-      readings = [readings];
     }
 
     // Validate and process horoscope readings
@@ -171,7 +168,9 @@ RETURN ONLY VALID JSON ARRAY - NO MARKDOWN, NO BACKTICKS, NO COMMENTARY.`;
       if (!validation.valid) {
         errors.push({
           index: i,
-          sign: reading.sign || "Unknown",
+          sign: typeof reading === "object" && reading !== null && "sign" in reading && typeof reading.sign === "string"
+            ? reading.sign
+            : "Unknown",
           error: validation.errors?.message || "Schema validation failed",
         });
         continue;
@@ -243,12 +242,13 @@ RETURN ONLY VALID JSON ARRAY - NO MARKDOWN, NO BACKTICKS, NO COMMENTARY.`;
       emailUpdates,
       validationErrors: errors.length > 0 ? errors : undefined,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error("ASTRO CRON ERROR:", error);
+    const message = error instanceof Error ? error.message : "Unknown error";
     return NextResponse.json(
       {
         error: "Celestial Intelligence handshake failed",
-        message: error.message,
+        message,
       },
       { status: 500 }
     );

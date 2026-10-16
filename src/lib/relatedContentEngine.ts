@@ -2,11 +2,18 @@ import { db } from '@/db';
 import { articles, contentRelationships } from '@/db/schema';
 import { desc, and, ne, eq } from 'drizzle-orm';
 
+type RelatedArticle = {
+  id: number;
+  title: string;
+  category: string;
+  publishedAt: Date | string | null;
+};
+
 export async function getRelatedContentByKeywords(
   articleId: string,
   keywords: string[],
   limit: number = 5
-): Promise<any[]> {
+): Promise<RelatedArticle[]> {
   if (keywords.length === 0) return [];
 
   try {
@@ -28,7 +35,7 @@ export async function getRelatedContentByCategory(
   articleId: string,
   category: string,
   limit: number = 5
-): Promise<any[]> {
+): Promise<RelatedArticle[]> {
   try {
     const relatedArticles = await db
       .select()

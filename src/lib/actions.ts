@@ -249,10 +249,11 @@ export async function subscribeUser(formData: FormData) {
 
     logger.info("User subscribed or reactivated", { email: sanitizedEmail });
     return { success: true };
-  } catch (error: any) {
+  } catch (error: unknown) {
     // Handle duplicate email error
-    if (error?.code === "23505" || error?.message?.includes("unique")) {
-      logger.info("Duplicate subscription attempt", { error: error?.message });
+    const dbError = error as { code?: string; message?: string };
+    if (dbError.code === "23505" || dbError.message?.includes("unique")) {
+      logger.info("Duplicate subscription attempt", { error: dbError.message });
       return { error: "You are already connected to the Network." };
     }
 

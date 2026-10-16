@@ -78,7 +78,7 @@ export const HoroscopeReadingsBatchSchema = z.array(HoroscopeReadingSchema);
 // VALIDATION UTILITIES
 // ======================================================
 
-export function validateNewsArticle(article: any): {
+export function validateNewsArticle(article: unknown): {
   valid: boolean;
   data?: z.infer<typeof NewsArticleSchema>;
   errors?: z.ZodError;
@@ -94,7 +94,7 @@ export function validateNewsArticle(article: any): {
   }
 }
 
-export function validateHoroscopeReading(reading: any): {
+export function validateHoroscopeReading(reading: unknown): {
   valid: boolean;
   data?: z.infer<typeof HoroscopeReadingSchema>;
   errors?: z.ZodError;
@@ -114,7 +114,10 @@ export function validateHoroscopeReading(reading: any): {
  * Content Depth Validator
  * Ensures articles meet premium quality standards
  */
-export function validateContentDepth(article: any): {
+export function validateContentDepth(article: {
+  content?: string | null;
+  keywordTags?: string[] | null;
+}): {
   isValid: boolean;
   wordCount: number;
   warnings: string[];

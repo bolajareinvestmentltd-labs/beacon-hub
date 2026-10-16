@@ -2,7 +2,6 @@
 
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useState, useEffect } from 'react';
 
 interface DatePickerProps {
   currentDate: Date;
@@ -11,11 +10,8 @@ interface DatePickerProps {
 export function HoroscopeDatePicker({ currentDate }: DatePickerProps) {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [displayDate, setDisplayDate] = useState<Date>(currentDate);
-
-  useEffect(() => {
-    setDisplayDate(currentDate);
-  }, [currentDate]);
+  const selectedDate = searchParams.get('date');
+  const displayDate = selectedDate ? new Date(selectedDate) : currentDate;
 
   const handlePreviousDay = () => {
     const newDate = new Date(displayDate);
@@ -27,7 +23,6 @@ export function HoroscopeDatePicker({ currentDate }: DatePickerProps) {
     const newDate = new Date(displayDate);
     newDate.setDate(newDate.getDate() + 1);
     const today = new Date();
-    // Prevent selecting future dates beyond today
     if (newDate <= today) {
       updateDate(newDate);
     }
@@ -38,16 +33,14 @@ export function HoroscopeDatePicker({ currentDate }: DatePickerProps) {
   };
 
   const updateDate = (newDate: Date) => {
-    const dateStr = newDate.toISOString().split('T')[0]; // YYYY-MM-DD
+    const dateStr = newDate.toISOString().split('T')[0];
     const params = new URLSearchParams(searchParams);
     params.set('date', dateStr);
     router.push(`?${params.toString()}`);
-    setDisplayDate(newDate);
   };
 
   const today = new Date();
-  const isToday =
-    displayDate.toDateString() === today.toDateString();
+  const isToday = displayDate.toDateString() === today.toDateString();
   const isFuture = displayDate > today;
 
   return (

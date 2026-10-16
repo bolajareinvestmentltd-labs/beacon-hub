@@ -14,6 +14,8 @@ export default async function CheckoutPage({ params }: { params: Promise<{ id: s
   const deal = rows[0];
   if (!deal) notFound();
 
+  const checkoutRef = `TR-${deal.id.toString().padStart(6, "0")}`;
+
   return (
     <main className="min-h-screen bg-[#FDFBF7] text-[#1C1C1C] antialiased selection:bg-[#C85A32] selection:text-white font-sans">
       {/* Editorial Header */}
@@ -28,7 +30,7 @@ export default async function CheckoutPage({ params }: { params: Promise<{ id: s
             </h1>
           </div>
           <div className="text-right font-mono text-xs text-slate-500">
-            REF: TR-{Math.random().toString(36).substring(2, 10).toUpperCase()}
+            REF: {checkoutRef}
           </div>
         </div>
       </header>

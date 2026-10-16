@@ -44,7 +44,7 @@ const fetchHoroscopes =
           The Astro Desk
         </h1>
         <p className="text-base md:text-lg text-slate-700 dark:text-slate-300 max-w-2xl mx-auto leading-relaxed">
-          Macro-trends in the cosmos. Select your sign for today's strategic planetary briefing from our master astrologers.
+          Macro-trends in the cosmos. Select your sign for today&apos;s strategic planetary briefing from our master astrologers.
         </p>
         <div className="h-1 w-20 bg-[#E2725B] mx-auto mt-8" />
       </div>
@@ -65,7 +65,7 @@ const fetchHoroscopes =
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
           {ZODIAC_SIGNS.map((sign) => {
             const hasReading = horoscopes.some(
-              (r: any) => r.sign?.toLowerCase() === sign.name.toLowerCase()
+              (r: { sign?: string }) => r.sign?.toLowerCase() === sign.name.toLowerCase()
             );
             const statusClasses = hasReading
               ? 'text-green-600 dark:text-green-400'

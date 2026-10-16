@@ -51,7 +51,6 @@ function isConfiguredSlot(slot: string) {
 
 const AdPlacementManager = ({
   zone,
-  articleContent,
   children,
   showHeaderAd = true,
   showMidStoryAd = true,

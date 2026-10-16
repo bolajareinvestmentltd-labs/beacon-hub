@@ -23,13 +23,16 @@ const redis = hasValidRedisConfig
 /**
  * Create a rate limiter instance
  */
-function createRateLimiter(maxRequests: number, window: string) {
+function createRateLimiter(
+  maxRequests: number,
+  window: Parameters<typeof Ratelimit.slidingWindow>[1]
+) {
   if (!redis) {
     return null;
   }
   return new Ratelimit({
     redis,
-    limiter: Ratelimit.slidingWindow(maxRequests, window as any),
+    limiter: Ratelimit.slidingWindow(maxRequests, window),
     analytics: true,
   });
 }

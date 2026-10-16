@@ -20,7 +20,7 @@ export default function QuoteCard({ quote, author, role = "Developer & Speaker" 
       {/* The Quote Content */}
       <div className="relative z-10">
         <p className="text-xl md:text-2xl font-medium text-slate-200 leading-relaxed mb-8">
-          "{quote}"
+          &ldquo;{quote}&rdquo;
         </p>
 
         {/* Author Info */}

@@ -3,25 +3,36 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 
+type AdminDeal = {
+  id: number;
+  title: string;
+  vendorName: string;
+  category: string;
+  price: number;
+  description: string;
+};
+
 export default function EditDealPage() {
   const params = useParams<{ id: string }>();
   const router = useRouter();
-  const [deal, setDeal] = useState<any>(null);
+  const [deal, setDeal] = useState<AdminDeal | null>(null);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
     fetch("/api/admin/deals", { credentials: "same-origin" })
       .then((response) => response.json())
-      .then((data) => setDeal((data.deals || []).find((item: any) => String(item.id) === String(params.id))))
+      .then((data: { deals?: AdminDeal[] }) => setDeal((data.deals || []).find((item) => String(item.id) === String(params.id)) ?? null))
       .catch(() => setMessage("Unable to load escrow asset."));
   }, [params.id]);
 
   if (!deal) return <main className="mx-auto max-w-2xl p-8">{message || "Loading escrow asset..."}</main>;
 
+  const currentDeal = deal;
+
   async function save(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const values = Object.fromEntries(new FormData(event.currentTarget));
-    const response = await fetch("/api/admin/deals", { method: "PATCH", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ id: deal.id, ...values, price: Number(values.price) }) });
+    const response = await fetch("/api/admin/deals", { method: "PATCH", headers: { "Content-Type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ id: currentDeal.id, ...values, price: Number(values.price) }) });
     const data = await response.json();
     if (!response.ok) return setMessage(data.error || "Unable to update asset.");
     router.push("/admin");

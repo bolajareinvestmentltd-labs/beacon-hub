@@ -17,50 +17,50 @@ export default function TermsPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">1. Agreement to Terms</h2>
           <p>
-            By accessing and using www.beacon-hub.com.ng (the "Service"), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
+            By accessing and using www.beacon-hub.com.ng (the &quot;Service&quot;), you accept and agree to be bound by the terms and provision of this agreement. If you do not agree to abide by the above, please do not use this service.
           </p>
         </section>
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">2. Use License</h2>
           <p>
-            Permission is granted to temporarily download one copy of the materials (information or software) on Beacon-Hub's Service for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
+            Permission is granted to temporarily download one copy of the materials (information or software) on Beacon-Hub&apos;s Service for personal, non-commercial transitory viewing only. This is the grant of a license, not a transfer of title, and under this license you may not:
           </p>
           <ul className="list-disc pl-6 mb-4">
             <li>Modify or copy the materials</li>
             <li>Use the materials for any commercial purpose or for any public display</li>
             <li>Attempt to decompile or reverse engineer any software contained on the Service</li>
             <li>Remove any copyright or other proprietary notations from the materials</li>
-            <li>Transmit the materials to anyone else or "mirror" the materials on any other server</li>
-            <li>Transfer the materials to another person or "mirror" the materials on any other server</li>
+            <li>Transmit the materials to anyone else or &quot;mirror&quot; the materials on any other server</li>
+            <li>Transfer the materials to another person or &quot;mirror&quot; the materials on any other server</li>
           </ul>
         </section>
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">3. Disclaimer</h2>
           <p>
-            The materials on Beacon-Hub's Service are provided as is. Beacon-Hub makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
+            The materials on Beacon-Hub&apos;s Service are provided as is. Beacon-Hub makes no warranties, expressed or implied, and hereby disclaims and negates all other warranties including, without limitation, implied warranties or conditions of merchantability, fitness for a particular purpose, or non-infringement of intellectual property or other violation of rights.
           </p>
         </section>
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">4. Limitations</h2>
           <p>
-            In no event shall Beacon-Hub or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Beacon-Hub's Service, even if Beacon-Hub or an authorized representative has been notified orally or in writing of the possibility of such damage.
+            In no event shall Beacon-Hub or its suppliers be liable for any damages (including, without limitation, damages for loss of data or profit, or due to business interruption) arising out of the use or inability to use the materials on Beacon-Hub&apos;s Service, even if Beacon-Hub or an authorized representative has been notified orally or in writing of the possibility of such damage.
           </p>
         </section>
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">5. Accuracy of Materials</h2>
           <p>
-            The materials appearing on Beacon-Hub's Service could include technical, typographical, or photographic errors. Beacon-Hub does not warrant that any of the materials on the Service are accurate, complete, or current. Beacon-Hub may make changes to the materials contained on the Service at any time without notice.
+            The materials appearing on Beacon-Hub&apos;s Service could include technical, typographical, or photographic errors. Beacon-Hub does not warrant that any of the materials on the Service are accurate, complete, or current. Beacon-Hub may make changes to the materials contained on the Service at any time without notice.
           </p>
         </section>
 
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">6. Links</h2>
           <p>
-            Beacon-Hub has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by Beacon-Hub of the site. Use of any such linked website is at the user's own risk.
+            Beacon-Hub has not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The inclusion of any link does not imply endorsement by Beacon-Hub of the site. Use of any such linked website is at the user&apos;s own risk.
           </p>
         </section>
 

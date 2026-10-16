@@ -118,7 +118,7 @@ export default function AboutPage() {
         <section className="mb-12">
           <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">Contact & Support</h2>
           <p>
-            Have questions or feedback? We'd love to hear from you!
+            Have questions or feedback? We&apos;d love to hear from you!
           </p>
           <p className="mt-4">
             <strong>Email:</strong> support@beacon-hub.com<br />

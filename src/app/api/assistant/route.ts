@@ -51,7 +51,10 @@ export async function POST(request: Request) {
     .orderBy(desc(articles.publishedAt))
     .limit(articleId ? 1 : 5);
 
-  const candidates = matches.map(({ content: _content, ...article }) => article);
+  const candidates = matches.map(({ content, ...article }) => {
+    void content;
+    return article;
+  });
   if (!matches.length) {
     const latest = await db.select({ id: articles.id, slug: articles.slug, title: articles.title, category: articles.category, excerpt: articles.excerpt, coverImage: articles.coverImage, publishedAt: articles.publishedAt })
       .from(articles)

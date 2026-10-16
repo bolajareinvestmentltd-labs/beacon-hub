@@ -17,7 +17,7 @@ export default function PrivacyPage() {
         <section className="mb-8">
           <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">1. Introduction</h2>
           <p>
-            Beacon-Hub ("we," "us," "our," or "Company") operates the www.beacon-hub.com.ng website (the "Service"). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.
+            Beacon-Hub (&quot;we,&quot; &quot;us,&quot; &quot;our,&quot; or &quot;Company&quot;) operates the www.beacon-hub.com.ng website (the &quot;Service&quot;). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website.
           </p>
           <p>
             Please read this Privacy Policy carefully. If you do not agree with our policies and practices, please do not use our Service.
@@ -69,7 +69,7 @@ export default function PrivacyPage() {
             When advertising is enabled, Beacon-Hub may display Google AdSense advertisements. Google and its partners may use cookies and other tracking technologies to serve ads based on your prior visits to our site and other websites, subject to your consent and applicable law. These technologies can personalize ads and measure campaign performance.
           </p>
           <p className="mt-3">
-            You can manage advertising personalization by visiting Google's{" "}
+            You can manage advertising personalization by visiting Google&apos;s{" "}
             <a href="https://adssettings.google.com" className="text-[#9C4A3A] underline">
               Ads Settings
             </a>
@@ -138,7 +138,7 @@ export default function PrivacyPage() {
         </section>
 
         <section className="mb-8">
-          <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">10. Children's Privacy</h2>
+          <h2 className="text-2xl font-semibold mb-4 text-[#9C4A3A]">10. Children&apos;s Privacy</h2>
           <p>
             Our Service is not directed to children under 13. We do not knowingly collect personal information from children under 13. If we become aware that we have collected such information, we will delete it promptly.
           </p>
