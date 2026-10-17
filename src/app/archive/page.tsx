@@ -1,9 +1,8 @@
 import { neon } from "@neondatabase/serverless";
 import Link from "next/link";
 import { Database } from "lucide-react";
+import { connection } from "next/server";
 import { z } from "zod";
-
-export const revalidate = 60;
 
 type ArchiveArticle = {
   id: number;
@@ -22,6 +21,7 @@ const ArchiveArticleSchema = z.object({
 });
 
 export default async function ArchivePage() {
+  await connection();
   const sql = neon(process.env.DATABASE_URL || "");
   
   let articles: ArchiveArticle[] = [];

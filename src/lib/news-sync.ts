@@ -1,6 +1,7 @@
 import { db } from '@/db';
 import { articles } from '@/db/schema';
 import { eq } from 'drizzle-orm';
+import { sanitizePublicArticleImage } from '@/lib/contentValidator';
 
 export type NewsArticleInput = {
   title?: string;
@@ -37,7 +38,7 @@ function toExcerpt(value?: string | null, fallback = 'No summary available.') {
 }
 
 export function normalizeIncomingArticle(article: NewsArticleInput) {
-  const title = article.title?.trim() || 'Untitled article';
+  const title = article.title?.replace(/<[^>]*>/g, '').replace(/[<>]/g, '').trim() || 'Untitled article';
   const category = article.category?.trim() || 'World';
   const content = article.content?.trim() || article.excerpt?.trim() || 'No content available.';
   const excerpt = toExcerpt(article.excerpt || content, content);
@@ -55,7 +56,7 @@ export function normalizeIncomingArticle(article: NewsArticleInput) {
     category,
     content,
     excerpt,
-    coverImage: article.image_url || article.imageUrl || null,
+    coverImage: sanitizePublicArticleImage(article.image_url || article.imageUrl || null),
     isBreaking,
     isSponsored,
     publishedAt: article.published_at || article.publishedAt || new Date(),

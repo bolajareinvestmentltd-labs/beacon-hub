@@ -4,6 +4,16 @@ const isDevelopment = process.env.NODE_ENV !== "production";
 const nextConfig: NextConfig = {
   // Allow your local phone IP to connect to the dev server
   allowedDevOrigins: ['192.168.43.104'],
+
+  async redirects() {
+    return [
+      {
+        source: '/read/h1-happy-66th-birthday-to-our-first-lady-h1-5449',
+        destination: '/read/happy-66th-birthday-to-our-first-lady-2360',
+        permanent: true,
+      },
+    ];
+  },
   
   // Security headers
   async headers() {
@@ -48,6 +58,26 @@ const nextConfig: NextConfig = {
       // GNews API image sources
       { protocol: 'https', hostname: '**.gstatic.com' },
       { protocol: 'https', hostname: '**.googleusercontent.com' },
+      { protocol: 'https', hostname: 'gazettengr.com' },
+      { protocol: 'https', hostname: 'theeagleonline.com.ng' },
+      { protocol: 'https', hostname: 'channelstv.com' },
+      { protocol: 'https', hostname: 'www.channelstv.com' },
+      { protocol: 'https', hostname: 'hjtyxwizpakpaxl7.public.blob.vercel-storage.com' },
+      { protocol: 'https', hostname: 'humanglemedia.com' },
+      { protocol: 'https', hostname: 'astrobiology.com' },
+      { protocol: 'https', hostname: 'cdn.legit.ng' },
+      { protocol: 'https', hostname: 'cdn.guardian.ng' },
+      { protocol: 'https', hostname: 'd1jcea4y7xhp7l.cloudfront.net' },
+      { protocol: 'https', hostname: 'punchng.com' },
+      { protocol: 'https', hostname: 'cdn.punchng.com' },
+      { protocol: 'https', hostname: '**.gazettengr.com' },
+      { protocol: 'https', hostname: '**.theeagleonline.com.ng' },
+      { protocol: 'https', hostname: '**.punchng.com' },
+      { protocol: 'https', hostname: '**.images.unsplash.com' },
+      { protocol: 'https', hostname: '**.unsplash.com' },
+      { protocol: 'https', hostname: '**.pexels.com' },
+      { protocol: 'https', hostname: '**.wikimedia.org' },
+      { protocol: 'https', hostname: '**.flickr.com' },
       
       // Common news CDN domains
       { protocol: 'https', hostname: '**.cdn.com' },

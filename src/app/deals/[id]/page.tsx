@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { ShieldCheck, Lock, AlertCircle, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { db } from "@/db";
@@ -45,12 +46,14 @@ export default async function EscrowDetailPage({
         {/* LEFT COLUMN: Asset Intelligence */}
         <div className="lg:col-span-2 flex flex-col gap-8">
           <div className="w-full h-[400px] bg-slate-200 dark:bg-[#1C1C1E] rounded-xl overflow-hidden border border-black/10 dark:border-white/10 relative">
-            <img
-              src={asset.imageUrl || ""}
+            <Image
+              src={asset.imageUrl || "/logo.png"}
               alt={asset.title}
-              className="w-full h-full object-cover"
+              fill
+              sizes="(max-width: 1024px) 100vw, 66vw"
+              className="object-cover"
             />
-            <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-md text-white px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-widest flex items-center gap-2">
+            <div className="absolute top-4 left-4 bg-black/80 backdrop-blur-md text-white px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-widest flex items-center gap-2 z-10">
               <Lock size={12} className="text-[#E2725B]" /> Verified Asset
             </div>
           </div>

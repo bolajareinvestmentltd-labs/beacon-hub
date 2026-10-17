@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ShieldCheck, ArrowRight, Image as ImageIcon } from "lucide-react";
 import { db } from "@/db";
@@ -38,11 +39,15 @@ export default async function DealsPage() {
             >
               <div className="w-full aspect-[4/3] md:aspect-[16/9] bg-slate-200 dark:bg-[#1C1C1E] relative overflow-hidden">
                 {deal.imageUrl ? (
-                  <img
-                    src={deal.imageUrl}
-                    alt={deal.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                  />
+                  <div className="absolute inset-0 overflow-hidden">
+                    <Image
+                      src={deal.imageUrl}
+                      alt={deal.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, 50vw"
+                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                    />
+                  </div>
                 ) : (
                   <div className="w-full h-full flex items-center justify-center">
                     <ImageIcon className="text-slate-400" size={32} />

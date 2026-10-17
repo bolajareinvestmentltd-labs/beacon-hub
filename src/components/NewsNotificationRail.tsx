@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { ChevronDown, ChevronUp, Radio } from 'lucide-react';
 import { useState } from 'react';
+import { sanitizePublicArticleImage } from '@/lib/contentValidator';
 
 type NewsNotification = {
   id: number;
@@ -54,8 +55,10 @@ export default function NewsNotificationRail({ articles }: { articles: NewsNotif
                   </span>
                   <span className="mt-1 block line-clamp-2 text-sm font-bold leading-5 text-foreground sm:text-base">{article.title}</span>
                 </button>
-                <Link href={`/read/${article.slug}`} aria-label={`Read ${article.title}`} className="relative h-12 w-16 shrink-0 overflow-hidden rounded-md bg-muted sm:h-14 sm:w-20">
-                  <Image src={article.coverImage || '/logo.png'} alt="" fill sizes="80px" unoptimized className="object-cover object-center" />
+                <Link href={`/read/${article.slug}`} aria-label={`Read ${article.title}`} className="relative grid h-12 w-16 shrink-0 place-items-center overflow-hidden rounded-md bg-muted sm:h-14 sm:w-20">
+                  {sanitizePublicArticleImage(article.coverImage) ? (
+                    <Image src={sanitizePublicArticleImage(article.coverImage)!} alt="" fill sizes="80px" unoptimized className="object-cover object-center" />
+                  ) : <span className="text-[8px] font-medium text-muted-foreground">No cover</span>}
                 </Link>
                 <button type="button" onClick={() => setExpanded(isExpanded ? null : article.id)} aria-label={isExpanded ? 'Collapse alert' : 'Expand alert'} aria-expanded={isExpanded} className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-muted text-foreground hover:bg-primary/10 hover:text-primary">
                   {isExpanded ? <ChevronUp size={17} /> : <ChevronDown size={17} />}
@@ -64,8 +67,10 @@ export default function NewsNotificationRail({ articles }: { articles: NewsNotif
               {isExpanded && (
                 <div className="border-t border-border px-3 pb-4 pt-3 sm:px-4">
                   <p className="mb-3 text-sm leading-6 text-muted-foreground">{article.excerpt}</p>
-                  <Link href={`/read/${article.slug}`} className="relative mb-3 block aspect-video w-full overflow-hidden rounded-lg bg-muted">
-                    <Image src={article.coverImage || '/logo.png'} alt={article.title} fill sizes="(max-width: 768px) calc(100vw - 3rem), 720px" unoptimized className="object-cover object-center" />
+                  <Link href={`/read/${article.slug}`} className="relative mb-3 grid aspect-video w-full place-items-center overflow-hidden rounded-lg bg-muted">
+                    {sanitizePublicArticleImage(article.coverImage) ? (
+                      <Image src={sanitizePublicArticleImage(article.coverImage)!} alt={article.title} fill sizes="(max-width: 768px) calc(100vw - 3rem), 720px" unoptimized className="object-cover object-center" />
+                    ) : <span className="text-xs font-medium text-muted-foreground">No cover image</span>}
                   </Link>
                   <Link href={`/read/${article.slug}`} className="text-sm font-bold text-primary hover:underline">Open full story</Link>
                 </div>

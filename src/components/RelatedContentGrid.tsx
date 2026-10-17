@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
+import { sanitizePublicArticleImage } from '@/lib/contentValidator';
 
 interface RelatedArticle {
   id: number;
@@ -39,28 +40,31 @@ export default function RelatedContentGrid({
 
       {/* Grid Layout: 3 columns desktop, 2 tablet, 1 mobile */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 md:gap-6">
-        {displayArticles.map((article) => (
-          <Link
-            key={article.id}
-            href={`/read/${article.slug}`}
-            className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card/55 transition-all duration-300 hover:border-primary hover:bg-card/85 hover:shadow-xl"
-          >
-            {/* Card Container with hover effect */}
-            <div className="relative h-44 overflow-hidden bg-muted md:h-52">
-              {/* Thumbnail Image */}
-              {article.coverImage ? (
-                <Image
-                  src={article.coverImage}
-                  alt={article.title}
-                  fill
-                  unoptimized
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                />
-              ) : (
-                <div className="app-gradient-cool flex h-full w-full items-center justify-center">
-                  <span className="text-sm font-medium text-foreground/70">No Image</span>
-                </div>
-              )}
+        {displayArticles.map((article) => {
+          const safeCoverImage = sanitizePublicArticleImage(article.coverImage);
+
+          return (
+            <Link
+              key={article.id}
+              href={`/read/${article.slug}`}
+              className="group relative flex flex-col overflow-hidden rounded-xl border border-border bg-card/55 transition-all duration-300 hover:border-primary hover:bg-card/85 hover:shadow-xl"
+            >
+              {/* Card Container with hover effect */}
+              <div className="relative h-44 overflow-hidden bg-muted md:h-52">
+                {/* Thumbnail Image */}
+                {safeCoverImage ? (
+                  <Image
+                    src={safeCoverImage}
+                    alt={article.title}
+                    fill
+                    unoptimized
+                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-muted">
+                    <span className="text-sm font-medium text-muted-foreground">No cover image</span>
+                  </div>
+                )}
 
               {/* Category Badge Overlay */}
               <div className="absolute top-3 left-3">
@@ -114,8 +118,9 @@ export default function RelatedContentGrid({
                 />
               </svg>
             </div>
-          </Link>
-        ))}
+            </Link>
+          );
+        })}
       </div>
 
       {/* View All Link */}

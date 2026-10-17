@@ -1,5 +1,6 @@
 import { getArticleBySlug, getRelatedArticles, incrementArticleViews } from "@/lib/queries";
 import { normalizeArticleSlug, slugToArticleTitle } from "@/lib/metadata";
+import { sanitizePublicArticleImage } from "@/lib/contentValidator";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import EditorialColumnComponent from "@/components/EditorialColumnComponent";
@@ -150,7 +151,10 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
 
   // Calculate reading time from content
   const readingTime = getReadingTimeString(articleData.content);
-  const featuredImageUrl = toAbsoluteHttpsUrl(articleData.coverImage, fallbackImageUrl);
+  const safeArticleImage = sanitizePublicArticleImage(articleData.coverImage);
+  const featuredImageUrl = safeArticleImage
+    ? toAbsoluteHttpsUrl(safeArticleImage, fallbackImageUrl)
+    : null;
 
   return (
     <div className="w-full min-w-0 overflow-x-hidden bg-gradient-to-b from-background via-muted to-background pb-24 text-foreground md:pb-0">
@@ -218,15 +222,21 @@ export default async function ArticlePage({ params }: { params: Promise<{ slug: 
         {/* Featured Image */}
         <div className="my-8 w-full sm:my-12 md:my-16">
           <div className="relative aspect-video w-full overflow-hidden rounded-xl bg-muted shadow-xl">
-            <Image
-              src={featuredImageUrl}
-              alt={articleData.title}
-              fill
-              sizes="(max-width: 768px) calc(100vw - 2.5rem), 896px"
-              unoptimized
-              loading="eager"
-              className="object-cover object-center"
-            />
+            {featuredImageUrl ? (
+              <Image
+                src={featuredImageUrl}
+                alt={articleData.title}
+                fill
+                sizes="(max-width: 768px) calc(100vw - 2.5rem), 896px"
+                unoptimized
+                loading="eager"
+                className="object-cover object-center"
+              />
+            ) : (
+              <div className="flex h-full items-center justify-center bg-muted text-sm font-medium text-muted-foreground">
+                No cover image available
+              </div>
+            )}
           </div>
         </div>
       </div>

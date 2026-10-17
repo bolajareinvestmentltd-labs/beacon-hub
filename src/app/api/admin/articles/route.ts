@@ -70,7 +70,7 @@ export async function POST(request: Request) {
 
   try {
     const formData = await request.formData();
-    const title = String(formData.get("title") || "").trim();
+    const title = String(formData.get("title") || "").replace(/<[^>]*>/g, "").replace(/[<>]/g, "").trim();
     const category = String(formData.get("category") || "Top News").trim();
     const content = String(formData.get("content") || "").trim();
     const excerpt = String(formData.get("excerpt") || "").trim();

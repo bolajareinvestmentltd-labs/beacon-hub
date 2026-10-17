@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import Image from 'next/image';
 import { ReactNode, useEffect, useState } from 'react';
+import { sanitizePublicArticleImage } from '@/lib/contentValidator';
 
 interface HeroArticle {
   id: number;
@@ -49,6 +50,7 @@ export default function AsymmetricalHeroLayout({
   const slides = story ? [story, ...feedArticles] : [];
   const slideCount = slides.length;
   const current = slides[activeSlide % Math.max(slideCount, 1)];
+  const safeCurrentImage = sanitizePublicArticleImage(current?.coverImage);
 
   useEffect(() => {
     if (slideCount < 2 || isPaused) return;
@@ -92,9 +94,9 @@ export default function AsymmetricalHeroLayout({
       {headerAd ? <div className="border-b border-border/70 p-3 text-center">{headerAd}</div> : null}
       <article key={current.slug} className="grid min-w-0 lg:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)]">
         <Link href={`/read/${current.slug}`} className="group relative block aspect-[16/9] min-h-0 overflow-hidden bg-muted lg:aspect-auto lg:min-h-[24rem]">
-          {current.coverImage ? (
+          {safeCurrentImage ? (
             <Image
-              src={current.coverImage}
+              src={safeCurrentImage}
               alt={current.title}
               fill
               unoptimized

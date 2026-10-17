@@ -1,5 +1,7 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import { getArticlesByCategory } from '@/lib/queries';
+import { sanitizePublicArticleImage } from '@/lib/contentValidator';
 
 interface CategoryPageProps {
   params: Promise<{
@@ -44,12 +46,16 @@ export default async function DynamicCategoryPage({ params }: CategoryPageProps)
                 key={article.id || index}
                 className="group block rounded-sm border border-border/80 bg-card/55 p-6 transition-all duration-300 hover:border-accent/60 hover:bg-card/80"
               >
-                {article.coverImage && (
-                  <img 
-                    src={article.coverImage} 
-                    alt={article.title}
-                    className="w-full h-48 object-cover grayscale group-hover:grayscale-0 transition-all duration-500 mb-4 rounded-sm"
-                  />
+                {sanitizePublicArticleImage(article.coverImage) && (
+                  <div className="relative mb-4 h-48 overflow-hidden rounded-sm">
+                    <Image
+                      src={sanitizePublicArticleImage(article.coverImage) || '/logo.png'}
+                      alt={article.title}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                      className="object-cover grayscale transition-all duration-500 group-hover:grayscale-0"
+                    />
+                  </div>
                 )}
                 <span className="mb-2 block text-xs font-mono font-bold text-accent">
                   {article.category}

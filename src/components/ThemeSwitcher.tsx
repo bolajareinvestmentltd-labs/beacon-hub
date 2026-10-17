@@ -2,9 +2,17 @@
 
 import { Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
+import { useEffect, useState } from "react";
 
 export function ThemeSwitcher() {
+  const [mounted, setMounted] = useState(false);
   const { resolvedTheme, setTheme } = useTheme();
+  useEffect(() => setMounted(true), []);
+
+  if (!mounted) {
+    return <span className="inline-flex h-9 w-9" aria-hidden="true" />;
+  }
+
   const isDark = resolvedTheme === "dark";
 
   return (

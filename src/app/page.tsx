@@ -1,4 +1,5 @@
-﻿import Link from 'next/link';
+﻿import Image from 'next/image';
+import Link from 'next/link';
 import AsymmetricalHeroLayout from '@/components/AsymmetricalHeroLayout';
 import SectionHeaderComponent from '@/components/SectionHeaderComponent';
 import * as queries from '@/lib/queries';
@@ -10,6 +11,7 @@ import { getArticles, getArticlesByCategory, getEditorialSections } from '@/lib/
 import { TAXONOMY } from '@/config/taxonomy';
 import PushNotificationOptIn from '@/components/PushNotificationOptIn';
 import NewsNotificationRail from '@/components/NewsNotificationRail';
+import { sanitizePublicArticleImage } from '@/lib/contentValidator';
 
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL?.startsWith('https://')
   ? process.env.NEXT_PUBLIC_SITE_URL
@@ -22,7 +24,7 @@ export async function generateMetadata(): Promise<Metadata> {
     ? `${latestArticle.title} | Beacon Hub`
     : 'Beacon Hub - Premium News Platform';
   const description = latestArticle?.excerpt || 'World-class news journalism with premium editorial design';
-  const image = latestArticle?.coverImage || fallbackImage;
+  const image = sanitizePublicArticleImage(latestArticle?.coverImage) || fallbackImage;
 
   return {
     title,
@@ -228,15 +230,23 @@ export default async function HomePage() {
               </div>
               {section.articles.length > 0 ? (
                 <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-                  {section.articles.map((article) => (
+                  {section.articles.map((article) => {
+                    const coverImage = sanitizePublicArticleImage(article.coverImage);
+
+                    return (
                     <Link key={article.id} href={`/read/${article.slug}`} className="group min-w-0 border-b border-border/70 pb-4">
                       <div className="relative mb-3 aspect-video w-full overflow-hidden rounded-lg bg-muted">
-                        <img
-                          src={article.coverImage || '/logo.png'}
-                          alt=""
-                          loading="lazy"
-                          className="h-full w-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                        />
+                        {coverImage ? (
+                          <Image
+                            src={coverImage}
+                            alt={article.title || 'Article cover'}
+                            fill
+                            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
+                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                          />
+                        ) : (
+                          <div className="flex h-full items-center justify-center bg-muted text-xs font-medium text-muted-foreground">No cover image</div>
+                        )}
                       </div>
                       <p className="mb-1 font-mono text-[9px] text-muted-foreground">{article.category}</p>
                       <h3 className="line-clamp-3 text-base font-bold leading-snug text-foreground transition-colors group-hover:text-primary">
@@ -244,7 +254,8 @@ export default async function HomePage() {
                       </h3>
                       <p className="mt-2 line-clamp-2 text-xs leading-5 text-muted-foreground">{article.excerpt}</p>
                     </Link>
-                  ))}
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="text-sm text-muted-foreground">This desk is warming up. New headlines arrive with the next feed update.</p>

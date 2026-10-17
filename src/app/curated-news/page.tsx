@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import { sanitizePublicArticleImage } from '@/lib/contentValidator';
 
 export const revalidate = 3600;
 
@@ -11,11 +12,9 @@ const fallbackImageUrl = new URL('/logo.png', siteUrl).toString();
 const curatedNewsDescription = 'Independent summaries of the latest technology and innovation reporting, with links to original sources.';
 
 function toAbsoluteHttpsUrl(value?: string | null) {
-  if (!value) return fallbackImageUrl;
-
   try {
-    const url = new URL(value, siteUrl);
-    return url.protocol === 'https:' ? url.toString() : fallbackImageUrl;
+    const safeImage = sanitizePublicArticleImage(value);
+    return safeImage ? new URL(safeImage, siteUrl).toString() : fallbackImageUrl;
   } catch {
     return fallbackImageUrl;
   }

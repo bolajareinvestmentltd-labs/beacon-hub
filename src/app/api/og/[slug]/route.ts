@@ -1,5 +1,6 @@
 import { getArticleBySlug } from '@/lib/queries';
 import { normalizeArticleSlug } from '@/lib/metadata';
+import { sanitizePublicArticleImage } from '@/lib/contentValidator';
 
 export const dynamic = 'force-dynamic';
 
@@ -21,7 +22,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ slug
 
   try {
     const article = await getArticleBySlug(normalizeArticleSlug(slug) || slug);
-    const cover = article?.coverImage ? String(article.coverImage) : '';
+    const cover = sanitizePublicArticleImage(article?.coverImage ? String(article.coverImage) : null);
     if (!cover) return fallbackRedirect(request);
 
     const source = new URL(cover, request.url);

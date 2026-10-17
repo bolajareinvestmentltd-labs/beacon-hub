@@ -1,8 +1,10 @@
 'use client';
 
+import Image from 'next/image';
 import Link from 'next/link';
 import { ArrowUpRight, Send, Sparkles, X } from 'lucide-react';
 import { useState } from 'react';
+import { sanitizePublicArticleImage } from '@/lib/contentValidator';
 
 type AssistantArticle = {
   id: number;
@@ -67,8 +69,10 @@ export default function NewsAssistant() {
             {error && <p role="alert" className="text-sm text-red-600 dark:text-red-400">{error}</p>}
             {articles.map((article) => (
               <Link key={article.id} href={`/read/${article.slug}`} onClick={() => setOpen(false)} className="flex gap-3 rounded-lg border border-border p-2 transition-colors hover:bg-muted">
-                <div className="h-16 w-20 shrink-0 overflow-hidden rounded-md bg-muted">
-                  <img src={article.coverImage || '/logo.png'} alt="" loading="lazy" className="h-full w-full object-cover" />
+                <div className="relative grid h-16 w-20 shrink-0 place-items-center overflow-hidden rounded-md bg-muted">
+                  {sanitizePublicArticleImage(article.coverImage) ? (
+                    <Image src={sanitizePublicArticleImage(article.coverImage)!} alt="" fill sizes="80px" className="object-cover" />
+                  ) : <span className="text-[8px] font-medium text-muted-foreground">No cover</span>}
                 </div>
                 <div className="min-w-0">
                   <p className="font-mono text-[9px] text-primary">{article.category}</p>

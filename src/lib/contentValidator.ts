@@ -1,5 +1,90 @@
 import { z } from 'zod';
 
+const SAFE_PUBLIC_IMAGE_HOST_PATTERNS = [
+  /^images\.unsplash\.com$/,
+  /^images\.pexels\.com$/,
+  /^images\.ctfassets\.net$/,
+  /^res\.cloudinary\.com$/,
+  /^upload\.wikimedia\.org$/,
+  /^media\.giphy\.com$/,
+  /^.*\.gstatic\.com$/,
+  /^.*\.googleusercontent\.com$/,
+  /^.*\.fastly\.net$/,
+  /^.*\.akamaized\.net$/,
+  /^.*\.cloudfront\.net$/,
+  /^.*\.cdn\.com$/,
+  /^.*\.bbc\.co\.uk$/,
+  /^.*\.bbc\.com$/,
+  /^.*\.cnn\.com$/,
+  /^.*\.reuters\.com$/,
+  /^.*\.apnews\.com$/,
+  /^.*\.theguardian\.com$/,
+  /^.*\.nytimes\.com$/,
+  /^gazettengr\.com$/,
+  /^.*\.gazettengr\.com$/,
+  /^theeagleonline\.com\.ng$/,
+  /^.*\.theeagleonline\.com\.ng$/,
+  /^channelstv\.com$/,
+  /^.*\.channelstv\.com$/,
+  /^hjtyxwizpakpaxl7\.public\.blob\.vercel-storage\.com$/,
+  /^humanglemedia\.com$/,
+  /^.*\.humanglemedia\.com$/,
+  /^astrobiology\.com$/,
+  /^.*\.astrobiology\.com$/,
+  /^cdn\.legit\.ng$/,
+  /^cdn\.guardian\.ng$/,
+  /^d1jcea4y7xhp7l\.cloudfront\.net$/,
+  /^punchng\.com$/,
+  /^.*\.punchng\.com$/,
+  /^cdn\.punchng\.com$/,
+  /^.*\.wsj\.com$/,
+  /^beacon-hub\.com\.ng$/,
+  /^www\.beacon-hub\.com\.ng$/,
+];
+
+export function sanitizePublicArticleImage(value?: string | null): string | null {
+  if (!value || typeof value !== 'string') return null;
+
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  if (/^(?:data|blob|javascript|vbscript):/i.test(trimmed)) return null;
+
+  if (trimmed.startsWith('/')) {
+    return trimmed;
+  }
+
+  try {
+    const parsed = new URL(trimmed);
+    const protocol = parsed.protocol.toLowerCase();
+    const hostname = parsed.hostname.toLowerCase();
+
+    if (protocol !== 'https:') return null;
+    if (['localhost', '127.0.0.1', '0.0.0.0', '::1'].includes(hostname) || hostname.endsWith('.local')) {
+      return null;
+    }
+
+    const pathname = parsed.pathname.toLowerCase();
+    if (pathname.endsWith('.svg') || pathname.endsWith('.svgz') || pathname.includes('javascript:')) {
+      return null;
+    }
+    if (/(?:^|[\/_-])(logo|icon|favicon)(?:$|[\/_-])/.test(pathname)) {
+      return null;
+    }
+
+    const isAllowedHost = SAFE_PUBLIC_IMAGE_HOST_PATTERNS.some((pattern) => pattern.test(hostname));
+    if (!isAllowedHost) return null;
+
+    return parsed.toString();
+  } catch {
+    return null;
+  }
+}
+
+export function resolveSafeShareImage(value?: string | null, fallback = '/beacon-hub-lockup.png') {
+  return sanitizePublicArticleImage(value) || fallback;
+}
+
 // ======================================================
 // STRUCTURED OUTPUT SCHEMAS FOR GEMINI 3.1 PRO
 // ======================================================

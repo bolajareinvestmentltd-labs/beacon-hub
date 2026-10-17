@@ -8,6 +8,7 @@ import { articles } from "@/db/schema";
 import { verifyAdminSessionToken } from "@/lib/server-auth";
 import { runDbOperation } from "@/lib/db-utils";
 import { sanitizeHTML, sanitizeInput } from "@/lib/sanitize";
+import { sanitizePublicArticleImage } from "@/lib/contentValidator";
 
 const EditArticleSchema = z.object({
   title: z.string().trim().min(3).max(200),
@@ -100,7 +101,7 @@ export async function PATCH(req: Request, { params }: { params: Promise<{ id: st
   const author = sanitizeInput(parsed.data.author).trim();
   const excerpt = sanitizeHTML(parsed.data.excerpt).trim();
   const content = sanitizeHTML(parsed.data.content).trim();
-  const coverImage = parsed.data.coverImage ? sanitizeInput(parsed.data.coverImage).trim() : null;
+  const coverImage = sanitizePublicArticleImage(parsed.data.coverImage ?? null);
 
   try {
     const result = await runDbOperation(() =>
